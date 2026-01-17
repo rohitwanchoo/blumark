@@ -64,11 +64,11 @@
                                     @enderror
                                 </div>
 
-                                <div x-data="phoneInput()">
+                                <div>
                                     <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                                     <input type="tel" name="phone" id="phone"
-                                           x-model="phone"
-                                           @input="formatPhone"
+                                           value="{{ old('phone', $user->getFormattedPhone()) }}"
+                                           oninput="formatPhoneInput(this)"
                                            class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border @error('phone') border-red-500 @enderror"
                                            placeholder="+1 (555) 123-4567">
                                     @error('phone')
@@ -226,33 +226,47 @@
     </div>
 
     <script>
-        function phoneInput() {
-            return {
-                phone: '{{ old('phone', $user->getFormattedPhone()) }}',
-                formatPhone() {
-                    // Remove all non-numeric characters
-                    let digits = this.phone.replace(/\D/g, '');
+        function formatPhoneInput(input) {
+            // Get cursor position
+            let cursorPos = input.selectionStart;
+            let oldLength = input.value.length;
 
-                    // Remove leading 1 if present (we'll add it back formatted)
-                    if (digits.startsWith('1') && digits.length > 10) {
-                        digits = digits.substring(1);
-                    }
+            // Remove all non-numeric characters
+            let digits = input.value.replace(/\D/g, '');
 
-                    // Limit to 10 digits (excluding country code)
-                    digits = digits.substring(0, 10);
-
-                    // Format the number
-                    if (digits.length === 0) {
-                        this.phone = '';
-                    } else if (digits.length <= 3) {
-                        this.phone = '+1 (' + digits;
-                    } else if (digits.length <= 6) {
-                        this.phone = '+1 (' + digits.substring(0, 3) + ') ' + digits.substring(3);
-                    } else {
-                        this.phone = '+1 (' + digits.substring(0, 3) + ') ' + digits.substring(3, 6) + '-' + digits.substring(6);
-                    }
-                }
+            // Remove leading 1 if present (we'll add it back formatted)
+            if (digits.startsWith('1') && digits.length > 10) {
+                digits = digits.substring(1);
             }
+
+            // Limit to 10 digits (excluding country code)
+            digits = digits.substring(0, 10);
+
+            // Format the number
+            let formatted = '';
+            if (digits.length === 0) {
+                formatted = '';
+            } else if (digits.length <= 3) {
+                formatted = '+1 (' + digits;
+            } else if (digits.length <= 6) {
+                formatted = '+1 (' + digits.substring(0, 3) + ') ' + digits.substring(3);
+            } else {
+                formatted = '+1 (' + digits.substring(0, 3) + ') ' + digits.substring(3, 6) + '-' + digits.substring(6);
+            }
+
+            // Update value
+            input.value = formatted;
+
+            // Adjust cursor position
+            let newLength = formatted.length;
+            let newCursorPos = cursorPos + (newLength - oldLength);
+            if (newCursorPos < 0) newCursorPos = 0;
+            if (newCursorPos > newLength) newCursorPos = newLength;
+
+            // Set cursor position after a brief delay
+            setTimeout(() => {
+                input.setSelectionRange(newCursorPos, newCursorPos);
+            }, 0);
         }
     </script>
 </x-app-layout>
