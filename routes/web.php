@@ -8,6 +8,7 @@ use App\Http\Controllers\CreditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\PricingController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\WatermarkJobController;
 use App\Http\Controllers\WebhookController;
@@ -60,9 +61,17 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Profile
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'show'])->name('show');
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+        Route::put('/', [ProfileController::class, 'update'])->name('update');
+    });
+
     // Watermark Jobs
     Route::prefix('jobs')->name('jobs.')->group(function () {
         Route::get('/', [WatermarkJobController::class, 'index'])->name('index');
+        Route::get('/batch', [WatermarkJobController::class, 'batch'])->name('batch');
         Route::post('/', [WatermarkJobController::class, 'store'])->name('store');
         Route::get('/{job}', [WatermarkJobController::class, 'show'])->name('show');
         Route::delete('/{job}', [WatermarkJobController::class, 'destroy'])->name('destroy');

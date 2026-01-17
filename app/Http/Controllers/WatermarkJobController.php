@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreWatermarkJobRequest;
 use App\Jobs\ProcessWatermarkPdf;
 use App\Models\WatermarkJob;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -27,9 +28,49 @@ class WatermarkJobController extends Controller
     }
 
     /**
+     * Display batch results for multiple uploaded jobs.
+     */
+    public function batch(Request $request): View|RedirectResponse
+    {
+        $ids = $request->query('ids');
+
+        if (empty($ids)) {
+            return redirect()->route('jobs.index');
+        }
+
+        $jobIds = array_filter(array_map('intval', explode(',', $ids)));
+
+        if (empty($jobIds)) {
+            return redirect()->route('jobs.index');
+        }
+
+        $jobs = WatermarkJob::whereIn('id', $jobIds)
+            ->where('user_id', $request->user()->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($jobs->isEmpty()) {
+            return redirect()->route('jobs.index');
+        }
+
+        // Prepare job data for JavaScript
+        $jobsData = $jobs->map(function ($job) {
+            return [
+                'id' => $job->id,
+                'status' => $job->status,
+                'error_message' => $job->error_message,
+                'page_count' => $job->page_count,
+                'can_download' => $job->isDone() && $job->outputExists(),
+            ];
+        })->values()->toArray();
+
+        return view('jobs.batch', compact('jobs', 'jobsData'));
+    }
+
+    /**
      * Store a newly created watermark job.
      */
-    public function store(StoreWatermarkJobRequest $request): RedirectResponse
+    public function store(StoreWatermarkJobRequest $request): RedirectResponse|JsonResponse
     {
         $user = $request->user();
 
@@ -66,6 +107,21 @@ class WatermarkJobController extends Controller
 
         // Dispatch the processing job
         ProcessWatermarkPdf::dispatch($watermarkJob);
+
+        // Return JSON for AJAX requests
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'File uploaded successfully',
+                'job' => [
+                    'id' => $watermarkJob->id,
+                    'filename' => $watermarkJob->original_filename,
+                    'status' => $watermarkJob->status,
+                    'file_size' => $watermarkJob->getFormattedFileSize(),
+                    'url' => route('jobs.show', $watermarkJob),
+                ],
+            ], 201);
+        }
 
         return redirect()
             ->route('jobs.show', $watermarkJob)

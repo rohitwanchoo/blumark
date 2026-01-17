@@ -8,16 +8,24 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Cashier\Billable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, Billable;
+    use HasApiTokens, HasFactory, Notifiable, Billable;
 
     protected $fillable = [
         'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
         'email_verified_at',
+        'company_name',
+        'company_type',
+        'phone',
+        'website',
+        'address',
     ];
 
     protected $hidden = [
@@ -62,6 +70,23 @@ class User extends Authenticatable
     public function hasSocialAccount(string $provider): bool
     {
         return $this->socialAccounts()->where('provider', $provider)->exists();
+    }
+
+    public function getFullName(): string
+    {
+        if ($this->first_name || $this->last_name) {
+            return trim($this->first_name . ' ' . $this->last_name);
+        }
+        return $this->name;
+    }
+
+    public function getCompanyTypeLabel(): ?string
+    {
+        return match($this->company_type) {
+            'iso' => 'ISO',
+            'funder' => 'Funder',
+            default => null,
+        };
     }
 
     public function getCredits(): int
