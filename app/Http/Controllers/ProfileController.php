@@ -45,9 +45,11 @@ class ProfileController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'company_name' => ['nullable', 'string', 'max:255'],
             'company_type' => ['nullable', 'string', Rule::in(['iso', 'funder'])],
-            'phone' => ['nullable', 'string', 'max:50'],
+            'phone' => ['nullable', 'string', 'regex:/^\+1 \(\d{3}\) \d{3}-\d{4}$/'],
             'website' => ['nullable', 'url', 'max:255'],
             'address' => ['nullable', 'string', 'max:500'],
+        ], [
+            'phone.regex' => 'Phone number must be in format +1 (XXX) XXX-XXXX',
         ]);
 
         // Update the name field as combination of first and last name
