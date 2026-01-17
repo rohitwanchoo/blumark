@@ -27,6 +27,15 @@ Route::get('/', function () {
 // Public pricing page
 Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
 
+// Legal pages
+Route::get('/privacy', function () {
+    return view('privacy');
+})->name('privacy');
+
+Route::get('/terms', function () {
+    return view('terms');
+})->name('terms');
+
 // Stripe webhooks (must be outside auth middleware)
 Route::post('/stripe/webhook', [WebhookController::class, 'handleWebhook'])->name('cashier.webhook');
 

@@ -73,9 +73,9 @@ class StoreWatermarkJobRequest extends FormRequest
         $defaults = config('watermark.defaults', []);
 
         $this->merge([
-            'opacity' => $this->input('opacity', $defaults['opacity'] ?? 50),
-            'font_size' => $this->input('font_size', $defaults['font_size'] ?? 14),
-            'color' => $this->input('color', $defaults['color'] ?? '#888888'),
+            'opacity' => $this->input('opacity', $defaults['opacity'] ?? 33),
+            'font_size' => $this->input('font_size', $defaults['font_size'] ?? 15),
+            'color' => $this->input('color', $defaults['color'] ?? '#878787'),
         ]);
     }
 

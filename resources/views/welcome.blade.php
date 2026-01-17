@@ -976,8 +976,8 @@
             <div class="border-t border-dark-700 pt-8 flex flex-col md:flex-row justify-between items-center">
                 <p class="text-sm">&copy; {{ date('Y') }} BluMark. All rights reserved.</p>
                 <div class="flex space-x-6 mt-4 md:mt-0 text-sm">
-                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="{{ route('privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="{{ route('terms') }}" class="hover:text-white transition-colors">Terms of Service</a>
                 </div>
             </div>
         </div>

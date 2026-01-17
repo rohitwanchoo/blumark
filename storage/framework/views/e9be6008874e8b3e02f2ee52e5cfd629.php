@@ -1,4 +1,13 @@
-<x-app-layout>
+<?php if (isset($component)) { $__componentOriginal4619374cef299e94fd7263111d0abc69 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4619374cef299e94fd7263111d0abc69 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.app-layout','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
     <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8" x-data="watermarkForm()">
         <!-- Page Header -->
         <div class="mb-8">
@@ -12,7 +21,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500">Total Jobs</p>
-                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ $stats['total_jobs'] }}</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1"><?php echo e($stats['total_jobs']); ?></p>
                     </div>
                     <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
                         <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,7 +34,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500">Completed</p>
-                        <p class="text-3xl font-bold text-green-600 mt-1">{{ $stats['completed_jobs'] }}</p>
+                        <p class="text-3xl font-bold text-green-600 mt-1"><?php echo e($stats['completed_jobs']); ?></p>
                     </div>
                     <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                         <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +47,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500">Pending</p>
-                        <p class="text-3xl font-bold text-yellow-600 mt-1">{{ $stats['pending_jobs'] }}</p>
+                        <p class="text-3xl font-bold text-yellow-600 mt-1"><?php echo e($stats['pending_jobs']); ?></p>
                     </div>
                     <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
                         <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +60,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500">Failed</p>
-                        <p class="text-3xl font-bold text-red-600 mt-1">{{ $stats['failed_jobs'] }}</p>
+                        <p class="text-3xl font-bold text-red-600 mt-1"><?php echo e($stats['failed_jobs']); ?></p>
                     </div>
                     <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
                         <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,8 +79,8 @@
                     <p class="text-sm text-gray-500 mt-1">Upload a document and configure your watermark settings</p>
                 </div>
                 <div class="p-6">
-                    <form method="POST" action="{{ route('jobs.store') }}" enctype="multipart/form-data">
-                        @csrf
+                    <form method="POST" action="<?php echo e(route('jobs.store')); ?>" enctype="multipart/form-data">
+                        <?php echo csrf_field(); ?>
 
                         <!-- PDF File Upload -->
                         <div class="mb-6">
@@ -80,10 +89,17 @@
                                 <input type="file" name="pdf_file" id="pdf_file" accept=".pdf" required
                                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 file:cursor-pointer cursor-pointer border border-gray-200 rounded-xl">
                             </div>
-                            <p class="mt-2 text-xs text-gray-500">Maximum file size: {{ config('watermark.max_upload_mb') }}MB</p>
-                            @error('pdf_file')
-                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
+                            <p class="mt-2 text-xs text-gray-500">Maximum file size: <?php echo e(config('watermark.max_upload_mb')); ?>MB</p>
+                            <?php $__errorArgs = ['pdf_file'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                <p class="mt-2 text-sm text-red-600"><?php echo e($message); ?></p>
+                            <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                         </div>
 
                         <!-- ISO & Lender Fields -->
@@ -93,18 +109,32 @@
                                 <input type="text" name="iso" id="iso" x-model="iso" required maxlength="50"
                                        class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border"
                                        placeholder="Enter ISO">
-                                @error('iso')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <?php $__errorArgs = ['iso'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <p class="mt-1 text-sm text-red-600"><?php echo e($message); ?></p>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             </div>
                             <div>
                                 <label for="lender" class="block text-sm font-medium text-gray-700 mb-2">Lender</label>
                                 <input type="text" name="lender" id="lender" x-model="lender" required maxlength="50"
                                        class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border"
                                        placeholder="Enter Lender">
-                                @error('lender')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
+                                <?php $__errorArgs = ['lender'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                    <p class="mt-1 text-sm text-red-600"><?php echo e($message); ?></p>
+                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                             </div>
                         </div>
 
@@ -229,7 +259,7 @@
                         <h3 class="text-lg font-semibold text-gray-900">Recent Jobs</h3>
                         <p class="text-sm text-gray-500 mt-1">Your latest watermarking jobs</p>
                     </div>
-                    <a href="{{ route('jobs.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center">
+                    <a href="<?php echo e(route('jobs.index')); ?>" class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center">
                         View all
                         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -237,7 +267,7 @@
                     </a>
                 </div>
                 <div class="p-6">
-                    @if($recentJobs->isEmpty())
+                    <?php if($recentJobs->isEmpty()): ?>
                         <div class="text-center py-12">
                             <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,10 +277,10 @@
                             <h4 class="text-sm font-medium text-gray-900 mb-1">No jobs yet</h4>
                             <p class="text-sm text-gray-500">Upload a PDF to get started!</p>
                         </div>
-                    @else
+                    <?php else: ?>
                         <div class="space-y-3">
-                            @foreach($recentJobs as $job)
-                                <a href="{{ route('jobs.show', $job) }}" class="block p-4 rounded-xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50/50 transition-all duration-200 group">
+                            <?php $__currentLoopData = $recentJobs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $job): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <a href="<?php echo e(route('jobs.show', $job)); ?>" class="block p-4 rounded-xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50/50 transition-all duration-200 group">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-3 min-w-0">
                                             <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-100 transition-colors">
@@ -259,43 +289,44 @@
                                                 </svg>
                                             </div>
                                             <div class="min-w-0">
-                                                <p class="text-sm font-medium text-gray-900 truncate">{{ $job->original_filename }}</p>
-                                                <p class="text-xs text-gray-500">{{ $job->created_at->diffForHumans() }}</p>
+                                                <p class="text-sm font-medium text-gray-900 truncate"><?php echo e($job->original_filename); ?></p>
+                                                <p class="text-xs text-gray-500"><?php echo e($job->created_at->diffForHumans()); ?></p>
                                             </div>
                                         </div>
                                         <div class="flex items-center space-x-3">
-                                            @if($job->status === 'done')
+                                            <?php if($job->status === 'done'): ?>
                                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                                     </svg>
                                                     Done
                                                 </span>
-                                            @elseif($job->status === 'pending' || $job->status === 'processing')
+                                            <?php elseif($job->status === 'pending' || $job->status === 'processing'): ?>
                                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
                                                     <svg class="w-3 h-3 mr-1 animate-spin" fill="none" viewBox="0 0 24 24">
                                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                     </svg>
-                                                    {{ ucfirst($job->status) }}
+                                                    <?php echo e(ucfirst($job->status)); ?>
+
                                                 </span>
-                                            @else
+                                            <?php else: ?>
                                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
                                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                                     </svg>
                                                     Failed
                                                 </span>
-                                            @endif
+                                            <?php endif; ?>
                                             <svg class="w-5 h-5 text-gray-400 group-hover:text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </div>
                                     </div>
                                 </a>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </div>
-                    @endif
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -303,7 +334,7 @@
 
     <script>
         function watermarkForm() {
-            const defaults = @json($defaults ?? []);
+            const defaults = <?php echo json_encode($defaults ?? [], 15, 512) ?>;
 
             return {
                 iso: '',
@@ -327,4 +358,14 @@
             };
         }
     </script>
-</x-app-layout>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4619374cef299e94fd7263111d0abc69)): ?>
+<?php $attributes = $__attributesOriginal4619374cef299e94fd7263111d0abc69; ?>
+<?php unset($__attributesOriginal4619374cef299e94fd7263111d0abc69); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4619374cef299e94fd7263111d0abc69)): ?>
+<?php $component = $__componentOriginal4619374cef299e94fd7263111d0abc69; ?>
+<?php unset($__componentOriginal4619374cef299e94fd7263111d0abc69); ?>
+<?php endif; ?>
+<?php /**PATH /var/www/html/watermarking/resources/views/dashboard.blade.php ENDPATH**/ ?>

@@ -20,51 +20,137 @@ class PdfWatermarkService
     {
         $this->validateInputFile($inputPath);
 
-        // Preprocess PDF to ensure compatibility (decompress if needed)
-        $processedInput = $this->preprocessPdf($inputPath);
-        $cleanupTemp = ($processedInput !== $inputPath);
-
-        $pdf = $this->createPdfInstance();
+        // Use image-based rendering to avoid FPDI template clipping issues
+        $tempDir = sys_get_temp_dir() . '/watermark_' . uniqid();
+        mkdir($tempDir, 0755, true);
 
         try {
-            $pageCount = $pdf->setSourceFile($processedInput);
-        } catch (Exception $e) {
-            if ($cleanupTemp) {
-                @unlink($processedInput);
+            // Convert PDF to PNG images using pdftoppm (200 DPI for quality)
+            $cmd = sprintf(
+                'pdftoppm -png -r 200 %s %s/page 2>&1',
+                escapeshellarg($inputPath),
+                escapeshellarg($tempDir)
+            );
+            exec($cmd, $output, $returnCode);
+
+            if ($returnCode !== 0) {
+                throw new Exception('Failed to convert PDF to images: ' . implode("\n", $output));
             }
-            throw new Exception("Failed to read PDF file: " . $e->getMessage());
+
+            // Get all generated images sorted by page number
+            $images = glob($tempDir . '/page-*.png');
+            natsort($images);
+            $images = array_values($images);
+
+            if (empty($images)) {
+                throw new Exception('No pages were extracted from the PDF.');
+            }
+
+            $pageCount = count($images);
+            $this->validatePageCount($pageCount);
+
+            // Create new PDF with watermarks using TCPDF (no FPDI = no clipping)
+            $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+            $pdf->SetCreator('PDF Watermark Platform');
+            $pdf->SetAuthor('PDF Watermark Platform');
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
+            $pdf->SetMargins(0, 0, 0);
+            $pdf->SetAutoPageBreak(false);
+
+            foreach ($images as $imagePath) {
+                // Get image dimensions
+                $imageSize = getimagesize($imagePath);
+                if (!$imageSize) {
+                    continue;
+                }
+
+                $imgWidth = $imageSize[0];
+                $imgHeight = $imageSize[1];
+
+                // Calculate page size in mm (pdftoppm uses 200 DPI)
+                // 200 DPI = 200 pixels per inch, 1 inch = 25.4mm
+                $pageWidth = ($imgWidth / 200) * 25.4;
+                $pageHeight = ($imgHeight / 200) * 25.4;
+
+                // Determine orientation
+                $orientation = $pageWidth > $pageHeight ? 'L' : 'P';
+
+                $pdf->AddPage($orientation, [$pageWidth, $pageHeight]);
+
+                // Place the image as background
+                $pdf->Image($imagePath, 0, 0, $pageWidth, $pageHeight, 'PNG');
+
+                // Apply watermark on top (no FPDI template = no clipping)
+                $this->applyWatermarkToPage($pdf, $settings, $pageWidth, $pageHeight);
+            }
+
+            // Save the watermarked PDF
+            $pdf->Output($outputPath, 'F');
+
+            return ['page_count' => $pageCount];
+
+        } finally {
+            // Cleanup temp files
+            $files = glob($tempDir . '/*');
+            foreach ($files as $file) {
+                @unlink($file);
+            }
+            @rmdir($tempDir);
         }
+    }
 
-        $this->validatePageCount($pageCount);
+    /**
+     * Apply watermark to a single page using TCPDF (no FPDI templates).
+     */
+    protected function applyWatermarkToPage(\TCPDF $pdf, array $settings, float $pageWidth, float $pageHeight): void
+    {
+        $iso = $settings['iso'] ?? '';
+        $lender = $settings['lender'] ?? '';
+        $watermarkText = "ISO: {$iso} | Lender: {$lender}";
 
-        // Process each page
-        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-            $templateId = $pdf->importPage($pageNo);
-            $size = $pdf->getTemplateSize($templateId);
+        $opacity = ($settings['opacity'] ?? 33) / 100;
+        $color = $this->hexToRgb($settings['color'] ?? '#878787');
 
-            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+        // Calculate font size to fit within page with comfortable margins
+        // Use 40% of smaller dimension to ensure text stays well within page bounds
+        $maxTextWidth = min($pageWidth, $pageHeight) * 0.40;
 
-            // Apply watermark FIRST (as background layer)
-            $this->applyGridWatermark($pdf, $settings, $size['width'], $size['height']);
+        $baseFontSize = 24;
+        $pdf->SetFont('helvetica', 'B', $baseFontSize);
+        $baseTextWidth = $pdf->GetStringWidth($watermarkText);
 
-            // Then overlay the original PDF content on top
-            // This way watermark only shows in empty/plain areas
-            $pdf->useTemplate($templateId, 0, 0, $size['width'], $size['height']);
-        }
+        $fontSize = ($maxTextWidth / $baseTextWidth) * $baseFontSize;
+        $fontSize = max(12, min($fontSize, 32));
 
-        $this->savePdf($pdf, $outputPath);
+        // Center of page
+        $centerX = $pageWidth / 2;
+        $centerY = $pageHeight / 2;
 
-        // Cleanup temp file if we created one
-        if ($cleanupTemp) {
-            @unlink($processedInput);
-        }
+        // Set styling
+        $pdf->SetAlpha($opacity);
+        $pdf->SetFont('helvetica', 'B', $fontSize);
+        $pdf->SetTextColor($color['r'], $color['g'], $color['b']);
 
-        // Flatten PDF if requested (converts to images, makes text unselectable)
-        if (!empty($settings['flatten_pdf'])) {
-            $this->flattenPdf($outputPath);
-        }
+        $textWidth = $pdf->GetStringWidth($watermarkText);
+        $textHeight = $fontSize * 0.35; // Approximate text height in mm
 
-        return ['page_count' => $pageCount];
+        // Apply diagonal watermark using TCPDF's rotation around text center
+        // Calculate the position so text CENTER is at page CENTER after rotation
+        $pdf->StartTransform();
+
+        // Rotate around the page center
+        $pdf->Rotate(45, $centerX, $centerY);
+
+        // Draw text so its center aligns with the rotation point
+        // Text() draws from baseline, so we offset by half width and adjust for baseline
+        $textX = $centerX - ($textWidth / 2);
+        $textY = $centerY - ($textHeight / 2);
+
+        $pdf->Text($textX, $textY, $watermarkText);
+        $pdf->StopTransform();
+
+        $pdf->SetAlpha(1);
     }
 
     /**
@@ -192,46 +278,79 @@ class PdfWatermarkService
     }
 
     /**
-     * Apply a single diagonal text watermark across the center of each page.
+     * Apply watermark directly to the page content stream.
+     * This method bypasses FPDI template clipping issues by writing to page content directly.
+     * Note: pageWidth and pageHeight are in mm (FPDI default unit).
      */
-    protected function applyGridWatermark(Fpdi $pdf, array $settings, float $pageWidth, float $pageHeight): void
+    protected function applyWatermarkDirect(Fpdi $pdf, array $settings, float $pageWidth, float $pageHeight): void
     {
         $iso = $settings['iso'] ?? '';
         $lender = $settings['lender'] ?? '';
         $watermarkText = "ISO: {$iso} | Lender: {$lender}";
 
-        $opacity = ($settings['opacity'] ?? 20) / 100;
+        $opacity = ($settings['opacity'] ?? 33) / 100;
         $color = $this->hexToRgb($settings['color'] ?? '#878787');
-        $fontSize = 48;
 
-        // Set styling
-        $pdf->SetFont('helvetica', 'B', $fontSize);
-        $pdf->SetTextColor($color['r'], $color['g'], $color['b']);
-        $pdf->SetAlpha($opacity);
+        // Calculate font size to fit within page with good margins
+        // Use 55% of the smaller dimension for comfortable fit when rotated
+        $maxTextWidth = min($pageWidth, $pageHeight) * 0.55;
 
-        $textWidth = $pdf->GetStringWidth($watermarkText);
-        // Text height in points (TCPDF uses mm, fontSize is in points)
-        // Approximate text height in mm: fontSize * 0.352778
-        $textHeight = $fontSize * 0.352778;
+        // Start with a base font size and calculate text width
+        $baseFontSize = 24;
+        $pdf->SetFont('helvetica', 'B', $baseFontSize);
+        $baseTextWidth = $pdf->GetStringWidth($watermarkText);
+
+        // Calculate the font size to achieve target width
+        $fontSize = ($maxTextWidth / $baseTextWidth) * $baseFontSize;
+
+        // Clamp font size to reasonable bounds
+        $fontSize = max(14, min($fontSize, 36));
 
         // Center of page
         $centerX = $pageWidth / 2;
         $centerY = $pageHeight / 2;
 
-        // Calculate text position so it's truly centered
-        // Text() uses top-left corner, so offset by half the dimensions
-        $textX = $centerX - ($textWidth / 2);
-        $textY = $centerY - ($textHeight / 2);
+        // Convert mm to points for PDF operations (1mm = 2.83465 points)
+        $k = $pdf->getScaleFactor();
 
-        // Apply diagonal watermark (-45° rotation around page center)
+        // Set graphics state for transparency
+        $pdf->SetAlpha($opacity);
+
+        // Set font and color
+        $pdf->SetFont('helvetica', 'B', $fontSize);
+        $pdf->SetTextColor($color['r'], $color['g'], $color['b']);
+
+        // Get the actual text width after setting font
+        $textWidth = $pdf->GetStringWidth($watermarkText);
+
+        // Use TCPDF's transformation but ensure we're not inside a clipped region
+        // by resetting the graphics state first
         $pdf->StartTransform();
-        $pdf->Rotate(-45, $centerX, $centerY);
+
+        // Rotate around page center
+        $pdf->Rotate(45, $centerX, $centerY);
+
+        // Draw the text centered
+        $textX = $centerX - ($textWidth / 2);
+        $textY = $centerY;
+
         $pdf->Text($textX, $textY, $watermarkText);
+
         $pdf->StopTransform();
 
-        // Reset
+        // Reset alpha
         $pdf->SetAlpha(1);
-        $pdf->SetFont('helvetica', '', 12);
+    }
+
+    /**
+     * Apply a single diagonal text watermark across the center of each page.
+     * Text is sized to fit diagonally across the page (left to right, bottom to top).
+     * Note: pageWidth and pageHeight are in mm (FPDI default unit).
+     * @deprecated Use applyWatermarkDirect instead
+     */
+    protected function applyGridWatermark(Fpdi $pdf, array $settings, float $pageWidth, float $pageHeight): void
+    {
+        $this->applyWatermarkDirect($pdf, $settings, $pageWidth, $pageHeight);
     }
 
     /**

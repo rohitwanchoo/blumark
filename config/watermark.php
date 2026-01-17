@@ -31,10 +31,10 @@ return [
     */
 
     'defaults' => [
-        'opacity' => (int) env('WATERMARK_DEFAULT_OPACITY', 20),
+        'opacity' => (int) env('WATERMARK_DEFAULT_OPACITY', 33),
         'font_size' => (int) env('WATERMARK_DEFAULT_FONT_SIZE', 15),
         'color' => env('WATERMARK_DEFAULT_COLOR', '#878787'),
-        'rotation' => (int) env('WATERMARK_DEFAULT_ROTATION', -45),
+        'rotation' => (int) env('WATERMARK_DEFAULT_ROTATION', 45),
     ],
 
     /*

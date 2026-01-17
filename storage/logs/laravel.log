@@ -109,3 +109,29 @@
 [2026-01-17 03:10:00] local.DEBUG: PDF preprocessing {"input":"/tmp/simple_input.pdf","output":"","return_code":0,"file_exists":true,"file_size":6171} 
 [2026-01-17 03:16:17] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/65217ef4-035f-4eda-ac45-caf3e582c419.pdf","output":"","return_code":0,"file_exists":true,"file_size":9948} 
 [2026-01-17 03:16:18] local.INFO: Watermark job completed {"job_id":31,"page_count":2} 
+[2026-01-17 03:39:13] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/5ed32586-c085-4e47-a71b-2858419ca6c9.pdf","output":"","return_code":0,"file_exists":true,"file_size":400666} 
+[2026-01-17 03:39:18] local.INFO: Watermark job completed {"job_id":32,"page_count":8} 
+[2026-01-17 03:44:02] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/69f1f8dd-ac9b-4362-a644-82bbf48a4d23.pdf","output":"","return_code":0,"file_exists":true,"file_size":400666} 
+[2026-01-17 03:44:07] local.INFO: Watermark job completed {"job_id":33,"page_count":8} 
+[2026-01-17 03:44:50] local.DEBUG: PDF preprocessing {"input":"/tmp/sample_test.pdf","output":"","return_code":0,"file_exists":true,"file_size":6800} 
+[2026-01-17 03:48:31] local.DEBUG: PDF preprocessing {"input":"/tmp/sample_sparse.pdf","output":"","return_code":0,"file_exists":true,"file_size":5778} 
+[2026-01-17 03:49:28] local.DEBUG: PDF preprocessing {"input":"/tmp/sample_test.pdf","output":"","return_code":0,"file_exists":true,"file_size":6800} 
+[2026-01-17 03:49:57] local.DEBUG: PDF preprocessing {"input":"/tmp/sample_test.pdf","output":"","return_code":0,"file_exists":true,"file_size":6800} 
+[2026-01-17 03:50:57] local.DEBUG: PDF preprocessing {"input":"/tmp/sample_test.pdf","output":"","return_code":0,"file_exists":true,"file_size":6800} 
+[2026-01-17 03:51:54] local.DEBUG: PDF preprocessing {"input":"/tmp/sample_test.pdf","output":"","return_code":0,"file_exists":true,"file_size":6800} 
+[2026-01-17 03:52:55] local.DEBUG: PDF preprocessing {"input":"/tmp/fresh_test.pdf","output":"","return_code":0,"file_exists":true,"file_size":5866} 
+[2026-01-17 03:53:21] local.DEBUG: PDF preprocessing {"input":"/tmp/fresh_test.pdf","output":"","return_code":0,"file_exists":true,"file_size":5866} 
+[2026-01-17 03:54:54] local.DEBUG: PDF preprocessing {"input":"/tmp/fresh_test.pdf","output":"","return_code":0,"file_exists":true,"file_size":5866} 
+[2026-01-17 03:56:16] local.DEBUG: PDF preprocessing {"input":"/tmp/fresh_test.pdf","output":"","return_code":0,"file_exists":true,"file_size":5858} 
+[2026-01-17 03:56:30] local.DEBUG: PDF preprocessing {"input":"/tmp/sample_test.pdf","output":"","return_code":0,"file_exists":true,"file_size":6800} 
+[2026-01-17 04:01:00] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/3f71565e-ed82-401c-b56c-045a6b9012b1.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 04:01:06] local.INFO: Watermark job completed {"job_id":34,"page_count":8} 
+[2026-01-17 04:02:23] local.DEBUG: PDF preprocessing {"input":"/tmp/test_input.pdf","output":"","return_code":0,"file_exists":true,"file_size":6600} 
+[2026-01-17 04:02:47] local.DEBUG: PDF preprocessing {"input":"/tmp/test_input.pdf","output":"","return_code":0,"file_exists":true,"file_size":6600} 
+[2026-01-17 04:03:11] local.DEBUG: PDF preprocessing {"input":"/tmp/test_input.pdf","output":"","return_code":0,"file_exists":true,"file_size":6600} 
+[2026-01-17 04:05:40] local.DEBUG: PDF preprocessing {"input":"/tmp/test_input.pdf","output":"","return_code":0,"file_exists":true,"file_size":6600} 
+[2026-01-17 04:12:54] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/aa3866dd-f4cb-4263-8a5a-6df2759add3e.pdf","output":"","return_code":0,"file_exists":true,"file_size":9948} 
+[2026-01-17 04:12:55] local.INFO: Watermark job completed {"job_id":35,"page_count":2} 
+[2026-01-17 04:13:29] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/b0c71ab2-f560-4947-8a8e-655204cc41d3.pdf","output":"","return_code":0,"file_exists":true,"file_size":400666} 
+[2026-01-17 04:13:34] local.INFO: Watermark job completed {"job_id":36,"page_count":8} 
+[2026-01-17 04:20:27] local.INFO: Watermark job completed {"job_id":37,"page_count":9} 
