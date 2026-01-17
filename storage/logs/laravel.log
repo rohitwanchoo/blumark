@@ -1,0 +1,111 @@
+
+[2026-01-17 01:45:56] local.INFO: Watermark job completed {"job_id":13,"page_count":39} 
+[2026-01-17 01:51:45] local.INFO: Watermark job completed {"job_id":14,"page_count":39} 
+[2026-01-17 01:55:18] local.INFO: Watermark job completed {"job_id":15,"page_count":2} 
+[2026-01-17 02:02:03] local.INFO: Watermark job completed {"job_id":16,"page_count":2} 
+[2026-01-17 02:10:54] local.INFO: Watermark job completed {"job_id":17,"page_count":39} 
+[2026-01-17 02:13:01] local.INFO: Watermark job completed {"job_id":18,"page_count":2} 
+[2026-01-17 02:14:01] local.INFO: Watermark job completed {"job_id":19,"page_count":39} 
+[2026-01-17 02:22:07] local.ERROR: Watermark job failed {"job_id":20,"error":"Failed to read PDF file: This PDF document probably uses a compression technique which is not supported by the free parser shipped with FPDI. (See https://www.setasign.com/fpdi-pdf-parser for more details)","trace":"#0 /var/www/html/watermarking/app/Jobs/ProcessWatermarkPdf.php(100): App\\Services\\PdfWatermarkService->watermarkIsoLender()
+#1 /var/www/html/watermarking/app/Jobs/ProcessWatermarkPdf.php(75): App\\Jobs\\ProcessWatermarkPdf->processIsoLenderWatermark()
+#2 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): App\\Jobs\\ProcessWatermarkPdf->handle()
+#3 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#4 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate\\Container\\Util::unwrapIfClosure()
+#5 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod()
+#6 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate\\Container\\BoundMethod::call()
+#7 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Bus/Dispatcher.php(126): Illuminate\\Container\\Container->call()
+#8 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(170): Illuminate\\Bus\\Dispatcher->Illuminate\\Bus\\{closure}()
+#9 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(127): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#10 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Bus/Dispatcher.php(130): Illuminate\\Pipeline\\Pipeline->then()
+#11 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/CallQueuedHandler.php(126): Illuminate\\Bus\\Dispatcher->dispatchNow()
+#12 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(170): Illuminate\\Queue\\CallQueuedHandler->Illuminate\\Queue\\{closure}()
+#13 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(127): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#14 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/CallQueuedHandler.php(121): Illuminate\\Pipeline\\Pipeline->then()
+#15 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/CallQueuedHandler.php(69): Illuminate\\Queue\\CallQueuedHandler->dispatchThroughMiddleware()
+#16 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Jobs/Job.php(102): Illuminate\\Queue\\CallQueuedHandler->call()
+#17 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Worker.php(442): Illuminate\\Queue\\Jobs\\Job->fire()
+#18 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Worker.php(392): Illuminate\\Queue\\Worker->process()
+#19 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Worker.php(178): Illuminate\\Queue\\Worker->runJob()
+#20 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Console/WorkCommand.php(149): Illuminate\\Queue\\Worker->daemon()
+#21 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Console/WorkCommand.php(132): Illuminate\\Queue\\Console\\WorkCommand->runWorker()
+#22 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate\\Queue\\Console\\WorkCommand->handle()
+#23 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#24 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate\\Container\\Util::unwrapIfClosure()
+#25 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod()
+#26 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate\\Container\\BoundMethod::call()
+#27 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Console/Command.php(213): Illuminate\\Container\\Container->call()
+#28 /var/www/html/watermarking/vendor/symfony/console/Command/Command.php(341): Illuminate\\Console\\Command->execute()
+#29 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Console/Command.php(182): Symfony\\Component\\Console\\Command\\Command->run()
+#30 /var/www/html/watermarking/vendor/symfony/console/Application.php(1102): Illuminate\\Console\\Command->run()
+#31 /var/www/html/watermarking/vendor/symfony/console/Application.php(356): Symfony\\Component\\Console\\Application->doRunCommand()
+#32 /var/www/html/watermarking/vendor/symfony/console/Application.php(195): Symfony\\Component\\Console\\Application->doRun()
+#33 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony\\Component\\Console\\Application->run()
+#34 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle()
+#35 /var/www/html/watermarking/artisan(13): Illuminate\\Foundation\\Application->handleCommand()
+#36 {main}"} 
+[2026-01-17 02:23:37] local.ERROR: Watermark job failed {"job_id":21,"error":"Failed to read PDF file: This PDF document probably uses a compression technique which is not supported by the free parser shipped with FPDI. (See https://www.setasign.com/fpdi-pdf-parser for more details)","trace":"#0 /var/www/html/watermarking/app/Jobs/ProcessWatermarkPdf.php(100): App\\Services\\PdfWatermarkService->watermarkIsoLender()
+#1 /var/www/html/watermarking/app/Jobs/ProcessWatermarkPdf.php(75): App\\Jobs\\ProcessWatermarkPdf->processIsoLenderWatermark()
+#2 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): App\\Jobs\\ProcessWatermarkPdf->handle()
+#3 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#4 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate\\Container\\Util::unwrapIfClosure()
+#5 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod()
+#6 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate\\Container\\BoundMethod::call()
+#7 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Bus/Dispatcher.php(126): Illuminate\\Container\\Container->call()
+#8 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(170): Illuminate\\Bus\\Dispatcher->Illuminate\\Bus\\{closure}()
+#9 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(127): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#10 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Bus/Dispatcher.php(130): Illuminate\\Pipeline\\Pipeline->then()
+#11 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/CallQueuedHandler.php(126): Illuminate\\Bus\\Dispatcher->dispatchNow()
+#12 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(170): Illuminate\\Queue\\CallQueuedHandler->Illuminate\\Queue\\{closure}()
+#13 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(127): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#14 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/CallQueuedHandler.php(121): Illuminate\\Pipeline\\Pipeline->then()
+#15 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/CallQueuedHandler.php(69): Illuminate\\Queue\\CallQueuedHandler->dispatchThroughMiddleware()
+#16 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Jobs/Job.php(102): Illuminate\\Queue\\CallQueuedHandler->call()
+#17 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Worker.php(442): Illuminate\\Queue\\Jobs\\Job->fire()
+#18 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Worker.php(392): Illuminate\\Queue\\Worker->process()
+#19 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Worker.php(178): Illuminate\\Queue\\Worker->runJob()
+#20 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Console/WorkCommand.php(149): Illuminate\\Queue\\Worker->daemon()
+#21 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Queue/Console/WorkCommand.php(132): Illuminate\\Queue\\Console\\WorkCommand->runWorker()
+#22 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate\\Queue\\Console\\WorkCommand->handle()
+#23 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate\\Container\\BoundMethod::Illuminate\\Container\\{closure}()
+#24 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(95): Illuminate\\Container\\Util::unwrapIfClosure()
+#25 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate\\Container\\BoundMethod::callBoundMethod()
+#26 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Container/Container.php(696): Illuminate\\Container\\BoundMethod::call()
+#27 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Console/Command.php(213): Illuminate\\Container\\Container->call()
+#28 /var/www/html/watermarking/vendor/symfony/console/Command/Command.php(341): Illuminate\\Console\\Command->execute()
+#29 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Console/Command.php(182): Symfony\\Component\\Console\\Command\\Command->run()
+#30 /var/www/html/watermarking/vendor/symfony/console/Application.php(1102): Illuminate\\Console\\Command->run()
+#31 /var/www/html/watermarking/vendor/symfony/console/Application.php(356): Symfony\\Component\\Console\\Application->doRunCommand()
+#32 /var/www/html/watermarking/vendor/symfony/console/Application.php(195): Symfony\\Component\\Console\\Application->doRun()
+#33 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony\\Component\\Console\\Application->run()
+#34 /var/www/html/watermarking/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle()
+#35 /var/www/html/watermarking/artisan(13): Illuminate\\Foundation\\Application->handleCommand()
+#36 {main}"} 
+[2026-01-17 02:27:47] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/19336a77-4064-4acc-ad6b-53f239bd5726.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 02:30:02] local.INFO: Watermark job completed {"job_id":22,"page_count":2} 
+[2026-01-17 02:37:06] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/19336a77-4064-4acc-ad6b-53f239bd5726.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 02:38:35] local.INFO: Watermark job completed {"job_id":23,"page_count":39} 
+[2026-01-17 02:41:14] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/19336a77-4064-4acc-ad6b-53f239bd5726.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 02:42:26] local.INFO: Watermark job completed {"job_id":24,"page_count":9} 
+[2026-01-17 02:45:05] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/19336a77-4064-4acc-ad6b-53f239bd5726.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 02:47:06] local.INFO: Watermark job completed {"job_id":25,"page_count":2} 
+[2026-01-17 02:49:40] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/19336a77-4064-4acc-ad6b-53f239bd5726.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 02:50:34] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/19336a77-4064-4acc-ad6b-53f239bd5726.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 02:53:14] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/851af3f3-ad9e-45f3-bb4c-a96dd523e4be.pdf","output":"","return_code":0,"file_exists":true,"file_size":9948} 
+[2026-01-17 02:53:15] local.INFO: Watermark job completed {"job_id":26,"page_count":2} 
+[2026-01-17 02:56:15] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/19336a77-4064-4acc-ad6b-53f239bd5726.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 02:56:32] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/a81b3fad-6fca-4e44-82dd-8f769f964cfe.pdf","output":"","return_code":0,"file_exists":true,"file_size":282573} 
+[2026-01-17 02:56:58] local.INFO: Watermark job completed {"job_id":27,"page_count":39} 
+[2026-01-17 03:01:35] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/fab979eb-347f-44f3-90d0-fd8f8f358af7.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 03:01:41] local.INFO: Watermark job completed {"job_id":28,"page_count":8} 
+[2026-01-17 03:03:51] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/75c9a691-c623-4331-848d-e59d1897e7e5.pdf","output":"   **** Error: Considering object with an invalid number 0 as null.
+               Output may be incorrect.","return_code":0,"file_exists":true,"file_size":1509815} 
+[2026-01-17 03:03:59] local.INFO: Watermark job completed {"job_id":29,"page_count":9} 
+[2026-01-17 03:04:43] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/19336a77-4064-4acc-ad6b-53f239bd5726.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 03:05:47] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/19336a77-4064-4acc-ad6b-53f239bd5726.pdf","output":"","return_code":0,"file_exists":true,"file_size":400665} 
+[2026-01-17 03:06:06] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/1f92d3e9-fa44-468f-abcd-7a86da742a6b.pdf","output":"   **** Error: Considering object with an invalid number 0 as null.
+               Output may be incorrect.","return_code":0,"file_exists":true,"file_size":1509815} 
+[2026-01-17 03:06:14] local.INFO: Watermark job completed {"job_id":30,"page_count":9} 
+[2026-01-17 03:07:03] local.DEBUG: PDF preprocessing {"input":"/tmp/simple_input.pdf","output":"","return_code":0,"file_exists":true,"file_size":6163} 
+[2026-01-17 03:10:00] local.DEBUG: PDF preprocessing {"input":"/tmp/simple_input.pdf","output":"","return_code":0,"file_exists":true,"file_size":6171} 
+[2026-01-17 03:16:17] local.DEBUG: PDF preprocessing {"input":"/var/www/html/watermarking/storage/app/private/watermark/uploads/65217ef4-035f-4eda-ac45-caf3e582c419.pdf","output":"","return_code":0,"file_exists":true,"file_size":9948} 
+[2026-01-17 03:16:18] local.INFO: Watermark job completed {"job_id":31,"page_count":2} 
