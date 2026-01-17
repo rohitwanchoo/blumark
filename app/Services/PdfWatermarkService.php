@@ -102,6 +102,7 @@ class PdfWatermarkService
 
     /**
      * Apply watermark to a single page using TCPDF (no FPDI templates).
+     * The watermark spans the full page diagonal from lower-left to upper-right.
      */
     protected function applyWatermarkToPage(\TCPDF $pdf, array $settings, float $pageWidth, float $pageHeight): void
     {
@@ -112,16 +113,18 @@ class PdfWatermarkService
         $opacity = ($settings['opacity'] ?? 33) / 100;
         $color = $this->hexToRgb($settings['color'] ?? '#878787');
 
-        // Calculate font size to fit within page with comfortable margins
-        // Use 40% of smaller dimension to ensure text stays well within page bounds
-        $maxTextWidth = min($pageWidth, $pageHeight) * 0.40;
+        // To keep text centered on the page, we need the text width to be less than
+        // the page width so that when positioned at (centerX - textWidth/2), the X
+        // coordinate stays positive (within page bounds)
+        // Max text width = pageWidth - 20mm margin = allows centered text to fit
+        $maxTextWidth = $pageWidth - 20;
 
         $baseFontSize = 24;
         $pdf->SetFont('helvetica', 'B', $baseFontSize);
         $baseTextWidth = $pdf->GetStringWidth($watermarkText);
 
         $fontSize = ($maxTextWidth / $baseTextWidth) * $baseFontSize;
-        $fontSize = max(12, min($fontSize, 32));
+        $fontSize = max(16, min($fontSize, 48));
 
         // Center of page
         $centerX = $pageWidth / 2;
@@ -135,17 +138,18 @@ class PdfWatermarkService
         $textWidth = $pdf->GetStringWidth($watermarkText);
         $textHeight = $fontSize * 0.35; // Approximate text height in mm
 
-        // Apply diagonal watermark using TCPDF's rotation around text center
-        // Calculate the position so text CENTER is at page CENTER after rotation
-        $pdf->StartTransform();
-
-        // Rotate around the page center
-        $pdf->Rotate(45, $centerX, $centerY);
-
-        // Draw text so its center aligns with the rotation point
-        // Text() draws from baseline, so we offset by half width and adjust for baseline
+        // Position text so its CENTER is exactly at page CENTER
+        // This ensures when rotated around the text center, it stays visually centered
         $textX = $centerX - ($textWidth / 2);
         $textY = $centerY - ($textHeight / 2);
+
+        // Apply diagonal watermark using TCPDF's rotation
+        $pdf->StartTransform();
+
+        // Rotate 45° around the PAGE CENTER (not text corner)
+        // The text center is at (centerX, centerY), so rotating around page center
+        // keeps the text centered on the page
+        $pdf->Rotate(45, $centerX, $centerY);
 
         $pdf->Text($textX, $textY, $watermarkText);
         $pdf->StopTransform();
