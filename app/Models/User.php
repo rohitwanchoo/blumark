@@ -89,6 +89,33 @@ class User extends Authenticatable
         };
     }
 
+    public function getFormattedPhone(): ?string
+    {
+        if (!$this->phone) {
+            return null;
+        }
+
+        // Remove all non-numeric characters except +
+        $phone = preg_replace('/[^0-9+]/', '', $this->phone);
+
+        // Handle different formats
+        if (str_starts_with($phone, '+1') && strlen($phone) === 12) {
+            // +1XXXXXXXXXX format
+            $number = substr($phone, 2);
+            return '+1 (' . substr($number, 0, 3) . ') ' . substr($number, 3, 3) . '-' . substr($number, 6);
+        } elseif (str_starts_with($phone, '1') && strlen($phone) === 11) {
+            // 1XXXXXXXXXX format
+            $number = substr($phone, 1);
+            return '+1 (' . substr($number, 0, 3) . ') ' . substr($number, 3, 3) . '-' . substr($number, 6);
+        } elseif (strlen($phone) === 10) {
+            // XXXXXXXXXX format (assume US/Canada)
+            return '+1 (' . substr($phone, 0, 3) . ') ' . substr($phone, 3, 3) . '-' . substr($phone, 6);
+        }
+
+        // Return original if format not recognized
+        return $this->phone;
+    }
+
     public function getCredits(): int
     {
         return $this->userCredits?->credits ?? 0;

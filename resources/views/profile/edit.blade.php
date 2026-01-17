@@ -64,10 +64,11 @@
                                     @enderror
                                 </div>
 
-                                <div>
+                                <div x-data="phoneInput()">
                                     <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                                     <input type="tel" name="phone" id="phone"
-                                           value="{{ old('phone', $user->phone) }}"
+                                           x-model="phone"
+                                           @input="formatPhone"
                                            class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border @error('phone') border-red-500 @enderror"
                                            placeholder="+1 (555) 123-4567">
                                     @error('phone')
@@ -223,4 +224,35 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function phoneInput() {
+            return {
+                phone: '{{ old('phone', $user->getFormattedPhone()) }}',
+                formatPhone() {
+                    // Remove all non-numeric characters
+                    let digits = this.phone.replace(/\D/g, '');
+
+                    // Remove leading 1 if present (we'll add it back formatted)
+                    if (digits.startsWith('1') && digits.length > 10) {
+                        digits = digits.substring(1);
+                    }
+
+                    // Limit to 10 digits (excluding country code)
+                    digits = digits.substring(0, 10);
+
+                    // Format the number
+                    if (digits.length === 0) {
+                        this.phone = '';
+                    } else if (digits.length <= 3) {
+                        this.phone = '+1 (' + digits;
+                    } else if (digits.length <= 6) {
+                        this.phone = '+1 (' + digits.substring(0, 3) + ') ' + digits.substring(3);
+                    } else {
+                        this.phone = '+1 (' + digits.substring(0, 3) + ') ' + digits.substring(3, 6) + '-' + digits.substring(6);
+                    }
+                }
+            }
+        }
+    </script>
 </x-app-layout>
