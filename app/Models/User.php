@@ -206,11 +206,23 @@ class User extends Authenticatable
 
     public function getMonthlyJobCount(): int
     {
-        // Count from watermark_jobs table directly for accurate tracking
-        return $this->watermarkJobs()
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
+        // Count jobs for billing: batch uploads count as 1 job, individual uploads count as 1 each
+        $thisMonth = now();
+
+        // Count individual jobs (not part of a batch)
+        $individualJobs = $this->watermarkJobs()
+            ->whereNull('batch_job_id')
+            ->whereMonth('created_at', $thisMonth->month)
+            ->whereYear('created_at', $thisMonth->year)
             ->count();
+
+        // Count batch jobs (each batch = 1 job regardless of file count)
+        $batchJobs = $this->batchJobs()
+            ->whereMonth('created_at', $thisMonth->month)
+            ->whereYear('created_at', $thisMonth->year)
+            ->count();
+
+        return $individualJobs + $batchJobs;
     }
 
     public function canCreateJob(int $pageCount = 0): array

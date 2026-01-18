@@ -47,36 +47,15 @@ class BatchController extends Controller
 
         $user = Auth::user();
         $files = $request->file('files');
-        $fileCount = count($files);
 
-        // Check usage limits for all files in the batch
-        $plan = $user->getCurrentPlan();
-        $monthlyUsage = $user->getMonthlyJobCount();
-        $monthlyLimit = $plan?->jobs_limit;
-        $credits = $user->getCredits();
-
-        // Calculate how many jobs would exceed the limit
-        $jobsWithinLimit = 0;
-        $jobsNeedingCredits = 0;
-
-        if ($monthlyLimit === null) {
-            // Unlimited plan
-            $jobsWithinLimit = $fileCount;
-        } else {
-            $remaining = max(0, $monthlyLimit - $monthlyUsage);
-            $jobsWithinLimit = min($fileCount, $remaining);
-            $jobsNeedingCredits = $fileCount - $jobsWithinLimit;
-        }
-
-        // Check if user can afford the batch
-        if ($jobsNeedingCredits > 0 && $credits < $jobsNeedingCredits) {
-            $shortfall = $jobsNeedingCredits - $credits;
+        // A batch counts as 1 job regardless of file count
+        $canCreate = $user->canCreateJob();
+        if (!$canCreate['allowed']) {
             return back()->withErrors([
-                'files' => "You can only process {$jobsWithinLimit} more files this month. " .
-                          "You need {$jobsNeedingCredits} credits for the remaining files, but only have {$credits}. " .
-                          "Please purchase {$shortfall} more credits or reduce the number of files."
+                'files' => $canCreate['reason']
             ]);
         }
+        $useCredits = $canCreate['use_credits'] ?? false;
 
         // Create batch job
         $settings = [
@@ -96,8 +75,12 @@ class BatchController extends Controller
             'total_files' => count($files),
         ]);
 
+        // Deduct 1 credit for the entire batch if over plan limit
+        if ($useCredits) {
+            $user->useCredits(1, "Batch job #{$batchJob->id} (" . count($files) . " files)");
+        }
+
         // Process each file
-        $jobsCreated = 0;
         foreach ($files as $file) {
             $originalFilename = $file->getClientOriginalName();
             $uuid = Str::uuid()->toString();
@@ -119,13 +102,6 @@ class BatchController extends Controller
                 'settings' => $watermarkSettings,
                 'file_size' => $file->getSize(),
             ]);
-
-            $jobsCreated++;
-
-            // Deduct credit if this job exceeds the plan limit
-            if ($jobsCreated > $jobsWithinLimit) {
-                $user->useCredits(1, "Watermark job #{$job->id} (batch #{$batchJob->id})");
-            }
 
             // Dispatch processing job
             ProcessWatermarkPdf::dispatch($job);
