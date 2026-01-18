@@ -93,6 +93,21 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(BatchJob::class);
     }
 
+    public function lenders(): HasMany
+    {
+        return $this->hasMany(Lender::class);
+    }
+
+    public function lenderDistributions(): HasMany
+    {
+        return $this->hasMany(LenderDistribution::class);
+    }
+
+    public function emailTemplates(): HasMany
+    {
+        return $this->hasMany(EmailTemplate::class);
+    }
+
     public function hasSocialAccount(string $provider): bool
     {
         return $this->socialAccounts()->where('provider', $provider)->exists();

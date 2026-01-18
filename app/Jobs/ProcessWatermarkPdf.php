@@ -2,11 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Models\DocumentFingerprint;
 use App\Models\WatermarkJob;
 use App\Services\DocumentFingerprintService;
 use App\Services\PdfWatermarkService;
-use App\Services\QrWatermarkService;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Throwable;
@@ -63,6 +66,8 @@ class ProcessWatermarkPdf implements ShouldQueue
 
         $this->watermarkJob->markAsProcessing();
 
+        $qrCodePath = null;
+
         try {
             $inputPath = $this->watermarkJob->getOriginalFullPath();
             $outputPath = $this->generateOutputPath();
@@ -72,6 +77,14 @@ class ProcessWatermarkPdf implements ShouldQueue
             $outputDir = dirname($outputPath);
             if (!is_dir($outputDir)) {
                 mkdir($outputDir, 0755, true);
+            }
+
+            // Generate QR code with verification URL before watermarking
+            if (config('watermark.security.qr_watermark_enabled', true)) {
+                $qrCodePath = $this->generateVerificationQrCode();
+                if ($qrCodePath) {
+                    $settings['qr_code_path'] = $qrCodePath;
+                }
             }
 
             // Process based on watermark type
@@ -86,6 +99,9 @@ class ProcessWatermarkPdf implements ShouldQueue
 
             $this->watermarkJob->markAsDone($storagePath, $result['page_count'] ?? null);
 
+            // Update lender distribution item status if this is part of a distribution
+            $this->updateDistributionItemStatus(true);
+
             // Generate document fingerprint for fraud detection
             $this->generateFingerprint();
 
@@ -96,6 +112,46 @@ class ProcessWatermarkPdf implements ShouldQueue
 
         } catch (Exception $e) {
             $this->handleFailure($e);
+        } finally {
+            // Cleanup QR code temp file
+            if ($qrCodePath && file_exists($qrCodePath)) {
+                @unlink($qrCodePath);
+            }
+        }
+    }
+
+    /**
+     * Generate QR code with verification URL.
+     */
+    protected function generateVerificationQrCode(): ?string
+    {
+        try {
+            // Generate verification URL using job ID
+            $verificationUrl = url('/verify/job/' . $this->watermarkJob->id);
+
+            $builder = new Builder(
+                writer: new PngWriter(),
+                data: $verificationUrl,
+                encoding: new Encoding('UTF-8'),
+                errorCorrectionLevel: ErrorCorrectionLevel::High,
+                size: 400, // Large size for better scanning
+                margin: 10,
+                roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            );
+
+            $result = $builder->build();
+
+            // Save to temp file
+            $tempPath = sys_get_temp_dir() . '/qr_' . uniqid() . '.png';
+            $result->saveToFile($tempPath);
+
+            return $tempPath;
+        } catch (Exception $e) {
+            Log::warning('Failed to generate QR code', [
+                'job_id' => $this->watermarkJob->id,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
         }
     }
 
@@ -172,62 +228,9 @@ class ProcessWatermarkPdf implements ShouldQueue
                 'fingerprint_id' => $fingerprint->id,
                 'verification_token' => $fingerprint->verification_token,
             ]);
-
-            // Add QR code to the PDF if enabled
-            if (config('watermark.security.qr_watermark_enabled', true)) {
-                $this->addQrCodeToDocument($fingerprint);
-            }
         } catch (Exception $e) {
             // Log but don't fail the job if fingerprinting fails
             Log::warning('Failed to generate document fingerprint', [
-                'job_id' => $this->watermarkJob->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    /**
-     * Add QR code with verification link to the document.
-     */
-    protected function addQrCodeToDocument(DocumentFingerprint $fingerprint): void
-    {
-        try {
-            $qrService = app(QrWatermarkService::class);
-            $outputPath = $this->watermarkJob->getOutputFullPath();
-
-            if (!$outputPath || !file_exists($outputPath)) {
-                Log::warning('Cannot add QR code - output file not found', [
-                    'job_id' => $this->watermarkJob->id,
-                ]);
-                return;
-            }
-
-            // Get QR settings from config
-            $qrConfig = config('watermark.qr', []);
-
-            // Generate QR and embed in PDF (overwrites the existing output)
-            $qrService->addQrWatermark($outputPath, $fingerprint, [
-                'position' => $qrConfig['position'] ?? 'bottom-right',
-                'page' => $qrConfig['page'] ?? 'first',
-                'size' => $qrConfig['pdf_size'] ?? 20,
-                'opacity' => $qrConfig['opacity'] ?? 0.9,
-                'margin' => 10,
-                'label' => $qrConfig['label'] ?? 'Scan to verify',
-                'url_only' => $qrConfig['url_only'] ?? true,
-                'output_path' => $outputPath, // Overwrite the same file
-            ]);
-
-            // Mark fingerprint as having QR embedded
-            $fingerprint->update(['qr_embedded' => true]);
-
-            Log::info('QR code added to document', [
-                'job_id' => $this->watermarkJob->id,
-                'fingerprint_id' => $fingerprint->id,
-                'verification_url' => $fingerprint->getVerificationUrl(),
-            ]);
-        } catch (Exception $e) {
-            // Log but don't fail if QR embedding fails
-            Log::warning('Failed to add QR code to document', [
                 'job_id' => $this->watermarkJob->id,
                 'error' => $e->getMessage(),
             ]);
@@ -248,6 +251,27 @@ class ProcessWatermarkPdf implements ShouldQueue
         ]);
 
         $this->watermarkJob->markAsFailed($errorMessage);
+
+        // Update lender distribution item status if this is part of a distribution
+        $this->updateDistributionItemStatus(false, $errorMessage);
+    }
+
+    /**
+     * Update lender distribution item status if this job is part of a distribution.
+     */
+    protected function updateDistributionItemStatus(bool $success, ?string $errorMessage = null): void
+    {
+        $item = $this->watermarkJob->lenderDistributionItem;
+
+        if (!$item) {
+            return;
+        }
+
+        if ($success) {
+            $item->markAsDone();
+        } else {
+            $item->markAsFailed($errorMessage);
+        }
     }
 
     /**

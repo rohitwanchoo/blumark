@@ -318,8 +318,13 @@ class PdfWatermarkService
             $this->validatePageCount($pageCount);
 
             // Apply watermark directly to images (makes it unextractable as text)
-            foreach ($images as $imagePath) {
+            foreach ($images as $index => $imagePath) {
                 $this->applyWatermarkToImage($imagePath, $settings);
+
+                // Add QR code to first page only
+                if ($index === 0 && !empty($settings['qr_code_path']) && file_exists($settings['qr_code_path'])) {
+                    $this->addQrCodeToImage($imagePath, $settings['qr_code_path']);
+                }
             }
 
             // Create new PDF from watermarked images
@@ -373,6 +378,7 @@ class PdfWatermarkService
     /**
      * Apply watermark directly to an image file using GD.
      * This renders the watermark as pixels, making it invisible to text extraction.
+     * Auto-adjusts font size to fit within page diagonal.
      */
     protected function applyWatermarkToImage(string $imagePath, array $settings): void
     {
@@ -380,7 +386,7 @@ class PdfWatermarkService
         $lender = $settings['lender'] ?? '';
         $watermarkText = "ISO: {$iso} | Lender: {$lender}";
 
-        $opacity = ($settings['opacity'] ?? 33) / 100;
+        $opacity = ($settings['opacity'] ?? 20) / 100;
         $color = $this->hexToRgb($settings['color'] ?? '#878787');
 
         // Load the image
@@ -409,11 +415,24 @@ class PdfWatermarkService
         }
 
         if (file_exists($fontFile)) {
-            // Use TrueType font for better quality
-            $fontSize = min($imgWidth, $imgHeight) * 0.05; // 5% of smaller dimension
-            $fontSize = max(20, min($fontSize, 100)); // Clamp between 20-100
+            // Calculate page diagonal - this is the max width for rotated text
+            $pageDiagonal = sqrt($imgWidth * $imgWidth + $imgHeight * $imgHeight);
 
-            // Get text bounding box
+            // Target text width: 80% of the page diagonal to leave margins
+            $targetTextWidth = $pageDiagonal * 0.80;
+
+            // Start with a reference font size to measure text
+            $referenceFontSize = 50;
+            $bbox = imagettfbbox($referenceFontSize, 0, $fontFile, $watermarkText);
+            $referenceTextWidth = abs($bbox[2] - $bbox[0]);
+
+            // Calculate the font size needed to achieve target width
+            $fontSize = ($targetTextWidth / $referenceTextWidth) * $referenceFontSize;
+
+            // Clamp font size to reasonable bounds (min 16, max 120)
+            $fontSize = max(16, min($fontSize, 120));
+
+            // Get final text bounding box with calculated font size
             $bbox = imagettfbbox($fontSize, 0, $fontFile, $watermarkText);
             $textWidth = abs($bbox[2] - $bbox[0]);
             $textHeight = abs($bbox[7] - $bbox[1]);
@@ -469,8 +488,87 @@ class PdfWatermarkService
     }
 
     /**
+     * Add QR code to an image file (bottom-right corner).
+     */
+    protected function addQrCodeToImage(string $imagePath, string $qrCodePath): void
+    {
+        $image = imagecreatefrompng($imagePath);
+        if (!$image) {
+            return;
+        }
+
+        $qrImage = imagecreatefrompng($qrCodePath);
+        if (!$qrImage) {
+            imagedestroy($image);
+            return;
+        }
+
+        $imgWidth = imagesx($image);
+        $imgHeight = imagesy($image);
+        $qrWidth = imagesx($qrImage);
+        $qrHeight = imagesy($qrImage);
+
+        // Calculate QR size - make it about 12% of page width for good visibility
+        $targetQrSize = (int) ($imgWidth * 0.12);
+        $targetQrSize = max(80, min($targetQrSize, 200)); // Clamp between 80-200 pixels
+
+        // Resize QR if needed
+        if ($qrWidth != $targetQrSize) {
+            $resizedQr = imagecreatetruecolor($targetQrSize, $targetQrSize);
+            imagealphablending($resizedQr, false);
+            imagesavealpha($resizedQr, true);
+            imagecopyresampled($resizedQr, $qrImage, 0, 0, 0, 0, $targetQrSize, $targetQrSize, $qrWidth, $qrHeight);
+            imagedestroy($qrImage);
+            $qrImage = $resizedQr;
+            $qrWidth = $targetQrSize;
+            $qrHeight = $targetQrSize;
+        }
+
+        // Position in bottom-right corner with margin
+        $margin = (int) ($imgWidth * 0.03); // 3% margin
+        $destX = $imgWidth - $qrWidth - $margin;
+        $destY = $imgHeight - $qrHeight - $margin;
+
+        // Add white background behind QR for better contrast
+        $white = imagecolorallocate($image, 255, 255, 255);
+        $padding = 8;
+        imagefilledrectangle(
+            $image,
+            $destX - $padding,
+            $destY - $padding,
+            $destX + $qrWidth + $padding,
+            $destY + $qrHeight + $padding,
+            $white
+        );
+
+        // Copy QR code onto image
+        imagecopy($image, $qrImage, $destX, $destY, 0, 0, $qrWidth, $qrHeight);
+
+        // Add "Scan to verify" label below QR
+        $fontFile = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
+        if (file_exists($fontFile)) {
+            $labelFontSize = max(8, (int) ($targetQrSize * 0.08));
+            $label = 'Scan to verify';
+            $labelColor = imagecolorallocate($image, 100, 100, 100);
+
+            $bbox = imagettfbbox($labelFontSize, 0, $fontFile, $label);
+            $labelWidth = abs($bbox[2] - $bbox[0]);
+            $labelX = $destX + ($qrWidth - $labelWidth) / 2;
+            $labelY = $destY + $qrHeight + $padding + $labelFontSize + 2;
+
+            imagettftext($image, $labelFontSize, 0, (int) $labelX, (int) $labelY, $labelColor, $fontFile, $label);
+        }
+
+        // Save the image
+        imagepng($image, $imagePath);
+        imagedestroy($image);
+        imagedestroy($qrImage);
+    }
+
+    /**
      * Apply watermark to a single page using TCPDF (no FPDI templates).
      * The watermark spans the full page diagonal from lower-left to upper-right.
+     * Auto-adjusts font size to fit within page diagonal.
      */
     protected function applyWatermarkToPage(\TCPDF $pdf, array $settings, float $pageWidth, float $pageHeight): void
     {
@@ -478,27 +576,31 @@ class PdfWatermarkService
         $lender = $settings['lender'] ?? '';
         $watermarkText = "ISO: {$iso} | Lender: {$lender}";
 
-        $opacity = ($settings['opacity'] ?? 33) / 100;
+        $opacity = ($settings['opacity'] ?? 20) / 100;
         $color = $this->hexToRgb($settings['color'] ?? '#878787');
 
-        // To keep text centered on the page, we need the text width to be less than
-        // the page width so that when positioned at (centerX - textWidth/2), the X
-        // coordinate stays positive (within page bounds)
-        // Max text width = pageWidth - 20mm margin = allows centered text to fit
-        $maxTextWidth = $pageWidth - 20;
+        // Calculate page diagonal - this is the max available width for rotated text
+        $pageDiagonal = sqrt($pageWidth * $pageWidth + $pageHeight * $pageHeight);
 
-        $baseFontSize = 24;
-        $pdf->SetFont('helvetica', 'B', $baseFontSize);
-        $baseTextWidth = $pdf->GetStringWidth($watermarkText);
+        // Target text width: 80% of diagonal to leave comfortable margins
+        $targetTextWidth = $pageDiagonal * 0.80;
 
-        $fontSize = ($maxTextWidth / $baseTextWidth) * $baseFontSize;
-        $fontSize = max(16, min($fontSize, 48));
+        // Use a reference font size to measure the text width
+        $referenceFontSize = 24;
+        $pdf->SetFont('helvetica', 'B', $referenceFontSize);
+        $referenceTextWidth = $pdf->GetStringWidth($watermarkText);
+
+        // Calculate the font size needed to achieve target width
+        $fontSize = ($targetTextWidth / $referenceTextWidth) * $referenceFontSize;
+
+        // Clamp font size to reasonable bounds (min 10, max 72)
+        $fontSize = max(10, min($fontSize, 72));
 
         // Center of page
         $centerX = $pageWidth / 2;
         $centerY = $pageHeight / 2;
 
-        // Set styling
+        // Set styling with calculated font size
         $pdf->SetAlpha($opacity);
         $pdf->SetFont('helvetica', 'B', $fontSize);
         $pdf->SetTextColor($color['r'], $color['g'], $color['b']);
@@ -652,6 +754,7 @@ class PdfWatermarkService
     /**
      * Apply watermark directly to the page content stream.
      * This method bypasses FPDI template clipping issues by writing to page content directly.
+     * Auto-adjusts font size to fit within page diagonal.
      * Note: pageWidth and pageHeight are in mm (FPDI default unit).
      */
     protected function applyWatermarkDirect(Fpdi $pdf, array $settings, float $pageWidth, float $pageHeight): void
@@ -660,35 +763,34 @@ class PdfWatermarkService
         $lender = $settings['lender'] ?? '';
         $watermarkText = "ISO: {$iso} | Lender: {$lender}";
 
-        $opacity = ($settings['opacity'] ?? 33) / 100;
+        $opacity = ($settings['opacity'] ?? 20) / 100;
         $color = $this->hexToRgb($settings['color'] ?? '#878787');
 
-        // Calculate font size to fit within page with good margins
-        // Use 55% of the smaller dimension for comfortable fit when rotated
-        $maxTextWidth = min($pageWidth, $pageHeight) * 0.55;
+        // Calculate page diagonal - this is the max available width for rotated text
+        $pageDiagonal = sqrt($pageWidth * $pageWidth + $pageHeight * $pageHeight);
 
-        // Start with a base font size and calculate text width
-        $baseFontSize = 24;
-        $pdf->SetFont('helvetica', 'B', $baseFontSize);
-        $baseTextWidth = $pdf->GetStringWidth($watermarkText);
+        // Target text width: 80% of diagonal to leave comfortable margins
+        $targetTextWidth = $pageDiagonal * 0.80;
 
-        // Calculate the font size to achieve target width
-        $fontSize = ($maxTextWidth / $baseTextWidth) * $baseFontSize;
+        // Use a reference font size to measure the text width
+        $referenceFontSize = 24;
+        $pdf->SetFont('helvetica', 'B', $referenceFontSize);
+        $referenceTextWidth = $pdf->GetStringWidth($watermarkText);
 
-        // Clamp font size to reasonable bounds
-        $fontSize = max(14, min($fontSize, 36));
+        // Calculate the font size needed to achieve target width
+        $fontSize = ($targetTextWidth / $referenceTextWidth) * $referenceFontSize;
+
+        // Clamp font size to reasonable bounds (min 10, max 72)
+        $fontSize = max(10, min($fontSize, 72));
 
         // Center of page
         $centerX = $pageWidth / 2;
         $centerY = $pageHeight / 2;
 
-        // Convert mm to points for PDF operations (1mm = 2.83465 points)
-        $k = $pdf->getScaleFactor();
-
         // Set graphics state for transparency
         $pdf->SetAlpha($opacity);
 
-        // Set font and color
+        // Set font and color with calculated font size
         $pdf->SetFont('helvetica', 'B', $fontSize);
         $pdf->SetTextColor($color['r'], $color['g'], $color['b']);
 

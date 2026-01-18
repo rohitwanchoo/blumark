@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Storage;
 
 class WatermarkJob extends Model
@@ -93,6 +94,14 @@ class WatermarkJob extends Model
     public function accessLogs(): HasMany
     {
         return $this->hasMany(DocumentAccessLog::class);
+    }
+
+    /**
+     * Get the lender distribution item if this job is part of a distribution.
+     */
+    public function lenderDistributionItem(): HasOne
+    {
+        return $this->hasOne(LenderDistributionItem::class);
     }
 
     /**

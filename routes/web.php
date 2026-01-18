@@ -20,6 +20,9 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\WatermarkJobController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\LenderController;
+use App\Http\Controllers\LenderDistributionController;
+use App\Http\Controllers\EmailTemplateController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\JobController as AdminJobController;
@@ -167,6 +170,43 @@ Route::middleware('auth')->group(function () {
     Route::prefix('shares')->name('shares.')->middleware('verified')->group(function () {
         Route::get('/', [ShareController::class, 'index'])->name('index');
         Route::delete('/{sharedLink}', [ShareController::class, 'destroy'])->name('destroy');
+    });
+
+    // Lenders (requires verified email)
+    Route::prefix('lenders')->name('lenders.')->middleware('verified')->group(function () {
+        Route::get('/', [LenderController::class, 'index'])->name('index');
+        Route::get('/create', [LenderController::class, 'create'])->name('create');
+        Route::post('/', [LenderController::class, 'store'])->name('store');
+        Route::get('/list', [LenderController::class, 'list'])->name('list');
+        Route::get('/{lender}/edit', [LenderController::class, 'edit'])->name('edit');
+        Route::put('/{lender}', [LenderController::class, 'update'])->name('update');
+        Route::delete('/{lender}', [LenderController::class, 'destroy'])->name('destroy');
+    });
+
+    // Lender Distributions (requires verified email)
+    Route::prefix('distributions')->name('distributions.')->middleware('verified')->group(function () {
+        Route::get('/', [LenderDistributionController::class, 'index'])->name('index');
+        Route::get('/create', [LenderDistributionController::class, 'create'])->name('create');
+        Route::post('/', [LenderDistributionController::class, 'store'])->name('store');
+        Route::get('/{distribution}', [LenderDistributionController::class, 'show'])->name('show');
+        Route::get('/{distribution}/status', [LenderDistributionController::class, 'status'])->name('status');
+        Route::post('/{distribution}/send-all', [LenderDistributionController::class, 'sendAll'])->name('send-all');
+        Route::get('/{distribution}/download-all', [LenderDistributionController::class, 'downloadAll'])->name('download-all');
+        Route::delete('/{distribution}', [LenderDistributionController::class, 'destroy'])->name('destroy');
+        Route::get('/{distribution}/items/{item}/download', [LenderDistributionController::class, 'itemDownload'])->name('item.download');
+        Route::post('/{distribution}/items/{item}/send', [LenderDistributionController::class, 'itemSend'])->name('item.send');
+    });
+
+    // Email Templates (requires verified email)
+    Route::prefix('email-templates')->name('email-templates.')->middleware('verified')->group(function () {
+        Route::get('/', [EmailTemplateController::class, 'index'])->name('index');
+        Route::get('/create', [EmailTemplateController::class, 'create'])->name('create');
+        Route::post('/', [EmailTemplateController::class, 'store'])->name('store');
+        Route::get('/{template}/edit', [EmailTemplateController::class, 'edit'])->name('edit');
+        Route::put('/{template}', [EmailTemplateController::class, 'update'])->name('update');
+        Route::delete('/{template}', [EmailTemplateController::class, 'destroy'])->name('destroy');
+        Route::post('/{template}/make-default', [EmailTemplateController::class, 'makeDefault'])->name('make-default');
+        Route::post('/preview', [EmailTemplateController::class, 'preview'])->name('preview');
     });
 
     // Billing routes (requires verified email)

@@ -463,7 +463,7 @@
                 lender: '',
                 fontSize: defaults.font_size || 15,
                 color: defaults.color || '#878787',
-                opacity: defaults.opacity || 33,
+                opacity: defaults.opacity || 20,
 
                 // Templates
                 templates: [],

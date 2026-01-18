@@ -38,7 +38,7 @@ class WatermarkJobController extends Controller
      *         "lender": "ACME Corp",
      *         "font_size": 15,
      *         "color": "#878787",
-     *         "opacity": 33
+     *         "opacity": 20
      *       },
      *       "page_count": 5,
      *       "file_size": 1048576,
@@ -78,7 +78,7 @@ class WatermarkJobController extends Controller
      * - `lender` - The lender name to display in the watermark
      * - `font_size` - Font size in points (8-48, default: 15)
      * - `color` - Hex color code for the watermark text (default: #878787)
-     * - `opacity` - Opacity percentage 1-100 (default: 33)
+     * - `opacity` - Opacity percentage 1-100 (default: 20)
      *
      * @response 201 {
      *   "message": "Watermark job created successfully",
@@ -92,7 +92,7 @@ class WatermarkJobController extends Controller
      *       "lender": "ACME Corp",
      *       "font_size": 15,
      *       "color": "#878787",
-     *       "opacity": 33
+     *       "opacity": 20
      *     },
      *     "page_count": null,
      *     "file_size": 1048576,
@@ -177,7 +177,7 @@ class WatermarkJobController extends Controller
      *       "lender": "ACME Corp",
      *       "font_size": 15,
      *       "color": "#878787",
-     *       "opacity": 33
+     *       "opacity": 20
      *     },
      *     "page_count": 5,
      *     "file_size": 1048576,
