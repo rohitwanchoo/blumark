@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -97,10 +98,19 @@ Route::middleware('auth')->group(function () {
     // Logout
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Email Verification
+    Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
 
-    // Profile
+    // Dashboard (requires verified email)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('verified')->name('dashboard');
+
+    // Profile (accessible without verification to allow email updates)
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'show'])->name('show');
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
@@ -118,8 +128,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/', [TwoFactorAuthenticationController::class, 'disable'])->name('disable');
     });
 
-    // Watermark Jobs
-    Route::prefix('jobs')->name('jobs.')->group(function () {
+    // Watermark Jobs (requires verified email)
+    Route::prefix('jobs')->name('jobs.')->middleware('verified')->group(function () {
         Route::get('/', [WatermarkJobController::class, 'index'])->name('index');
         Route::get('/batch', [WatermarkJobController::class, 'batch'])->name('batch');
         Route::post('/', [WatermarkJobController::class, 'store'])->name('store');
@@ -132,8 +142,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/{job}/shares', [ShareController::class, 'listForJob'])->name('shares');
     });
 
-    // Batch processing
-    Route::prefix('batch')->name('batch.')->group(function () {
+    // Batch processing (requires verified email)
+    Route::prefix('batch')->name('batch.')->middleware('verified')->group(function () {
         Route::get('/', [BatchController::class, 'index'])->name('index');
         Route::get('/create', [BatchController::class, 'create'])->name('create');
         Route::post('/', [BatchController::class, 'store'])->name('store');
@@ -143,8 +153,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{batch}', [BatchController::class, 'destroy'])->name('destroy');
     });
 
-    // Templates
-    Route::prefix('templates')->name('templates.')->group(function () {
+    // Templates (requires verified email)
+    Route::prefix('templates')->name('templates.')->middleware('verified')->group(function () {
         Route::get('/', [TemplateController::class, 'index'])->name('index');
         Route::get('/list', [TemplateController::class, 'list'])->name('list');
         Route::post('/', [TemplateController::class, 'store'])->name('store');
@@ -153,14 +163,14 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{template}', [TemplateController::class, 'destroy'])->name('destroy');
     });
 
-    // Shared links management
-    Route::prefix('shares')->name('shares.')->group(function () {
+    // Shared links management (requires verified email)
+    Route::prefix('shares')->name('shares.')->middleware('verified')->group(function () {
         Route::get('/', [ShareController::class, 'index'])->name('index');
         Route::delete('/{sharedLink}', [ShareController::class, 'destroy'])->name('destroy');
     });
 
-    // Billing routes
-    Route::prefix('billing')->name('billing.')->group(function () {
+    // Billing routes (requires verified email)
+    Route::prefix('billing')->name('billing.')->middleware('verified')->group(function () {
         // Billing dashboard
         Route::get('/', [BillingController::class, 'index'])->name('index');
 

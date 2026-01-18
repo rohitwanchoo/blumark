@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\TwoFactorController;
 use App\Http\Controllers\Api\WatermarkJobController;
@@ -36,6 +37,13 @@ Route::prefix('v1')->group(function () {
         // Authentication
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
+
+        // Email Verification
+        Route::prefix('email')->group(function () {
+            Route::get('/verification-status', [EmailVerificationController::class, 'status']);
+            Route::post('/verification-notification', [EmailVerificationController::class, 'resend']);
+            Route::get('/verify/{id}/{hash}', [EmailVerificationController::class, 'verify']);
+        });
 
         // Two-Factor Authentication Settings
         Route::prefix('two-factor')->group(function () {
