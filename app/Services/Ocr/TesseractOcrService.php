@@ -82,7 +82,8 @@ class TesseractOcrService implements OcrServiceInterface
                 confidence: $avgConfidence,
                 processingTimeMs: $processingTime,
                 pagesProcessed: count($images),
-                pageResults: $pageResults
+                pageResults: $pageResults,
+                engine: 'tesseract'
             );
         } catch (\Exception $e) {
             Log::error('Tesseract OCR failed', [
@@ -95,7 +96,8 @@ class TesseractOcrService implements OcrServiceInterface
                 confidence: 0,
                 processingTimeMs: (int) ((microtime(true) - $startTime) * 1000),
                 pagesProcessed: 0,
-                error: $e->getMessage()
+                error: $e->getMessage(),
+                engine: 'tesseract'
             );
         } finally {
             // Cleanup temp files
@@ -112,7 +114,7 @@ class TesseractOcrService implements OcrServiceInterface
             $outputBase = sys_get_temp_dir() . '/tesseract_' . uniqid();
             $outputFile = $outputBase . '.txt';
 
-            // Build tesseract command
+            // Build tesseract command with both txt and tsv output
             $cmd = sprintf(
                 '%s %s %s -l %s',
                 escapeshellarg($this->tesseractPath),
@@ -126,8 +128,8 @@ class TesseractOcrService implements OcrServiceInterface
                 $cmd .= ' --psm ' . (int) $options['psm'];
             }
 
-            // Get confidence data
-            $cmd .= ' -c tessedit_create_tsv=1';
+            // Output both txt and tsv formats for text and confidence data
+            $cmd .= ' txt tsv';
 
             $result = Process::timeout(120)->run($cmd);
 
@@ -146,7 +148,8 @@ class TesseractOcrService implements OcrServiceInterface
                 text: trim($text),
                 confidence: $confidence,
                 processingTimeMs: (int) ((microtime(true) - $startTime) * 1000),
-                pagesProcessed: 1
+                pagesProcessed: 1,
+                engine: 'tesseract'
             );
         } catch (\Exception $e) {
             return new OcrResult(
@@ -154,7 +157,8 @@ class TesseractOcrService implements OcrServiceInterface
                 confidence: 0,
                 processingTimeMs: (int) ((microtime(true) - $startTime) * 1000),
                 pagesProcessed: 0,
-                error: $e->getMessage()
+                error: $e->getMessage(),
+                engine: 'tesseract'
             );
         }
     }

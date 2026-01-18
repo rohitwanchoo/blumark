@@ -10,7 +10,8 @@ class OcrResult
         public readonly int $processingTimeMs,
         public readonly int $pagesProcessed,
         public readonly array $pageResults = [],
-        public readonly ?string $error = null
+        public readonly ?string $error = null,
+        public readonly ?string $engine = null
     ) {}
 
     public function isSuccessful(): bool
@@ -49,6 +50,7 @@ class OcrResult
             'page_results' => $this->pageResults,
             'error' => $this->error,
             'word_count' => $this->getWordCount(),
+            'engine' => $this->engine,
         ];
     }
 }
