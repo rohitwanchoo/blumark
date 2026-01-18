@@ -2,11 +2,14 @@
 
 namespace App\Providers;
 
+use App\Listeners\SendWelcomeEmail;
 use App\Models\DocumentAccessLog;
 use App\Observers\DocumentAccessLogObserver;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -39,5 +42,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Register observers for suspicious activity detection
         DocumentAccessLog::observe(DocumentAccessLogObserver::class);
+
+        // Register event listeners
+        Event::listen(Registered::class, SendWelcomeEmail::class);
     }
 }

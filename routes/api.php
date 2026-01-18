@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PasswordResetController;
+use App\Http\Controllers\Api\TwoFactorController;
 use App\Http\Controllers\Api\WatermarkJobController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,11 +24,28 @@ Route::prefix('v1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
+    // Password Reset Routes
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+    Route::post('/reset-password', [PasswordResetController::class, 'reset']);
+
+    // Two-Factor Authentication Challenge (during login)
+    Route::post('/two-factor-challenge', [AuthController::class, 'verifyTwoFactor']);
+
     // Protected Routes (require Sanctum token)
     Route::middleware('auth:sanctum')->group(function () {
         // Authentication
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
+
+        // Two-Factor Authentication Settings
+        Route::prefix('two-factor')->group(function () {
+            Route::get('/status', [TwoFactorController::class, 'status']);
+            Route::post('/enable', [TwoFactorController::class, 'enable']);
+            Route::post('/confirm', [TwoFactorController::class, 'confirm']);
+            Route::delete('/disable', [TwoFactorController::class, 'disable']);
+            Route::get('/recovery-codes', [TwoFactorController::class, 'recoveryCodes']);
+            Route::post('/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes']);
+        });
 
         // Watermark Jobs
         Route::apiResource('watermark-jobs', WatermarkJobController::class);

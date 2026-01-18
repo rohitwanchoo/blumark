@@ -30,13 +30,16 @@
             @enderror
         </div>
 
-        <!-- Remember Me -->
+        <!-- Remember Me & Forgot Password -->
         <div class="flex items-center justify-between mt-4">
             <label for="remember_me" class="inline-flex items-center">
                 <input id="remember_me" type="checkbox" name="remember"
                        class="rounded border-gray-300 text-primary-600 shadow-sm focus:ring-primary-500">
                 <span class="ml-2 text-sm text-gray-600">Remember me</span>
             </label>
+            <a href="{{ route('password.request') }}" class="text-sm text-primary-600 hover:text-primary-500">
+                Forgot password?
+            </a>
         </div>
 
         <!-- Submit Button -->

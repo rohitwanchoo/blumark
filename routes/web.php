@@ -1,8 +1,12 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\Auth\TwoFactorAuthenticationController;
+use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CreditController;
@@ -76,6 +80,16 @@ Route::middleware('guest')->group(function () {
     // Social authentication routes
     Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
     Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
+
+    // Password reset routes
+    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('reset-password', [NewPasswordController::class, 'store'])->name('password.store');
+
+    // Two-factor authentication challenge (during login)
+    Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'create'])->name('two-factor.challenge');
+    Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
 });
 
 // Authenticated routes
@@ -92,6 +106,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
         Route::put('/', [ProfileController::class, 'update'])->name('update');
         Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password');
+    });
+
+    // Two-factor authentication settings
+    Route::prefix('two-factor')->name('two-factor.')->group(function () {
+        Route::get('/', [TwoFactorAuthenticationController::class, 'show'])->name('show');
+        Route::get('/enable', [TwoFactorAuthenticationController::class, 'enable'])->name('enable');
+        Route::post('/confirm', [TwoFactorAuthenticationController::class, 'confirm'])->name('confirm');
+        Route::get('/recovery-codes', [TwoFactorAuthenticationController::class, 'showRecoveryCodes'])->name('recovery-codes');
+        Route::post('/recovery-codes', [TwoFactorAuthenticationController::class, 'regenerateRecoveryCodes'])->name('recovery-codes.regenerate');
+        Route::delete('/', [TwoFactorAuthenticationController::class, 'disable'])->name('disable');
     });
 
     // Watermark Jobs
