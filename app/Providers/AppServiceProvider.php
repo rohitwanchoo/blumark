@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\DocumentAccessLog;
+use App\Observers\DocumentAccessLogObserver;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
@@ -34,5 +36,8 @@ class AppServiceProvider extends ServiceProvider
                 SecurityScheme::http('bearer', 'JWT')
             );
         });
+
+        // Register observers for suspicious activity detection
+        DocumentAccessLog::observe(DocumentAccessLogObserver::class);
     }
 }

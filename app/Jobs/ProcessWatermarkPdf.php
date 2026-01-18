@@ -2,10 +2,14 @@
 
 namespace App\Jobs;
 
+use App\Models\DocumentFingerprint;
 use App\Models\WatermarkJob;
+use App\Services\DocumentFingerprintService;
 use App\Services\PdfWatermarkService;
+use App\Services\QrWatermarkService;
 use Exception;
 use Illuminate\Bus\Queueable;
+use Throwable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -82,6 +86,9 @@ class ProcessWatermarkPdf implements ShouldQueue
 
             $this->watermarkJob->markAsDone($storagePath, $result['page_count'] ?? null);
 
+            // Generate document fingerprint for fraud detection
+            $this->generateFingerprint();
+
             Log::info('Watermark job completed', [
                 'job_id' => $this->watermarkJob->id,
                 'page_count' => $result['page_count'] ?? 'unknown',
@@ -148,6 +155,83 @@ class ProcessWatermarkPdf implements ShouldQueue
     }
 
     /**
+     * Generate document fingerprint for fraud detection.
+     */
+    protected function generateFingerprint(): void
+    {
+        if (!config('watermark.security.fingerprint_enabled', true)) {
+            return;
+        }
+
+        try {
+            $fingerprintService = app(DocumentFingerprintService::class);
+            $fingerprint = $fingerprintService->generateFingerprint($this->watermarkJob);
+
+            Log::info('Document fingerprint generated', [
+                'job_id' => $this->watermarkJob->id,
+                'fingerprint_id' => $fingerprint->id,
+                'verification_token' => $fingerprint->verification_token,
+            ]);
+
+            // Add QR code to the PDF if enabled
+            if (config('watermark.security.qr_watermark_enabled', true)) {
+                $this->addQrCodeToDocument($fingerprint);
+            }
+        } catch (Exception $e) {
+            // Log but don't fail the job if fingerprinting fails
+            Log::warning('Failed to generate document fingerprint', [
+                'job_id' => $this->watermarkJob->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Add QR code with verification link to the document.
+     */
+    protected function addQrCodeToDocument(DocumentFingerprint $fingerprint): void
+    {
+        try {
+            $qrService = app(QrWatermarkService::class);
+            $outputPath = $this->watermarkJob->getOutputFullPath();
+
+            if (!$outputPath || !file_exists($outputPath)) {
+                Log::warning('Cannot add QR code - output file not found', [
+                    'job_id' => $this->watermarkJob->id,
+                ]);
+                return;
+            }
+
+            // Get QR settings from config
+            $qrConfig = config('watermark.qr', []);
+
+            // Generate QR and embed in PDF (overwrites the existing output)
+            $qrService->addQrWatermark($outputPath, $fingerprint, [
+                'position' => $qrConfig['position'] ?? 'bottom-right',
+                'page' => $qrConfig['page'] ?? 'first',
+                'size' => $qrConfig['pdf_size'] ?? 20,
+                'opacity' => $qrConfig['opacity'] ?? 0.9,
+                'margin' => 10,
+                'label' => $qrConfig['label'] ?? 'Scan to verify',
+                'url_only' => $qrConfig['url_only'] ?? true,
+                'output_path' => $outputPath, // Overwrite the same file
+            ]);
+
+            Log::info('QR code added to document', [
+                'job_id' => $this->watermarkJob->id,
+                'fingerprint_id' => $fingerprint->id,
+                'verification_url' => $fingerprint->getVerificationUrl(),
+            ]);
+        } catch (Exception $e) {
+            // Log but don't fail if QR embedding fails
+            Log::warning('Failed to add QR code to document', [
+                'job_id' => $this->watermarkJob->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
      * Handle job failure.
      */
     protected function handleFailure(Exception $e): void
@@ -166,7 +250,7 @@ class ProcessWatermarkPdf implements ShouldQueue
     /**
      * Handle a job failure after all retries.
      */
-    public function failed(?Exception $exception): void
+    public function failed(?Throwable $exception): void
     {
         $errorMessage = $exception?->getMessage() ?? 'Unknown error occurred';
 

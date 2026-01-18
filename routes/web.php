@@ -3,15 +3,26 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\BatchController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CreditController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ShareController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\WatermarkJobController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\JobController as AdminJobController;
+use App\Http\Controllers\Admin\ImpersonationController;
+use App\Http\Controllers\Admin\AlertController as AdminAlertController;
+use App\Http\Controllers\Admin\AuditController as AdminAuditController;
+use App\Http\Controllers\Admin\OcrTestController as AdminOcrTestController;
+use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,6 +47,20 @@ Route::get('/privacy', function () {
 Route::get('/terms', function () {
     return view('terms');
 })->name('terms');
+
+// Public shared link routes (no auth required)
+Route::get('/s/{token}', [ShareController::class, 'show'])->name('share.show');
+Route::get('/s/{token}/download', fn(string $token) => redirect()->route('share.show', $token));
+Route::post('/s/{token}/download', [ShareController::class, 'download'])->name('share.download');
+
+// Public document verification routes (no auth required)
+Route::prefix('verify')->name('verify.')->group(function () {
+    Route::get('/', [VerificationController::class, 'index'])->name('index');
+    Route::post('/upload', [VerificationController::class, 'upload'])->name('upload');
+    Route::post('/qr', [VerificationController::class, 'qr'])->name('qr');
+    Route::post('/tamper-report', [VerificationController::class, 'tamperReport'])->name('tamper-report');
+    Route::get('/{token}', [VerificationController::class, 'show'])->name('show');
+});
 
 // Stripe webhooks (must be outside auth middleware)
 Route::post('/stripe/webhook', [WebhookController::class, 'handleWebhook'])->name('cashier.webhook');
@@ -79,6 +104,35 @@ Route::middleware('auth')->group(function () {
         Route::get('/{job}/status', [WatermarkJobController::class, 'status'])->name('status');
         Route::get('/{job}/download', [DownloadController::class, 'download'])->name('download');
         Route::get('/{job}/preview', [DownloadController::class, 'preview'])->name('preview');
+        Route::post('/{job}/share', [ShareController::class, 'store'])->name('share');
+        Route::get('/{job}/shares', [ShareController::class, 'listForJob'])->name('shares');
+    });
+
+    // Batch processing
+    Route::prefix('batch')->name('batch.')->group(function () {
+        Route::get('/', [BatchController::class, 'index'])->name('index');
+        Route::get('/create', [BatchController::class, 'create'])->name('create');
+        Route::post('/', [BatchController::class, 'store'])->name('store');
+        Route::get('/{batch}', [BatchController::class, 'show'])->name('show');
+        Route::get('/{batch}/status', [BatchController::class, 'status'])->name('status');
+        Route::get('/{batch}/download', [BatchController::class, 'download'])->name('download');
+        Route::delete('/{batch}', [BatchController::class, 'destroy'])->name('destroy');
+    });
+
+    // Templates
+    Route::prefix('templates')->name('templates.')->group(function () {
+        Route::get('/', [TemplateController::class, 'index'])->name('index');
+        Route::get('/list', [TemplateController::class, 'list'])->name('list');
+        Route::post('/', [TemplateController::class, 'store'])->name('store');
+        Route::post('/quick', [TemplateController::class, 'quickSave'])->name('quick');
+        Route::put('/{template}', [TemplateController::class, 'update'])->name('update');
+        Route::delete('/{template}', [TemplateController::class, 'destroy'])->name('destroy');
+    });
+
+    // Shared links management
+    Route::prefix('shares')->name('shares.')->group(function () {
+        Route::get('/', [ShareController::class, 'index'])->name('index');
+        Route::delete('/{sharedLink}', [ShareController::class, 'destroy'])->name('destroy');
     });
 
     // Billing routes
@@ -108,5 +162,60 @@ Route::middleware('auth')->group(function () {
         // Invoices
         Route::get('/invoices', [BillingController::class, 'invoices'])->name('invoices');
         Route::get('/invoices/{invoice}', [BillingController::class, 'downloadInvoice'])->name('invoices.download');
+    });
+});
+
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Dashboard
+    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/activity', [AdminDashboardController::class, 'activity'])->name('activity');
+
+    // Users
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/{user}/credits', [AdminUserController::class, 'addCredits'])->name('users.credits');
+    Route::post('/users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.role');
+
+    // Impersonation
+    Route::post('/users/{user}/impersonate', [ImpersonationController::class, 'impersonate'])->name('users.impersonate');
+    Route::post('/stop-impersonating', [ImpersonationController::class, 'stop'])->name('impersonate.stop');
+
+    // Jobs
+    Route::get('/jobs', [AdminJobController::class, 'index'])->name('jobs.index');
+    Route::get('/jobs/{job}', [AdminJobController::class, 'show'])->name('jobs.show');
+    Route::delete('/jobs/{job}', [AdminJobController::class, 'destroy'])->name('jobs.destroy');
+
+    // Security Audit
+    Route::prefix('audit')->name('audit.')->group(function () {
+        Route::get('/', [AdminAuditController::class, 'index'])->name('index');
+        Route::get('/leaks', [AdminAuditController::class, 'leaks'])->name('leaks');
+        Route::get('/verifications', [AdminAuditController::class, 'verifications'])->name('verifications');
+        Route::get('/job/{job}', [AdminAuditController::class, 'job'])->name('job');
+        Route::get('/job/{job}/export', [AdminAuditController::class, 'export'])->name('export');
+        Route::get('/investigate', fn() => redirect()->route('admin.audit.leaks'))->name('investigate.form');
+        Route::post('/investigate', [AdminAuditController::class, 'investigate'])->name('investigate');
+        Route::get('/fingerprint/{fingerprint}', [AdminAuditController::class, 'fingerprint'])->name('fingerprint');
+    });
+
+    // OCR Testing
+    Route::prefix('ocr')->name('ocr.')->group(function () {
+        Route::get('/', [AdminOcrTestController::class, 'index'])->name('index');
+        Route::post('/job/{job}/test', [AdminOcrTestController::class, 'test'])->name('test');
+        Route::post('/job/{job}/compare', [AdminOcrTestController::class, 'compare'])->name('compare');
+        Route::post('/batch-test', [AdminOcrTestController::class, 'batchTest'])->name('batch');
+        Route::get('/job/{job}/history', [AdminOcrTestController::class, 'history'])->name('history');
+        Route::delete('/result/{result}', [AdminOcrTestController::class, 'destroy'])->name('destroy');
+    });
+
+    // Security Alerts
+    Route::prefix('alerts')->name('alerts.')->group(function () {
+        Route::get('/', [AdminAlertController::class, 'index'])->name('index');
+        Route::get('/{alert}', [AdminAlertController::class, 'show'])->name('show');
+        Route::post('/{alert}/acknowledge', [AdminAlertController::class, 'acknowledge'])->name('acknowledge');
+        Route::post('/{alert}/resolve', [AdminAlertController::class, 'resolve'])->name('resolve');
+        Route::post('/{alert}/dismiss', [AdminAlertController::class, 'dismiss'])->name('dismiss');
     });
 });

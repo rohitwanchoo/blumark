@@ -138,7 +138,10 @@ class WatermarkJobController extends Controller
             abort(403, 'You are not authorized to view this job.');
         }
 
-        return view('jobs.show', compact('job'));
+        // Get the document fingerprint for verification
+        $fingerprint = $job->fingerprints()->first();
+
+        return view('jobs.show', compact('job', 'fingerprint'));
     }
 
     /**

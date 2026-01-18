@@ -2,11 +2,279 @@
 
 namespace App\Services;
 
+use App\Models\DocumentFingerprint;
 use Exception;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
 class PdfWatermarkService
 {
+    protected ?InvisibleWatermarkService $invisibleService = null;
+    protected ?DocumentFingerprintService $fingerprintService = null;
+
+    /**
+     * Set the invisible watermark service for multi-layer watermarking.
+     */
+    public function setInvisibleService(InvisibleWatermarkService $service): self
+    {
+        $this->invisibleService = $service;
+        return $this;
+    }
+
+    /**
+     * Set the fingerprint service for multi-layer watermarking.
+     */
+    public function setFingerprintService(DocumentFingerprintService $service): self
+    {
+        $this->fingerprintService = $service;
+        return $this;
+    }
+
+    /**
+     * Apply multi-layer watermark with comprehensive protection.
+     *
+     * Layers:
+     * 1. Background layer - Subtle repeating pattern
+     * 2. Main visible watermark - Primary watermark text
+     * 3. Invisible metadata layer - Encoded tracking data
+     * 4. Edge/margin watermarks - Additional protection
+     *
+     * @param string $inputPath Full path to the input PDF
+     * @param string $outputPath Full path for the output PDF
+     * @param array $settings Watermark settings
+     * @param DocumentFingerprint|null $fingerprint Optional fingerprint for tracking
+     * @return array Result with page_count and layers applied
+     */
+    public function applyMultiLayerWatermark(
+        string $inputPath,
+        string $outputPath,
+        array $settings,
+        ?DocumentFingerprint $fingerprint = null
+    ): array {
+        $this->validateInputFile($inputPath);
+
+        $tempDir = sys_get_temp_dir() . '/multilayer_' . uniqid();
+        mkdir($tempDir, 0755, true);
+
+        $layersApplied = [];
+
+        try {
+            // Convert PDF to images for processing
+            $cmd = sprintf(
+                'pdftoppm -png -r 200 %s %s/page 2>&1',
+                escapeshellarg($inputPath),
+                escapeshellarg($tempDir)
+            );
+            exec($cmd, $output, $returnCode);
+
+            if ($returnCode !== 0) {
+                throw new Exception('Failed to convert PDF to images');
+            }
+
+            $images = glob($tempDir . '/page-*.png');
+            natsort($images);
+            $images = array_values($images);
+
+            if (empty($images)) {
+                throw new Exception('No pages were extracted from the PDF.');
+            }
+
+            $pageCount = count($images);
+            $this->validatePageCount($pageCount);
+
+            // Create new PDF with multi-layer watermarks
+            $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+            $pdf->SetCreator('PDF Watermark Platform');
+            $pdf->SetAuthor('PDF Watermark Platform');
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
+            $pdf->SetMargins(0, 0, 0);
+            $pdf->SetAutoPageBreak(false);
+
+            // Add fingerprint marker to PDF producer
+            if ($fingerprint) {
+                $pdf->SetCreator('WM-' . $fingerprint->unique_marker);
+            }
+
+            foreach ($images as $index => $imagePath) {
+                $imageSize = getimagesize($imagePath);
+                if (!$imageSize) {
+                    continue;
+                }
+
+                $pageWidth = ($imageSize[0] / 200) * 25.4;
+                $pageHeight = ($imageSize[1] / 200) * 25.4;
+                $orientation = $pageWidth > $pageHeight ? 'L' : 'P';
+
+                $pdf->AddPage($orientation, [$pageWidth, $pageHeight]);
+                $pdf->Image($imagePath, 0, 0, $pageWidth, $pageHeight, 'PNG');
+
+                // Layer 1: Background pattern (if enabled)
+                if ($settings['enable_background_layer'] ?? false) {
+                    $this->applyBackgroundLayer($pdf, $settings, $pageWidth, $pageHeight);
+                    $layersApplied['background'] = true;
+                }
+
+                // Layer 2: Main visible watermark
+                $this->applyWatermarkToPage($pdf, $settings, $pageWidth, $pageHeight);
+                $layersApplied['main'] = true;
+
+                // Layer 3: Edge/margin watermarks (if enabled)
+                if ($settings['enable_edge_watermarks'] ?? false) {
+                    $this->applyEdgeWatermarks($pdf, $settings, $pageWidth, $pageHeight, $fingerprint);
+                    $layersApplied['edge'] = true;
+                }
+
+                // Layer 4: OCR-resistant elements (if enabled)
+                if ($settings['ocr_resistant'] ?? false) {
+                    $this->applyOcrResistantElements($pdf, $settings, $pageWidth, $pageHeight);
+                    $layersApplied['ocr_resistant'] = true;
+                }
+            }
+
+            // Save the multi-layer watermarked PDF
+            $pdf->Output($outputPath, 'F');
+
+            // Layer 5: Invisible metadata (applied after PDF generation)
+            if (($settings['enable_invisible_layer'] ?? true) && $this->invisibleService && $fingerprint) {
+                $this->invisibleService->embedInvisible($outputPath, [
+                    'marker' => $fingerprint->unique_marker,
+                    'hash' => $fingerprint->fingerprint_hash,
+                ], ['output_path' => $outputPath]);
+                $layersApplied['invisible'] = true;
+            }
+
+            return [
+                'page_count' => $pageCount,
+                'layers_applied' => $layersApplied,
+            ];
+
+        } finally {
+            // Cleanup temp files
+            $files = glob($tempDir . '/*');
+            foreach ($files as $file) {
+                @unlink($file);
+            }
+            @rmdir($tempDir);
+        }
+    }
+
+    /**
+     * Apply subtle background pattern layer.
+     */
+    protected function applyBackgroundLayer(\TCPDF $pdf, array $settings, float $pageWidth, float $pageHeight): void
+    {
+        $patternText = $settings['background_pattern_text'] ?? 'CONFIDENTIAL';
+        $patternOpacity = ($settings['background_opacity'] ?? 5) / 100;
+        $color = $this->hexToRgb($settings['background_color'] ?? '#cccccc');
+
+        $pdf->SetAlpha($patternOpacity);
+        $pdf->SetFont('helvetica', '', 8);
+        $pdf->SetTextColor($color['r'], $color['g'], $color['b']);
+
+        // Create a subtle repeating pattern
+        $spacingX = 40;
+        $spacingY = 25;
+
+        for ($y = 10; $y < $pageHeight; $y += $spacingY) {
+            for ($x = 10; $x < $pageWidth; $x += $spacingX) {
+                $pdf->StartTransform();
+                $pdf->Rotate(30, $x, $y);
+                $pdf->Text($x, $y, $patternText);
+                $pdf->StopTransform();
+            }
+        }
+
+        $pdf->SetAlpha(1);
+    }
+
+    /**
+     * Apply edge/margin watermarks for additional protection.
+     */
+    protected function applyEdgeWatermarks(
+        \TCPDF $pdf,
+        array $settings,
+        float $pageWidth,
+        float $pageHeight,
+        ?DocumentFingerprint $fingerprint = null
+    ): void {
+        $edgeText = $fingerprint
+            ? "ID: {$fingerprint->unique_marker}"
+            : ($settings['edge_text'] ?? 'PROTECTED DOCUMENT');
+
+        $opacity = ($settings['edge_opacity'] ?? 15) / 100;
+        $color = $this->hexToRgb($settings['edge_color'] ?? '#999999');
+
+        $pdf->SetAlpha($opacity);
+        $pdf->SetFont('helvetica', '', 6);
+        $pdf->SetTextColor($color['r'], $color['g'], $color['b']);
+
+        // Top edge
+        $pdf->Text(5, 3, $edgeText);
+        $pdf->Text($pageWidth - $pdf->GetStringWidth($edgeText) - 5, 3, $edgeText);
+
+        // Bottom edge
+        $pdf->Text(5, $pageHeight - 5, $edgeText);
+        $pdf->Text($pageWidth - $pdf->GetStringWidth($edgeText) - 5, $pageHeight - 5, $edgeText);
+
+        // Left edge (rotated)
+        $pdf->StartTransform();
+        $pdf->Rotate(90, 3, $pageHeight / 2);
+        $pdf->Text(3, $pageHeight / 2, $edgeText);
+        $pdf->StopTransform();
+
+        // Right edge (rotated)
+        $pdf->StartTransform();
+        $pdf->Rotate(-90, $pageWidth - 3, $pageHeight / 2);
+        $pdf->Text($pageWidth - 3, $pageHeight / 2, $edgeText);
+        $pdf->StopTransform();
+
+        $pdf->SetAlpha(1);
+    }
+
+    /**
+     * Apply OCR-resistant elements to confuse text extraction.
+     */
+    protected function applyOcrResistantElements(\TCPDF $pdf, array $settings, float $pageWidth, float $pageHeight): void
+    {
+        $opacity = ($settings['ocr_resistant_opacity'] ?? 3) / 100;
+
+        $pdf->SetAlpha($opacity);
+
+        // Add noise characters at random positions
+        $noiseChars = ['|', '/', '\\', '-', '_', '.', ','];
+        $pdf->SetFont('helvetica', '', 2);
+        $pdf->SetTextColor(200, 200, 200);
+
+        for ($i = 0; $i < 50; $i++) {
+            $x = mt_rand(0, (int) $pageWidth);
+            $y = mt_rand(0, (int) $pageHeight);
+            $char = $noiseChars[array_rand($noiseChars)];
+            $pdf->Text($x, $y, $char);
+        }
+
+        // Add invisible decoy text
+        $pdf->SetTextColor(255, 255, 255); // White on white
+        $pdf->SetFont('helvetica', '', 1);
+        $decoyText = 'WATERMARK_DECOY_' . bin2hex(random_bytes(4));
+        $pdf->Text(0, 0, $decoyText);
+
+        $pdf->SetAlpha(1);
+    }
+
+    /**
+     * Apply watermark with OCR-resistant font rendering.
+     */
+    public function watermarkOcrResistant(string $inputPath, string $outputPath, array $settings): array
+    {
+        // Enable OCR-resistant mode
+        $settings['ocr_resistant'] = true;
+
+        // Fragment the watermark text with special rendering
+        $settings['fragment_text'] = true;
+
+        return $this->watermarkIsoLender($inputPath, $outputPath, $settings);
+    }
+
     /**
      * Apply ISO/Lender watermark in a 9-position grid layout.
      *

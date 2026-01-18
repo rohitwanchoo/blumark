@@ -104,6 +104,7 @@
                     <a href="#how-it-works" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">How It Works</a>
                     <a href="#use-cases" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">Use Cases</a>
                     <a href="#security" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">Security</a>
+                    <a href="/docs/api" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">Developers</a>
                 </div>
 
                 <!-- Auth Buttons -->

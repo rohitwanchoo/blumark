@@ -171,6 +171,27 @@
                         </div>
                     </div>
 
+                    <!-- Template Selection -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="template" class="block text-sm font-medium text-gray-700">Template</label>
+                            <button type="button"
+                                    @click="saveAsTemplate()"
+                                    :disabled="!iso.trim() || !lender.trim()"
+                                    class="text-xs text-primary-600 hover:text-primary-700 font-medium disabled:text-gray-400 disabled:cursor-not-allowed">
+                                + Save as Template
+                            </button>
+                        </div>
+                        <select x-model="selectedTemplate"
+                                @change="applyTemplate()"
+                                class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border">
+                            <option value="">-- Select a template (optional) --</option>
+                            <template x-for="template in templates" :key="template.id">
+                                <option :value="template.id" x-text="template.name + ' (' + template.iso + ' | ' + template.lender + ')'"></option>
+                            </template>
+                        </select>
+                    </div>
+
                     <!-- ISO & Lender Fields -->
                     <div class="grid grid-cols-2 gap-4 mb-6">
                         <div>
@@ -444,6 +465,10 @@
                 color: defaults.color || '#878787',
                 opacity: defaults.opacity || 33,
 
+                // Templates
+                templates: [],
+                selectedTemplate: '',
+
                 // File handling
                 files: [],
                 isDragging: false,
@@ -452,6 +477,72 @@
                 errorMessage: '',
                 successMessage: '',
                 fileIdCounter: 0,
+
+                init() {
+                    this.loadTemplates();
+                },
+
+                async loadTemplates() {
+                    try {
+                        const response = await fetch('{{ route('templates.list') }}', {
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        if (response.ok) {
+                            this.templates = await response.json();
+                        }
+                    } catch (e) {
+                        console.error('Failed to load templates:', e);
+                    }
+                },
+
+                applyTemplate() {
+                    if (!this.selectedTemplate) return;
+                    const template = this.templates.find(t => t.id == this.selectedTemplate);
+                    if (template) {
+                        this.iso = template.iso;
+                        this.lender = template.lender;
+                        this.fontSize = template.font_size;
+                        this.color = template.color;
+                        this.opacity = template.opacity;
+                    }
+                },
+
+                async saveAsTemplate() {
+                    if (!this.iso.trim() || !this.lender.trim()) return;
+
+                    const name = prompt('Enter a name for this template:', `${this.iso} - ${this.lender}`);
+                    if (!name) return;
+
+                    try {
+                        const response = await fetch('{{ route('templates.quick') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({
+                                name: name,
+                                iso: this.iso,
+                                lender: this.lender,
+                                font_size: this.fontSize,
+                                color: this.color,
+                                opacity: this.opacity
+                            })
+                        });
+
+                        if (response.ok) {
+                            await this.loadTemplates();
+                            alert('Template saved successfully!');
+                        } else {
+                            const data = await response.json();
+                            alert(data.message || 'Failed to save template');
+                        }
+                    } catch (e) {
+                        console.error('Failed to save template:', e);
+                        alert('Failed to save template');
+                    }
+                },
 
                 get canUpload() {
                     return this.files.length > 0 &&

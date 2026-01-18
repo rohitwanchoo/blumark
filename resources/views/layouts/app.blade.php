@@ -56,6 +56,19 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="font-sans antialiased bg-gray-50">
+    <!-- Impersonation Banner -->
+    @if(session('impersonating'))
+    <div class="bg-yellow-500 text-yellow-900 text-center py-2 px-4 text-sm font-medium sticky top-0 z-50">
+        <span>You are impersonating <strong>{{ Auth::user()->name }}</strong>.</span>
+        <form action="{{ route('admin.impersonate.stop') }}" method="POST" class="inline ml-4">
+            @csrf
+            <button type="submit" class="underline hover:no-underline font-semibold">
+                Stop Impersonating
+            </button>
+        </form>
+    </div>
+    @endif
+
     <div class="min-h-screen flex">
         <!-- Sidebar -->
         <aside class="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 sidebar-gradient">
@@ -87,6 +100,27 @@
                     </svg>
                     My Jobs
                 </a>
+                <a href="{{ route('batch.index') }}"
+                   class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('batch.*') ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white hover:bg-dark-700' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                    Batch Jobs
+                </a>
+                <a href="{{ route('templates.index') }}"
+                   class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('templates.*') ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white hover:bg-dark-700' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+                    </svg>
+                    Templates
+                </a>
+                <a href="{{ route('shares.index') }}"
+                   class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('shares.*') ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white hover:bg-dark-700' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                    </svg>
+                    Shared Links
+                </a>
                 <a href="{{ route('billing.index') }}"
                    class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('billing.*') ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white hover:bg-dark-700' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,6 +128,47 @@
                     </svg>
                     Billing
                 </a>
+
+                <!-- Security Section -->
+                <div class="pt-4 mt-4 border-t border-dark-700">
+                    <p class="px-3 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Security</p>
+                    <a href="{{ route('verify.index') }}"
+                       class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('verify.*') ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white hover:bg-dark-700' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        Verify Document
+                    </a>
+                    @if(Auth::check() && Auth::user()->isAdmin())
+                    <a href="{{ route('admin.audit.index') }}"
+                       class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.audit.*') ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white hover:bg-dark-700' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                        </svg>
+                        Security Audit
+                    </a>
+                    <a href="{{ route('admin.ocr.index') }}"
+                       class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.ocr.*') ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white hover:bg-dark-700' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        OCR Testing
+                    </a>
+                    @endif
+                </div>
+
+                @if(Auth::check() && Auth::user()->isAdmin())
+                <div class="pt-4 mt-4 border-t border-dark-700">
+                    <a href="{{ route('admin.dashboard') }}"
+                       class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('admin.*') ? 'bg-purple-600 text-white' : 'text-purple-400 hover:text-white hover:bg-purple-900' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        Admin Panel
+                    </a>
+                </div>
+                @endif
             </nav>
 
             <!-- User Menu -->
@@ -162,7 +237,19 @@
                              class="absolute right-0 mt-2 w-48 bg-dark-800 rounded-lg shadow-lg border border-dark-700 overflow-hidden z-50">
                             <a href="{{ route('dashboard') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">Dashboard</a>
                             <a href="{{ route('jobs.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">My Jobs</a>
+                            <a href="{{ route('batch.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">Batch Jobs</a>
+                            <a href="{{ route('templates.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">Templates</a>
+                            <a href="{{ route('shares.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">Shared Links</a>
                             <a href="{{ route('billing.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">Billing</a>
+                            <div class="border-t border-dark-700"></div>
+                            <p class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Security</p>
+                            <a href="{{ route('verify.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">Verify Document</a>
+                            @if(Auth::check() && Auth::user()->isAdmin())
+                            <a href="{{ route('admin.audit.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">Security Audit</a>
+                            <a href="{{ route('admin.ocr.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">OCR Testing</a>
+                            <div class="border-t border-dark-700"></div>
+                            <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 text-sm text-purple-300 hover:text-white hover:bg-purple-900">Admin Panel</a>
+                            @endif
                             <div class="border-t border-dark-700"></div>
                             <a href="{{ route('profile.show') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">My Profile</a>
                             <form method="POST" action="{{ route('logout') }}">

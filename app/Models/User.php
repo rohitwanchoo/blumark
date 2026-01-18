@@ -26,6 +26,7 @@ class User extends Authenticatable
         'phone',
         'website',
         'address',
+        'role',
     ];
 
     protected $hidden = [
@@ -65,6 +66,21 @@ class User extends Authenticatable
     public function socialAccounts(): HasMany
     {
         return $this->hasMany(SocialAccount::class);
+    }
+
+    public function watermarkTemplates(): HasMany
+    {
+        return $this->hasMany(WatermarkTemplate::class);
+    }
+
+    public function sharedLinks(): HasMany
+    {
+        return $this->hasMany(SharedLink::class);
+    }
+
+    public function batchJobs(): HasMany
+    {
+        return $this->hasMany(BatchJob::class);
     }
 
     public function hasSocialAccount(string $provider): bool
@@ -235,5 +251,24 @@ class User extends Authenticatable
         }
 
         return max(0, $plan->jobs_limit - $this->getMonthlyJobCount());
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array($this->role, ['admin', 'super_admin']);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function getRoleLabel(): string
+    {
+        return match($this->role) {
+            'super_admin' => 'Super Admin',
+            'admin' => 'Admin',
+            default => 'User',
+        };
     }
 }

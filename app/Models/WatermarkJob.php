@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 class WatermarkJob extends Model
@@ -18,6 +19,7 @@ class WatermarkJob extends Model
      */
     protected $fillable = [
         'user_id',
+        'batch_job_id',
         'original_filename',
         'original_path',
         'output_path',
@@ -59,6 +61,38 @@ class WatermarkJob extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the batch job this job belongs to.
+     */
+    public function batchJob(): BelongsTo
+    {
+        return $this->belongsTo(BatchJob::class);
+    }
+
+    /**
+     * Get the shared links for this job.
+     */
+    public function sharedLinks(): HasMany
+    {
+        return $this->hasMany(SharedLink::class);
+    }
+
+    /**
+     * Get the document fingerprints for this job.
+     */
+    public function fingerprints(): HasMany
+    {
+        return $this->hasMany(DocumentFingerprint::class);
+    }
+
+    /**
+     * Get the access logs for this job.
+     */
+    public function accessLogs(): HasMany
+    {
+        return $this->hasMany(DocumentAccessLog::class);
     }
 
     /**
