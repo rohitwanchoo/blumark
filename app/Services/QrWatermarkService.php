@@ -36,15 +36,17 @@ class QrWatermarkService
         $size = $options['size'] ?? 150;
         $margin = $options['margin'] ?? 10;
 
-        $result = (new Builder())
-            ->writer(new PngWriter())
-            ->data($qrContent)
-            ->encoding(new Encoding('UTF-8'))
-            ->errorCorrectionLevel(ErrorCorrectionLevel::High)
-            ->size($size)
-            ->margin($margin)
-            ->roundBlockSizeMode(RoundBlockSizeMode::Margin)
-            ->build();
+        $builder = new Builder(
+            writer: new PngWriter(),
+            data: $qrContent,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: $size,
+            margin: $margin,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+        );
+
+        $result = $builder->build();
 
         // Save to temp file
         $tempPath = sys_get_temp_dir() . '/qr_' . uniqid() . '.png';
