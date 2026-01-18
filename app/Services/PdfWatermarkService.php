@@ -317,7 +317,12 @@ class PdfWatermarkService
             $pageCount = count($images);
             $this->validatePageCount($pageCount);
 
-            // Create new PDF with watermarks using TCPDF (no FPDI = no clipping)
+            // Apply watermark directly to images (makes it unextractable as text)
+            foreach ($images as $imagePath) {
+                $this->applyWatermarkToImage($imagePath, $settings);
+            }
+
+            // Create new PDF from watermarked images
             $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
             $pdf->SetCreator('PDF Watermark Platform');
             $pdf->SetAuthor('PDF Watermark Platform');
@@ -346,11 +351,8 @@ class PdfWatermarkService
 
                 $pdf->AddPage($orientation, [$pageWidth, $pageHeight]);
 
-                // Place the image as background
+                // Place the watermarked image (watermark is now part of image, not text layer)
                 $pdf->Image($imagePath, 0, 0, $pageWidth, $pageHeight, 'PNG');
-
-                // Apply watermark on top (no FPDI template = no clipping)
-                $this->applyWatermarkToPage($pdf, $settings, $pageWidth, $pageHeight);
             }
 
             // Save the watermarked PDF
@@ -366,6 +368,104 @@ class PdfWatermarkService
             }
             @rmdir($tempDir);
         }
+    }
+
+    /**
+     * Apply watermark directly to an image file using GD.
+     * This renders the watermark as pixels, making it invisible to text extraction.
+     */
+    protected function applyWatermarkToImage(string $imagePath, array $settings): void
+    {
+        $iso = $settings['iso'] ?? '';
+        $lender = $settings['lender'] ?? '';
+        $watermarkText = "ISO: {$iso} | Lender: {$lender}";
+
+        $opacity = ($settings['opacity'] ?? 33) / 100;
+        $color = $this->hexToRgb($settings['color'] ?? '#878787');
+
+        // Load the image
+        $image = imagecreatefrompng($imagePath);
+        if (!$image) {
+            return;
+        }
+
+        $imgWidth = imagesx($image);
+        $imgHeight = imagesy($image);
+
+        // Enable alpha blending
+        imagealphablending($image, true);
+        imagesavealpha($image, true);
+
+        // Create watermark color with transparency
+        // GD uses 0-127 for alpha (0 = opaque, 127 = transparent)
+        $alpha = (int) (127 - ($opacity * 127));
+        $textColor = imagecolorallocatealpha($image, $color['r'], $color['g'], $color['b'], $alpha);
+
+        // Calculate font size based on image dimensions
+        // Use a TrueType font if available, otherwise use built-in font
+        $fontFile = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
+        if (!file_exists($fontFile)) {
+            $fontFile = '/usr/share/fonts/truetype/freefont/FreeSansBold.ttf';
+        }
+
+        if (file_exists($fontFile)) {
+            // Use TrueType font for better quality
+            $fontSize = min($imgWidth, $imgHeight) * 0.05; // 5% of smaller dimension
+            $fontSize = max(20, min($fontSize, 100)); // Clamp between 20-100
+
+            // Get text bounding box
+            $bbox = imagettfbbox($fontSize, 0, $fontFile, $watermarkText);
+            $textWidth = abs($bbox[2] - $bbox[0]);
+            $textHeight = abs($bbox[7] - $bbox[1]);
+
+            // Calculate center position
+            $centerX = $imgWidth / 2;
+            $centerY = $imgHeight / 2;
+
+            // Create a temporary image for the rotated text
+            $diagonal = sqrt($textWidth * $textWidth + $textHeight * $textHeight) * 1.5;
+            $tempImg = imagecreatetruecolor((int) $diagonal, (int) $diagonal);
+            imagealphablending($tempImg, true);
+            imagesavealpha($tempImg, true);
+            $transparent = imagecolorallocatealpha($tempImg, 0, 0, 0, 127);
+            imagefill($tempImg, 0, 0, $transparent);
+
+            // Draw text on temp image (centered)
+            $tempCenterX = $diagonal / 2 - $textWidth / 2;
+            $tempCenterY = $diagonal / 2 + $textHeight / 2;
+            imagettftext($tempImg, $fontSize, 0, (int) $tempCenterX, (int) $tempCenterY, $textColor, $fontFile, $watermarkText);
+
+            // Rotate the temp image
+            $rotated = imagerotate($tempImg, 45, $transparent);
+            imagedestroy($tempImg);
+
+            if ($rotated) {
+                $rotWidth = imagesx($rotated);
+                $rotHeight = imagesy($rotated);
+
+                // Copy rotated watermark to main image (centered)
+                $destX = (int) (($imgWidth - $rotWidth) / 2);
+                $destY = (int) (($imgHeight - $rotHeight) / 2);
+
+                imagecopy($image, $rotated, $destX, $destY, 0, 0, $rotWidth, $rotHeight);
+                imagedestroy($rotated);
+            }
+        } else {
+            // Fallback to built-in font (less pretty but works)
+            $font = 5; // Largest built-in font
+            $charWidth = imagefontwidth($font);
+            $charHeight = imagefontheight($font);
+            $textWidth = strlen($watermarkText) * $charWidth;
+
+            $x = (int) (($imgWidth - $textWidth) / 2);
+            $y = (int) ($imgHeight / 2);
+
+            imagestring($image, $font, $x, $y, $watermarkText, $textColor);
+        }
+
+        // Save the watermarked image
+        imagepng($image, $imagePath);
+        imagedestroy($image);
     }
 
     /**
