@@ -67,6 +67,7 @@ Route::prefix('verify')->name('verify.')->group(function () {
     Route::post('/upload', [VerificationController::class, 'upload'])->name('upload');
     Route::post('/qr', [VerificationController::class, 'qr'])->name('qr');
     Route::post('/tamper-report', [VerificationController::class, 'tamperReport'])->name('tamper-report');
+    Route::get('/job/{id}', [VerificationController::class, 'showByJob'])->name('show-job');
     Route::get('/{token}', [VerificationController::class, 'show'])->name('show');
 });
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DocumentFingerprint;
 use App\Models\VerificationAttempt;
+use App\Models\WatermarkJob;
 use App\Services\DocumentFingerprintService;
 use App\Services\QrWatermarkService;
 use App\Services\TamperDetectionService;
@@ -57,6 +58,48 @@ class VerificationController extends Controller
             'result' => $result,
             'fingerprint' => $fingerprint,
             'job' => $result['job'] ?? null,
+        ]);
+    }
+
+    /**
+     * Verify a document by watermark job ID.
+     */
+    public function showByJob(int $id, Request $request)
+    {
+        $job = WatermarkJob::with('user')->find($id);
+
+        if (!$job) {
+            return view('verify.invalid', [
+                'message' => 'Document not found.',
+                'status' => 'not_found',
+            ]);
+        }
+
+        // Get fingerprint if exists
+        $fingerprint = DocumentFingerprint::where('watermark_job_id', $job->id)->first();
+
+        // Log the verification attempt
+        VerificationAttempt::create([
+            'fingerprint_id' => $fingerprint?->id,
+            'verification_token' => $fingerprint?->verification_token ?? 'job-' . $id,
+            'status' => 'verified',
+            'verification_method' => VerificationAttempt::METHOD_QR,
+            'request_ip' => $request->ip(),
+            'request_data' => [
+                'user_agent' => $request->userAgent(),
+                'referrer' => $request->header('referer'),
+                'job_id' => $id,
+            ],
+        ]);
+
+        return view('verify.show', [
+            'result' => [
+                'valid' => true,
+                'status' => 'verified',
+                'message' => 'Document verified successfully.',
+            ],
+            'fingerprint' => $fingerprint,
+            'job' => $job,
         ]);
     }
 
