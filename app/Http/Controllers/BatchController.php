@@ -47,11 +47,35 @@ class BatchController extends Controller
 
         $user = Auth::user();
         $files = $request->file('files');
+        $fileCount = count($files);
 
-        // Check usage limits
-        $canCreate = $user->canCreateJob();
-        if (!$canCreate['allowed']) {
-            return back()->withErrors(['files' => $canCreate['reason']]);
+        // Check usage limits for all files in the batch
+        $plan = $user->getCurrentPlan();
+        $monthlyUsage = $user->getMonthlyJobCount();
+        $monthlyLimit = $plan?->jobs_limit;
+        $credits = $user->getCredits();
+
+        // Calculate how many jobs would exceed the limit
+        $jobsWithinLimit = 0;
+        $jobsNeedingCredits = 0;
+
+        if ($monthlyLimit === null) {
+            // Unlimited plan
+            $jobsWithinLimit = $fileCount;
+        } else {
+            $remaining = max(0, $monthlyLimit - $monthlyUsage);
+            $jobsWithinLimit = min($fileCount, $remaining);
+            $jobsNeedingCredits = $fileCount - $jobsWithinLimit;
+        }
+
+        // Check if user can afford the batch
+        if ($jobsNeedingCredits > 0 && $credits < $jobsNeedingCredits) {
+            $shortfall = $jobsNeedingCredits - $credits;
+            return back()->withErrors([
+                'files' => "You can only process {$jobsWithinLimit} more files this month. " .
+                          "You need {$jobsNeedingCredits} credits for the remaining files, but only have {$credits}. " .
+                          "Please purchase {$shortfall} more credits or reduce the number of files."
+            ]);
         }
 
         // Create batch job
@@ -73,6 +97,7 @@ class BatchController extends Controller
         ]);
 
         // Process each file
+        $jobsCreated = 0;
         foreach ($files as $file) {
             $originalFilename = $file->getClientOriginalName();
             $uuid = Str::uuid()->toString();
@@ -94,6 +119,13 @@ class BatchController extends Controller
                 'settings' => $watermarkSettings,
                 'file_size' => $file->getSize(),
             ]);
+
+            $jobsCreated++;
+
+            // Deduct credit if this job exceeds the plan limit
+            if ($jobsCreated > $jobsWithinLimit) {
+                $user->useCredits(1, "Watermark job #{$job->id} (batch #{$batchJob->id})");
+            }
 
             // Dispatch processing job
             ProcessWatermarkPdf::dispatch($job);

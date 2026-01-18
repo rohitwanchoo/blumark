@@ -74,6 +74,24 @@ class WatermarkJobController extends Controller
     {
         $user = $request->user();
 
+        // Check if user can create a job (billing limits)
+        $canCreate = $user->canCreateJob();
+        if (!$canCreate['allowed']) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => $canCreate['reason'],
+                    'monthly_usage' => $canCreate['monthly_usage'] ?? null,
+                    'monthly_limit' => $canCreate['monthly_limit'] ?? null,
+                ], 403);
+            }
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', $canCreate['reason']);
+        }
+
         // Store the PDF file
         $pdfFile = $request->file('pdf_file');
         $originalFilename = $pdfFile->getClientOriginalName();
@@ -104,6 +122,11 @@ class WatermarkJobController extends Controller
             'settings' => $request->getWatermarkSettings(),
             'file_size' => $pdfFile->getSize(),
         ]);
+
+        // Deduct credits if user is over their plan limit
+        if ($canCreate['use_credits'] ?? false) {
+            $user->useCredits(1, "Watermark job #{$watermarkJob->id}");
+        }
 
         // Dispatch the processing job
         ProcessWatermarkPdf::dispatch($watermarkJob);
