@@ -42,7 +42,7 @@ class Plan extends Model
         if ($this->price_cents === 0) {
             return 'Free';
         }
-        return '$' . number_format($this->price_cents / 100, 0);
+        return '$' . number_format($this->price_cents / 100, 2);
     }
 
     public function isUnlimited(): bool
