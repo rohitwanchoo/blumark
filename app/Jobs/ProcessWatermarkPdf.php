@@ -217,6 +217,9 @@ class ProcessWatermarkPdf implements ShouldQueue
                 'output_path' => $outputPath, // Overwrite the same file
             ]);
 
+            // Mark fingerprint as having QR embedded
+            $fingerprint->update(['qr_embedded' => true]);
+
             Log::info('QR code added to document', [
                 'job_id' => $this->watermarkJob->id,
                 'fingerprint_id' => $fingerprint->id,

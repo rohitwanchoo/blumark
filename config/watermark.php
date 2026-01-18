@@ -245,7 +245,7 @@ return [
         'size' => (int) env('WATERMARK_QR_SIZE', 150),
 
         // QR code position: 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'
-        'position' => env('WATERMARK_QR_POSITION', 'bottom-right'),
+        'position' => env('WATERMARK_QR_POSITION', 'top-right'),
 
         // QR code size in PDF (mm)
         'pdf_size' => (int) env('WATERMARK_QR_PDF_SIZE', 20),

@@ -21,6 +21,7 @@ class DocumentFingerprint extends Model
         'verification_token',
         'verified_at',
         'last_verified_at',
+        'qr_embedded',
     ];
 
     protected function casts(): array
