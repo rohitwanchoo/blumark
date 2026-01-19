@@ -82,7 +82,7 @@ class PlansAndCreditsSeeder extends Seeder
             [
                 'name' => 'Starter Pack',
                 'stripe_price_id' => env('STRIPE_CREDIT_STARTER_PRICE_ID'),
-                'credits' => 50,
+                'credits' => 100,
                 'price_cents' => 1000,
                 'bonus_credits' => 0,
                 'is_popular' => false,
@@ -95,7 +95,7 @@ class PlansAndCreditsSeeder extends Seeder
             [
                 'name' => 'Value Pack',
                 'stripe_price_id' => env('STRIPE_CREDIT_VALUE_PRICE_ID'),
-                'credits' => 400,
+                'credits' => 300,
                 'price_cents' => 2000,
                 'bonus_credits' => 0,
                 'is_popular' => true,
@@ -108,7 +108,7 @@ class PlansAndCreditsSeeder extends Seeder
             [
                 'name' => 'Bulk Pack',
                 'stripe_price_id' => env('STRIPE_CREDIT_BULK_PRICE_ID'),
-                'credits' => 1000,
+                'credits' => 600,
                 'price_cents' => 5000,
                 'bonus_credits' => 0,
                 'is_popular' => false,
