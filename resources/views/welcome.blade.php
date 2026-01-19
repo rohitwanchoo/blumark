@@ -1206,7 +1206,9 @@
                     <ul class="space-y-2 text-sm">
                         <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
                         <li><a href="#how-it-works" class="hover:text-white transition-colors">How It Works</a></li>
+                        <li><a href="#use-cases" class="hover:text-white transition-colors">Use Cases</a></li>
                         <li><a href="#security" class="hover:text-white transition-colors">Security</a></li>
+                        <li><a href="/docs/api" class="hover:text-white transition-colors">Developers</a></li>
                     </ul>
                 </div>
 
