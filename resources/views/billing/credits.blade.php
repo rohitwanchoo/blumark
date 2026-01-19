@@ -17,7 +17,7 @@
             <svg class="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <p class="text-sm text-primary-800"><strong>1 credit = 1 watermark</strong> (single or multiple files at one time). Credits are used when you've reached your monthly plan limit. They never expire.</p>
+            <p class="text-sm text-primary-800"><strong>1 credit = 1 watermark job</strong> (single or multiple files at one time). Credits are used when you've reached your monthly plan limit. They never expire.</p>
         </div>
 
         <!-- Current Balance -->
@@ -42,11 +42,11 @@
                             <div class="mt-4">
                                 <span class="text-4xl font-bold text-gray-900">{{ $pack->getPriceFormatted() }}</span>
                             </div>
-                            <p class="mt-2 text-lg font-medium text-gray-900">{{ $pack->getTotalCredits() }} watermarks</p>
-                            <p class="text-sm text-gray-500">${{ number_format($pack->getPricePerCredit(), 2) }} per watermark</p>
+                            <p class="mt-2 text-lg font-medium text-gray-900">{{ $pack->getTotalCredits() }} watermark jobs</p>
+                            <p class="text-sm text-gray-500">${{ number_format($pack->getPricePerCredit(), 2) }} per job</p>
 
                             @if($pack->bonus_credits > 0)
-                                <p class="mt-2 text-sm text-green-600 font-medium">+{{ $pack->bonus_credits }} bonus watermarks!</p>
+                                <p class="mt-2 text-sm text-green-600 font-medium">+{{ $pack->bonus_credits }} bonus jobs!</p>
                             @endif
 
                             <a href="{{ route('billing.credits.purchase', $pack) }}"
