@@ -45,7 +45,6 @@ class PlansAndCreditsSeeder extends Seeder
                     'Unlimited pages per job',
                     'All watermark positions',
                     'Priority processing',
-                    'Batch uploads',
                     'API access',
                     'Email support',
                 ],
