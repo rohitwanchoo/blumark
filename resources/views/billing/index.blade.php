@@ -39,7 +39,7 @@
                         @if($remainingJobs !== null)
                             of {{ $currentPlan?->jobs_limit ?? 0 }} used
                         @else
-                            watermarking jobs this month (unlimited)
+                            watermark jobs this month (unlimited)
                         @endif
                     </p>
                 </div>
@@ -47,7 +47,7 @@
                     <div class="w-full bg-gray-200 rounded-full h-2">
                         <div class="bg-primary-600 h-2 rounded-full" style="width: {{ min(100, ($monthlyUsage / $currentPlan->jobs_limit) * 100) }}%"></div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">{{ $remainingJobs }} watermarking jobs remaining</p>
+                    <p class="text-xs text-gray-500 mt-2">{{ $remainingJobs }} watermark jobs remaining</p>
                 @endif
             </div>
 
@@ -85,7 +85,7 @@
                                 </div>
                                 <div>
                                     <p class="font-medium text-gray-900">Upgrade Your Plan</p>
-                                    <p class="text-sm text-gray-500">Get more watermarking jobs and features</p>
+                                    <p class="text-sm text-gray-500">Get more watermark jobs and features</p>
                                 </div>
                             </div>
                             <svg class="w-5 h-5 text-gray-400 group-hover:text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,7 +104,7 @@
                             </div>
                             <div>
                                 <p class="font-medium text-gray-900">Buy Credit Pack</p>
-                                <p class="text-sm text-gray-500">Get extra watermarking jobs</p>
+                                <p class="text-sm text-gray-500">Get extra watermark jobs</p>
                             </div>
                         </div>
                         <svg class="w-5 h-5 text-gray-400 group-hover:text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
