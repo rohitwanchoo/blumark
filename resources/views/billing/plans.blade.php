@@ -31,9 +31,9 @@
                         </div>
                         <p class="mt-2 text-sm text-gray-500">
                             @if($plan->jobs_limit)
-                                {{ $plan->jobs_limit }} watermarking jobs/month
+                                {{ $plan->jobs_limit }} watermark jobs/month
                             @else
-                                Unlimited watermarking jobs
+                                Unlimited watermark jobs
                             @endif
                         </p>
 
@@ -87,7 +87,7 @@
                     <p class="mt-1 text-sm text-gray-600">Yes, you can upgrade or downgrade at any time. Changes take effect immediately.</p>
                 </div>
                 <div class="bg-white rounded-xl p-4 border border-gray-100">
-                    <h3 class="font-medium text-gray-900">What happens to unused watermarking jobs?</h3>
+                    <h3 class="font-medium text-gray-900">What happens to unused watermark jobs?</h3>
                     <p class="mt-1 text-sm text-gray-600">Monthly allocations reset at the start of each billing period and don't roll over.</p>
                 </div>
             </div>
