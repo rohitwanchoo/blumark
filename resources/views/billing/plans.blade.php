@@ -15,13 +15,13 @@
         <!-- Plan Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach($plans as $plan)
-                <div class="bg-white rounded-2xl shadow-sm border {{ $plan->slug === 'pro' ? 'border-primary-500 ring-2 ring-primary-500' : 'border-gray-100' }} overflow-hidden relative">
+                <div class="bg-white rounded-2xl shadow-sm border {{ $plan->slug === 'pro' ? 'border-primary-500 ring-2 ring-primary-500' : 'border-gray-100' }} overflow-hidden relative flex flex-col">
                     @if($plan->slug === 'pro')
                         <div class="absolute top-0 left-0 right-0 bg-primary-500 text-white text-xs font-semibold text-center py-1">
                             MOST POPULAR
                         </div>
                     @endif
-                    <div class="p-6 {{ $plan->slug === 'pro' ? 'pt-10' : '' }}">
+                    <div class="p-6 {{ $plan->slug === 'pro' ? 'pt-10' : '' }} flex flex-col flex-grow">
                         <h3 class="text-lg font-semibold text-gray-900">{{ $plan->name }}</h3>
                         <div class="mt-4 flex items-baseline">
                             <span class="text-4xl font-bold text-gray-900">{{ $plan->getMonthlyPrice() }}</span>
@@ -37,7 +37,7 @@
                             @endif
                         </p>
 
-                        <ul class="mt-6 space-y-3">
+                        <ul class="mt-6 space-y-3 flex-grow">
                             @foreach($plan->features ?? [] as $feature)
                                 <li class="flex items-start">
                                     <svg class="w-5 h-5 text-primary-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -48,7 +48,7 @@
                             @endforeach
                         </ul>
 
-                        <div class="mt-8">
+                        <div class="mt-auto pt-6">
                             @if($currentPlan?->id === $plan->id)
                                 <span class="block w-full text-center px-4 py-3 bg-gray-100 rounded-xl text-sm font-semibold text-gray-500">
                                     Current Plan
