@@ -92,9 +92,33 @@ class SubscriptionController extends Controller
                 ->with('error', 'This plan is not available for subscription.');
         }
 
+        $currentPlan = $user->getCurrentPlan();
+        $isDowngrade = $currentPlan && $plan->price_cents < $currentPlan->price_cents;
+
+        if ($isDowngrade) {
+            // For downgrades, schedule change at end of billing period
+            $subscription = $user->subscription('default');
+            $stripe = new \Stripe\StripeClient(config('cashier.secret'));
+
+            $stripe->subscriptions->update($subscription->stripe_id, [
+                'items' => [
+                    [
+                        'id' => $subscription->items->first()->stripe_id,
+                        'price' => $plan->stripe_price_id,
+                    ],
+                ],
+                'proration_behavior' => 'none',
+                'billing_cycle_anchor' => 'unchanged',
+            ]);
+
+            return redirect()->route('billing.index')
+                ->with('success', 'Your plan will be downgraded to ' . $plan->name . ' at the start of your next billing cycle.');
+        }
+
+        // For upgrades, apply immediately with proration
         $user->subscription('default')->swap($plan->stripe_price_id);
 
         return redirect()->route('billing.index')
-            ->with('success', 'Your plan has been updated successfully.');
+            ->with('success', 'Your plan has been upgraded to ' . $plan->name . ' successfully.');
     }
 }
