@@ -98,12 +98,12 @@
                         @endif
 
                         <div class="flex flex-col space-y-2">
-                            @if($billing['plan_slug'] === 'free')
+                            @if($billing['plan_slug'] !== 'enterprise')
                                 <a href="{{ route('billing.plans') }}" class="inline-flex items-center justify-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-lg transition-colors">
                                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                                     </svg>
-                                    Upgrade
+                                    {{ $billing['plan_slug'] === 'free' ? 'Upgrade' : 'Manage Plan' }}
                                 </a>
                             @endif
                             <a href="{{ route('billing.credits') }}" class="inline-flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
