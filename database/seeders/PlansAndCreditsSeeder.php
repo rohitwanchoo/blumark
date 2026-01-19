@@ -83,7 +83,7 @@ class PlansAndCreditsSeeder extends Seeder
                 'name' => 'Starter Pack',
                 'stripe_price_id' => env('STRIPE_CREDIT_STARTER_PRICE_ID'),
                 'credits' => 50,
-                'price_cents' => 500,
+                'price_cents' => 1000,
                 'bonus_credits' => 0,
                 'is_popular' => false,
                 'sort_order' => 1,
