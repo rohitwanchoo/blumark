@@ -77,6 +77,6 @@ class CreditController extends Controller
         }
 
         return redirect()->route('billing.credits')
-            ->with('success', 'Credits purchased successfully! They will be added to your account shortly.');
+            ->with('success', 'Credits purchased successfully and have been added to your account.');
     }
 }
