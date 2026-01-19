@@ -71,9 +71,9 @@
                             @if($billing['jobs_remaining'] !== null && $billing['jobs_remaining'] <= 10)
                                 <p class="text-xs text-gray-500 mt-2">
                                     @if($billing['jobs_remaining'] === 0)
-                                        <span class="text-red-600 font-medium">No submissions remaining this month</span>
+                                        <span class="text-red-600 font-medium">No watermarking jobs remaining this month</span>
                                     @else
-                                        <span class="text-yellow-600">{{ $billing['jobs_remaining'] }} submissions remaining this month</span>
+                                        <span class="text-yellow-600">{{ $billing['jobs_remaining'] }} watermarking jobs remaining this month</span>
                                     @endif
                                 </p>
                             @endif
