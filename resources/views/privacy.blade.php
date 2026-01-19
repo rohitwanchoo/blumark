@@ -217,6 +217,49 @@
     <!-- Footer -->
     <footer class="bg-dark-900 text-gray-400 py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <!-- Brand -->
+                <div class="md:col-span-2">
+                    <a href="/" class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-white">Blu<span class="text-primary-400">Mark</span></span>
+                    </a>
+                    <p class="text-sm max-w-md">
+                        PDF watermarking built for the MCA industry. Dual watermarks help ISOs get proper credit and lenders get organized submissions. Better for everyone.
+                    </p>
+                </div>
+
+                <!-- Links -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/#features" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="/#how-it-works" class="hover:text-white transition-colors">How It Works</a></li>
+                        <li><a href="/#use-cases" class="hover:text-white transition-colors">Use Cases</a></li>
+                        <li><a href="/#security" class="hover:text-white transition-colors">Security</a></li>
+                        <li><a href="/docs/api" class="hover:text-white transition-colors">Developers</a></li>
+                    </ul>
+                </div>
+
+                <!-- Account -->
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Account</h4>
+                    <ul class="space-y-2 text-sm">
+                        @guest
+                        <li><a href="{{ route('login') }}" class="hover:text-white transition-colors">Sign In</a></li>
+                        <li><a href="{{ route('register') }}" class="hover:text-white transition-colors">Create Account</a></li>
+                        @else
+                        <li><a href="{{ route('dashboard') }}" class="hover:text-white transition-colors">Dashboard</a></li>
+                        <li><a href="{{ route('jobs.index') }}" class="hover:text-white transition-colors">My Jobs</a></li>
+                        @endguest
+                    </ul>
+                </div>
+            </div>
+
             <div class="border-t border-dark-700 pt-8 flex flex-col md:flex-row justify-between items-center">
                 <p class="text-sm">&copy; {{ date('Y') }} BluMark. All rights reserved.</p>
                 <div class="flex space-x-6 mt-4 md:mt-0 text-sm">
