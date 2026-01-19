@@ -59,6 +59,15 @@
                     <span class="text-xl font-bold text-white">Blu<span class="text-primary-400">Mark</span></span>
                 </a>
 
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/#features" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">Features</a>
+                    <a href="/#how-it-works" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">How It Works</a>
+                    <a href="/#use-cases" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">Use Cases</a>
+                    <a href="/#security" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">Security</a>
+                    <a href="/docs/api" class="text-gray-300 hover:text-white text-sm font-medium transition-colors">Developers</a>
+                </div>
+
                 <!-- Auth Buttons -->
                 <div class="flex items-center space-x-4">
                     @auth
@@ -94,7 +103,7 @@
                     By accessing or using BluMark ("Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use our Service.
                 </p>
                 <p>
-                    These Terms apply to all users, including ISOs, brokers, funders, and any other parties using our PDF watermarking service.
+                    These Terms apply to all users, including ISOs, brokers, lenders, and any other parties using our PDF watermarking service.
                 </p>
 
                 <h2 class="text-2xl font-bold text-gray-900">2. Description of Service</h2>
