@@ -12,6 +12,14 @@
             <p class="text-gray-500 mt-1">Purchase credit packs for extra submissions</p>
         </div>
 
+        <!-- Info Box -->
+        <div class="bg-primary-50 border border-primary-100 rounded-xl p-4 mb-8 flex items-start space-x-3">
+            <svg class="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <p class="text-sm text-primary-800"><strong>1 credit = 1 submission.</strong> Credits are used when you've reached your monthly plan limit. They never expire and can be used anytime.</p>
+        </div>
+
         <!-- Current Balance -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8 max-w-sm">
             <p class="text-sm font-medium text-gray-500 mb-1">Current Balance</p>
@@ -34,11 +42,11 @@
                             <div class="mt-4">
                                 <span class="text-4xl font-bold text-gray-900">{{ $pack->getPriceFormatted() }}</span>
                             </div>
-                            <p class="mt-2 text-lg text-gray-700">{{ $pack->getTotalCredits() }} credits</p>
-                            <p class="text-sm text-gray-500">${{ number_format($pack->getPricePerCredit(), 2) }} per credit</p>
+                            <p class="mt-2 text-lg font-medium text-gray-900">{{ $pack->getTotalCredits() }} submissions</p>
+                            <p class="text-sm text-gray-500">${{ number_format($pack->getPricePerCredit(), 2) }} per submission</p>
 
                             @if($pack->bonus_credits > 0)
-                                <p class="mt-2 text-sm text-green-600 font-medium">+{{ $pack->bonus_credits }} bonus credits!</p>
+                                <p class="mt-2 text-sm text-green-600 font-medium">+{{ $pack->bonus_credits }} bonus submissions!</p>
                             @endif
 
                             <a href="{{ route('billing.credits.purchase', $pack) }}"
