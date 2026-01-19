@@ -107,7 +107,7 @@ class PlansAndCreditsSeeder extends Seeder
             [
                 'name' => 'Bulk Pack',
                 'stripe_price_id' => env('STRIPE_CREDIT_BULK_PRICE_ID'),
-                'credits' => 1200,
+                'credits' => 1300,
                 'price_cents' => 5000,
                 'bonus_credits' => 0,
                 'is_popular' => false,
