@@ -35,7 +35,7 @@ class PlansAndCreditsSeeder extends Seeder
             [
                 'name' => 'Pro',
                 'stripe_price_id' => env('STRIPE_PRO_PRICE_ID'),
-                'price_cents' => 4999,
+                'price_cents' => 5000,
                 'billing_period' => 'monthly',
                 'jobs_limit' => 300,
                 'pages_per_job_limit' => null,
@@ -57,7 +57,7 @@ class PlansAndCreditsSeeder extends Seeder
             [
                 'name' => 'Enterprise',
                 'stripe_price_id' => env('STRIPE_ENTERPRISE_PRICE_ID'),
-                'price_cents' => 9999,
+                'price_cents' => 10000,
                 'billing_period' => 'monthly',
                 'jobs_limit' => null,
                 'pages_per_job_limit' => null,
