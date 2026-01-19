@@ -53,7 +53,7 @@
                     <div class="flex-1 lg:max-w-md">
                         @if($billing['jobs_limit'] !== null)
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-medium text-gray-700">Monthly Submissions</span>
+                                <span class="text-sm font-medium text-gray-700">Monthly Usage</span>
                                 <span class="text-sm font-semibold
                                     @if($billing['usage_percentage'] >= 90) text-red-600
                                     @elseif($billing['usage_percentage'] >= 75) text-yellow-600
