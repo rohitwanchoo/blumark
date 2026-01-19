@@ -68,15 +68,16 @@
                                     @else bg-primary-500 @endif"
                                     style="width: {{ $billing['usage_percentage'] }}%"></div>
                             </div>
-                            @if($billing['jobs_remaining'] !== null && $billing['jobs_remaining'] <= 10)
-                                <p class="text-xs text-gray-500 mt-2">
-                                    @if($billing['jobs_remaining'] === 0)
-                                        <span class="text-red-600 font-medium">No watermarking jobs remaining this month</span>
-                                    @else
-                                        <span class="text-yellow-600">{{ $billing['jobs_remaining'] }} watermarking jobs remaining this month</span>
+                            <p class="text-xs mt-2">
+                                @if($billing['total_available'] > 0)
+                                    <span class="text-green-600 font-medium">{{ $billing['total_available'] }} watermark jobs available</span>
+                                    @if($billing['credits'] > 0)
+                                        <span class="text-gray-400">({{ $billing['jobs_remaining'] ?? 0 }} plan + {{ $billing['credits'] }} credits)</span>
                                     @endif
-                                </p>
-                            @endif
+                                @else
+                                    <span class="text-red-600 font-medium">No watermark jobs available. <a href="{{ route('billing.credits') }}" class="underline">Buy credits</a></span>
+                                @endif
+                            </p>
                         @else
                             <div class="flex items-center space-x-2 text-green-600">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
