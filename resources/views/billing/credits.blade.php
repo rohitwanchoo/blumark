@@ -43,7 +43,7 @@
                                 <span class="text-4xl font-bold text-gray-900">{{ $pack->getPriceFormatted() }}</span>
                             </div>
                             <p class="mt-2 text-lg font-medium text-gray-900">{{ $pack->getTotalCredits() }} watermark jobs</p>
-                            <p class="text-sm text-gray-500">${{ number_format($pack->getPricePerCredit(), 2) }} per job</p>
+                            <p class="text-sm text-gray-500">${{ number_format($pack->getPricePerCredit(), 2) }} per watermark job</p>
 
                             @if($pack->bonus_credits > 0)
                                 <p class="mt-2 text-sm text-green-600 font-medium">+{{ $pack->bonus_credits }} bonus jobs!</p>
