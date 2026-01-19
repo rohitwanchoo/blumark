@@ -25,8 +25,6 @@ class PlansAndCreditsSeeder extends Seeder
                     '20 pages max per job',
                     'All watermark positions',
                     'Priority processing',
-                    'Batch uploads',
-                    'API access',
                     'Email support',
                 ],
                 'sort_order' => 1,
