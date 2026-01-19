@@ -38,10 +38,10 @@ class PlansAndCreditsSeeder extends Seeder
                 'stripe_price_id' => env('STRIPE_PRO_PRICE_ID'),
                 'price_cents' => 5000,
                 'billing_period' => 'monthly',
-                'jobs_limit' => 1500,
+                'jobs_limit' => 1000,
                 'pages_per_job_limit' => null,
                 'features' => [
-                    '1500 watermark jobs per month',
+                    '1000 watermark jobs per month',
                     'Unlimited pages per job',
                     'All watermark positions',
                     'Priority processing',
