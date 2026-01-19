@@ -41,6 +41,41 @@ class CreditController extends Controller
 
     public function success(Request $request)
     {
+        $sessionId = $request->query('session_id');
+        $packId = $request->query('pack');
+
+        if ($sessionId && $packId) {
+            try {
+                $stripe = new \Stripe\StripeClient(config('cashier.secret'));
+                $session = $stripe->checkout->sessions->retrieve($sessionId);
+
+                if ($session->payment_status === 'paid') {
+                    $user = $request->user();
+                    $creditPack = CreditPack::find($packId);
+                    $paymentIntentId = $session->payment_intent;
+
+                    // Check if credits already added for this payment (avoid duplicates)
+                    $alreadyAdded = $user->creditTransactions()
+                        ->where('stripe_payment_intent_id', $paymentIntentId)
+                        ->exists();
+
+                    if (!$alreadyAdded && $creditPack) {
+                        $user->addCredits(
+                            $creditPack->getTotalCredits(),
+                            'purchase',
+                            "Purchased {$creditPack->name} ({$creditPack->getTotalCredits()} credits)",
+                            $paymentIntentId
+                        );
+
+                        return redirect()->route('billing.credits')
+                            ->with('success', "Credits purchased successfully! {$creditPack->getTotalCredits()} credits have been added to your account.");
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Credit purchase success error: ' . $e->getMessage());
+            }
+        }
+
         return redirect()->route('billing.credits')
             ->with('success', 'Credits purchased successfully! They will be added to your account shortly.');
     }
