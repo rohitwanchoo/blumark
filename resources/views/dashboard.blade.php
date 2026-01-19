@@ -6,12 +6,123 @@
             <p class="text-gray-500 mt-1">Welcome back! Upload PDFs to add watermarks.</p>
         </div>
 
+        <!-- Billing & Usage Widget -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
+            <div class="p-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                    <!-- Plan Info -->
+                    <div class="flex items-center space-x-4">
+                        <div class="w-14 h-14 rounded-xl flex items-center justify-center
+                            @if($billing['plan_slug'] === 'enterprise') bg-purple-100
+                            @elseif($billing['plan_slug'] === 'pro') bg-primary-100
+                            @else bg-gray-100 @endif">
+                            @if($billing['plan_slug'] === 'enterprise')
+                                <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            @elseif($billing['plan_slug'] === 'pro')
+                                <svg class="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            @else
+                                <svg class="w-7 h-7 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            @endif
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h3 class="text-lg font-bold text-gray-900">{{ $billing['plan_name'] }} Plan</h3>
+                                @if($billing['on_grace_period'])
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Canceling
+                                    </span>
+                                @endif
+                            </div>
+                            <p class="text-sm text-gray-500 mt-0.5">
+                                @if($billing['jobs_limit'] === null)
+                                    Unlimited submissions per month
+                                @else
+                                    {{ $billing['jobs_limit'] }} submissions per month
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Usage Stats -->
+                    <div class="flex-1 lg:max-w-md">
+                        @if($billing['jobs_limit'] !== null)
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-700">Monthly Submissions</span>
+                                <span class="text-sm font-semibold
+                                    @if($billing['usage_percentage'] >= 90) text-red-600
+                                    @elseif($billing['usage_percentage'] >= 75) text-yellow-600
+                                    @else text-gray-900 @endif">
+                                    {{ $billing['jobs_used'] }} / {{ $billing['jobs_limit'] }}
+                                </span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="h-3 rounded-full transition-all duration-500
+                                    @if($billing['usage_percentage'] >= 90) bg-red-500
+                                    @elseif($billing['usage_percentage'] >= 75) bg-yellow-500
+                                    @else bg-primary-500 @endif"
+                                    style="width: {{ $billing['usage_percentage'] }}%"></div>
+                            </div>
+                            @if($billing['jobs_remaining'] !== null && $billing['jobs_remaining'] <= 10)
+                                <p class="text-xs text-gray-500 mt-2">
+                                    @if($billing['jobs_remaining'] === 0)
+                                        <span class="text-red-600 font-medium">No submissions remaining this month</span>
+                                    @else
+                                        <span class="text-yellow-600">{{ $billing['jobs_remaining'] }} submissions remaining this month</span>
+                                    @endif
+                                </p>
+                            @endif
+                        @else
+                            <div class="flex items-center space-x-2 text-green-600">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm font-medium">Unlimited submissions - no restrictions</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Credits & Actions -->
+                    <div class="flex items-center space-x-4">
+                        @if($billing['credits'] > 0)
+                            <div class="text-center px-4 py-2 bg-green-50 rounded-xl border border-green-100">
+                                <p class="text-2xl font-bold text-green-600">{{ $billing['credits'] }}</p>
+                                <p class="text-xs text-green-700">Credits</p>
+                            </div>
+                        @endif
+
+                        <div class="flex flex-col space-y-2">
+                            @if($billing['plan_slug'] === 'free')
+                                <a href="{{ route('billing.plans') }}" class="inline-flex items-center justify-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                    </svg>
+                                    Upgrade
+                                </a>
+                            @endif
+                            <a href="{{ route('billing.credits') }}" class="inline-flex items-center justify-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                                Buy Credits
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-500">Total Jobs</p>
+                        <p class="text-sm font-medium text-gray-500">Documents Processed</p>
                         <p class="text-3xl font-bold text-gray-900 mt-1">{{ $stats['total_jobs'] }}</p>
                     </div>
                     <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
@@ -372,14 +483,14 @@
                 </div>
             </div>
 
-            <!-- Recent Jobs -->
+            <!-- Recent Submissions -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Recent Jobs</h3>
-                        <p class="text-sm text-gray-500 mt-1">Your latest watermarking jobs</p>
+                        <h3 class="text-lg font-semibold text-gray-900">Recent Submissions</h3>
+                        <p class="text-sm text-gray-500 mt-1">Documents sent to lenders</p>
                     </div>
-                    <a href="{{ route('jobs.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center">
+                    <a href="{{ route('distributions.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center">
                         View all
                         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -387,53 +498,56 @@
                     </a>
                 </div>
                 <div class="p-6">
-                    @if($recentJobs->isEmpty())
+                    @if($recentDistributions->isEmpty())
                         <div class="text-center py-12">
                             <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                 </svg>
                             </div>
-                            <h4 class="text-sm font-medium text-gray-900 mb-1">No jobs yet</h4>
-                            <p class="text-sm text-gray-500">Upload a PDF to get started!</p>
+                            <h4 class="text-sm font-medium text-gray-900 mb-1">No submissions yet</h4>
+                            <p class="text-sm text-gray-500 mb-4">Send watermarked documents to your lenders</p>
+                            <a href="{{ route('distributions.create') }}" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                New Submission
+                            </a>
                         </div>
                     @else
                         <div class="space-y-3">
-                            @foreach($recentJobs as $job)
-                                <a href="{{ route('jobs.show', $job) }}" class="block p-4 rounded-xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50/50 transition-all duration-200 group">
+                            @foreach($recentDistributions as $distribution)
+                                <a href="{{ route('distributions.show', $distribution) }}" class="block p-4 rounded-xl border border-gray-100 hover:border-primary-200 hover:bg-primary-50/50 transition-all duration-200 group">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-3 min-w-0">
-                                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-100 transition-colors">
-                                                <svg class="w-5 h-5 text-gray-500 group-hover:text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors">
+                                                <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                                                 </svg>
                                             </div>
                                             <div class="min-w-0">
-                                                <p class="text-sm font-medium text-gray-900 truncate">{{ $job->original_filename }}</p>
-                                                <p class="text-xs text-gray-500">{{ $job->created_at->diffForHumans() }}</p>
+                                                <p class="text-sm font-medium text-gray-900 truncate">{{ $distribution->name }}</p>
+                                                <p class="text-xs text-gray-500">{{ $distribution->created_at->diffForHumans() }}</p>
                                             </div>
                                         </div>
                                         <div class="flex items-center space-x-3">
-                                            @if($job->status === 'done')
+                                            @if($distribution->status === 'completed')
                                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                                     </svg>
                                                     Done
                                                 </span>
-                                            @elseif($job->status === 'pending' || $job->status === 'processing')
+                                            @elseif($distribution->status === 'processing' || $distribution->status === 'pending')
                                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
                                                     <svg class="w-3 h-3 mr-1 animate-spin" fill="none" viewBox="0 0 24 24">
                                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                                                     </svg>
-                                                    {{ ucfirst($job->status) }}
+                                                    Processing
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                                    </svg>
                                                     Failed
                                                 </span>
                                             @endif
@@ -441,6 +555,28 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </div>
+                                    </div>
+                                    <div class="flex items-center mt-2 text-xs text-gray-500 ml-[52px]">
+                                        <span class="flex items-center mr-3">
+                                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            {{ $distribution->items->unique('lender_id')->count() }} {{ Str::plural('lender', $distribution->items->unique('lender_id')->count()) }}
+                                        </span>
+                                        <span class="flex items-center">
+                                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            {{ $distribution->items->count() }} {{ Str::plural('file', $distribution->items->count()) }}
+                                        </span>
+                                        @php
+                                            $sentCount = $distribution->items->filter(fn($i) => $i->isSent())->count();
+                                        @endphp
+                                        @if($sentCount > 0)
+                                            <span class="ml-auto text-green-600 font-medium">
+                                                {{ $sentCount }}/{{ $distribution->items->count() }} sent
+                                            </span>
+                                        @endif
                                     </div>
                                 </a>
                             @endforeach
