@@ -9,7 +9,7 @@
                 Back to Billing
             </a>
             <h1 class="text-2xl font-bold text-gray-900">Credits</h1>
-            <p class="text-gray-500 mt-1">Purchase credit packs for extra submissions</p>
+            <p class="text-gray-500 mt-1">Purchase credit packs for extra watermarking jobs</p>
         </div>
 
         <!-- Info Box -->
