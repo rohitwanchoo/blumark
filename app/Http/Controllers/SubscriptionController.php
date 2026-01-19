@@ -19,20 +19,21 @@ class SubscriptionController extends Controller
     public function checkout(Request $request, Plan $plan)
     {
         $user = $request->user();
+        $currentPlan = $user->getCurrentPlan();
 
         // If user already has this plan
-        if ($user->getCurrentPlan()?->id === $plan->id) {
+        if ($currentPlan?->id === $plan->id) {
             return redirect()->route('billing.index')
                 ->with('info', 'You are already on this plan.');
         }
 
-        // Free plan - cancel subscription
+        // Free plan - cancel subscription at end of billing period
         if ($plan->slug === 'free') {
             if ($user->subscribed('default')) {
                 $user->subscription('default')->cancel();
             }
             return redirect()->route('billing.index')
-                ->with('success', 'Switched to free plan. Your current subscription will remain active until the end of the billing period.');
+                ->with('success', 'Your subscription will be cancelled at the end of the current billing period. You\'ll retain access until then.');
         }
 
         // Check if plan has a Stripe price ID
@@ -41,7 +42,38 @@ class SubscriptionController extends Controller
                 ->with('error', 'This plan is not available for subscription at this time.');
         }
 
-        // Redirect to Stripe Checkout
+        // If user is already subscribed, handle plan change
+        if ($user->subscribed('default')) {
+            $isDowngrade = $currentPlan && $plan->price_cents < $currentPlan->price_cents;
+
+            if ($isDowngrade) {
+                // For downgrades, schedule change at end of billing period
+                $subscription = $user->subscription('default');
+                $stripe = new \Stripe\StripeClient(config('cashier.secret'));
+
+                $stripe->subscriptions->update($subscription->stripe_id, [
+                    'items' => [
+                        [
+                            'id' => $subscription->items->first()->stripe_id,
+                            'price' => $plan->stripe_price_id,
+                        ],
+                    ],
+                    'proration_behavior' => 'none',
+                    'billing_cycle_anchor' => 'unchanged',
+                ]);
+
+                return redirect()->route('billing.index')
+                    ->with('success', 'Your plan will be downgraded to ' . $plan->name . ' at the end of your current billing cycle. You\'ll retain your current plan features until then.');
+            }
+
+            // For upgrades, apply immediately with proration
+            $user->subscription('default')->swap($plan->stripe_price_id);
+
+            return redirect()->route('billing.index')
+                ->with('success', 'Your plan has been upgraded to ' . $plan->name . ' successfully!');
+        }
+
+        // New subscription - redirect to Stripe Checkout
         return $user->newSubscription('default', $plan->stripe_price_id)
             ->checkout([
                 'success_url' => route('billing.subscription.success') . '?session_id={CHECKOUT_SESSION_ID}',
