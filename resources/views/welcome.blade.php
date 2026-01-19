@@ -151,7 +151,7 @@
                 <!-- Subheadline -->
                 <p class="text-lg sm:text-xl text-gray-400 mb-10 max-w-2xl mx-auto animate-fade-in-up" style="animation-delay: 0.2s; opacity: 0;">
                     Dual watermarks: ISO name + Lender name on every document.
-                    ISOs prove deal ownership. Funders get clean submissions. Everyone wins.
+                    ISOs prove deal ownership. Lenders get clean submissions. Everyone wins.
                 </p>
 
                 <!-- CTA Buttons -->
@@ -233,7 +233,7 @@
                     Professional Document Standards for MCA
                 </h2>
                 <p class="text-lg text-gray-600">
-                    When ISOs and funders both use watermarking, deals move faster, disputes disappear, and everyone operates with confidence.
+                    When ISOs and lenders both use watermarking, deals move faster, disputes disappear, and everyone operates with confidence.
                 </p>
             </div>
 
@@ -248,7 +248,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 mb-3">Dual Watermark System</h3>
                     <p class="text-gray-600">
-                        Two watermarks on every page: <strong>Your ISO</strong> (who's sending) + <strong>Lender name</strong> (who's receiving). Send same docs to multiple funders — each uniquely marked.
+                        Two watermarks on every page: <strong>Your ISO</strong> (who's sending) + <strong>Lender name</strong> (who's receiving). Send same docs to multiple lenders — each uniquely marked.
                     </p>
                 </div>
 
@@ -256,12 +256,12 @@
                 <div class="group p-8 rounded-2xl border border-gray-200 hover:border-primary-200 hover:shadow-xl transition-all duration-300 bg-white">
                     <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4l16 16M4 20L20 4"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">9-Position Grid Layout</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Diagonal Watermark</h3>
                     <p class="text-gray-600">
-                        Watermarks in all 9 positions. Can't crop or screenshot around them. Every page, every corner protected.
+                        One bold diagonal watermark spans the entire page. Impossible to crop, screenshot, or edit around. Full page protection.
                     </p>
                 </div>
 
@@ -274,7 +274,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 mb-3">Stop Statement Recycling</h3>
                     <p class="text-gray-600">
-                        Watermarked docs are obviously contaminated when recycled. "Prepared for XYZ Funding" tells funders to reject.
+                        Watermarked docs are obviously contaminated when recycled. "Prepared for XYZ Funding" tells lenders to reject.
                     </p>
                 </div>
 
@@ -317,6 +317,26 @@
                         Even dishonest actors behave when their name is permanently burned into every page. Stops theft before it happens.
                     </p>
                 </div>
+
+                <!-- Feature 7 - QR Code Tracking -->
+                <div class="group p-8 rounded-2xl border border-gray-200 hover:border-primary-200 hover:shadow-xl transition-all duration-300 bg-white md:col-span-2 lg:col-span-3">
+                    <div class="flex flex-col lg:flex-row lg:items-center gap-6">
+                        <div class="w-14 h-14 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-3">
+                                <h3 class="text-xl font-semibold text-gray-900">QR Code Tracking</h3>
+                                <span class="px-2.5 py-1 bg-rose-100 text-rose-700 text-xs font-bold rounded-full uppercase tracking-wide">100% Theft Protection</span>
+                            </div>
+                            <p class="text-gray-600">
+                                Every watermarked document includes a unique QR code. When scanned, it reveals <strong>exactly who received that document</strong> — the ISO, the lender, and when it was created. If your documents leak, you'll know exactly where they came from. <strong>The ultimate way to stop data theft.</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -331,7 +351,7 @@
                     Dual Watermark System
                 </h2>
                 <p class="text-lg text-gray-600">
-                    Every document gets two watermarks: <strong>Your ISO</strong> (sender) and <strong>Lender name</strong> (recipient). Send the same application to multiple funders — each copy uniquely traceable.
+                    Every document gets two watermarks: <strong>Your ISO</strong> (sender) and <strong>Lender name</strong> (recipient). Send the same application to multiple lenders — each copy uniquely traceable.
                 </p>
             </div>
 
@@ -344,7 +364,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 mb-3">Upload Application</h3>
                     <p class="text-gray-600">
-                        Upload your merchant's bank statements, application, or term sheet that you want to send to funders.
+                        Upload your merchant's bank statements, application, or term sheet that you want to send to lenders.
                     </p>
                     <!-- Connector Line -->
                     <div class="hidden md:block absolute top-8 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-primary-300 to-transparent"></div>
@@ -368,21 +388,21 @@
                     <div class="w-16 h-16 bg-primary-600 text-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-lg shadow-primary-600/30">
                         3
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Send to Multiple Funders</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Send to Multiple Lenders</h3>
                     <p class="text-gray-600">
-                        Create a separate watermarked copy for each funder. Same ISO, different lender names = full traceability.
+                        Create a separate watermarked copy for each lender. Same ISO, different lender names = full traceability.
                     </p>
                 </div>
             </div>
 
-            <!-- Visual Example of Multi-Funder Workflow -->
+            <!-- Visual Example of Multi-Lender Workflow -->
             <div class="mt-16 bg-white rounded-3xl p-8 lg:p-12 border border-gray-200 shadow-sm">
-                <h4 class="text-xl font-bold text-gray-900 mb-8 text-center">Example: Same Application, Multiple Funders</h4>
+                <h4 class="text-xl font-bold text-gray-900 mb-8 text-center">Example: Same Application, Multiple Lenders</h4>
                 <div class="grid md:grid-cols-3 gap-6">
                     <!-- Copy 1 -->
                     <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-semibold text-blue-700">Copy for Funder A</span>
+                            <span class="text-sm font-semibold text-blue-700">Copy for Lender A</span>
                             <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
@@ -399,7 +419,7 @@
                     <!-- Copy 2 -->
                     <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-200">
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-semibold text-emerald-700">Copy for Funder B</span>
+                            <span class="text-sm font-semibold text-emerald-700">Copy for Lender B</span>
                             <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
@@ -416,7 +436,7 @@
                     <!-- Copy 3 -->
                     <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-semibold text-purple-700">Copy for Funder C</span>
+                            <span class="text-sm font-semibold text-purple-700">Copy for Lender C</span>
                             <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
@@ -433,8 +453,8 @@
 
                 <div class="mt-8 bg-gray-100 rounded-xl p-4 text-center">
                     <p class="text-gray-700 text-sm">
-                        <strong>Result:</strong> Same ISO (ABC Partners) on all copies, but each funder gets a copy with <em>their specific name</em>.
-                        If any copy leaks, you know exactly which funder received it.
+                        <strong>Result:</strong> Same ISO (ABC Partners) on all copies, but each lender gets a copy with <em>their specific name</em>.
+                        If any copy leaks, you know exactly which lender received it.
                     </p>
                 </div>
             </div>
@@ -467,10 +487,10 @@
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <span class="inline-block px-4 py-1.5 bg-primary-100 text-primary-700 text-sm font-semibold rounded-full mb-4">Win-Win for Everyone</span>
                 <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                    Better for ISOs. Better for Funders.
+                    Better for ISOs. Better for Lenders.
                 </h2>
                 <p class="text-lg text-gray-600">
-                    Watermarking creates transparency that benefits the entire MCA ecosystem. ISOs get credit for their deals. Funders get organized submissions. Merchants get faster approvals.
+                    Watermarking creates transparency that benefits the entire MCA ecosystem. ISOs get credit for their deals. Lenders get organized submissions. Merchants get faster approvals.
                 </p>
             </div>
 
@@ -484,7 +504,7 @@
                         </svg>
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 mb-2">Clear Attribution</h3>
-                    <p class="text-gray-600 text-sm">ISO + Lender on every page. ISOs get proper credit. Funders know exactly who sent each deal. No confusion.</p>
+                    <p class="text-gray-600 text-sm">ISO + Lender on every page. ISOs get proper credit. Lenders know exactly who sent each deal. No confusion.</p>
                 </div>
 
                 <!-- Faster Deals -->
@@ -506,7 +526,7 @@
                         </svg>
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 mb-2">Industry Standard</h3>
-                    <p class="text-gray-600 text-sm">Leading ISOs and funders already watermark. It's becoming the mark of a professional, trustworthy operation.</p>
+                    <p class="text-gray-600 text-sm">Leading ISOs and lenders already watermark. It's becoming the mark of a professional, trustworthy operation.</p>
                 </div>
 
                 <!-- Mutual Protection -->
@@ -517,13 +537,13 @@
                         </svg>
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 mb-2">Mutual Protection</h3>
-                    <p class="text-gray-600 text-sm">Both parties protected if questions arise. Clear documentation benefits ISOs and funders equally.</p>
+                    <p class="text-gray-600 text-sm">Both parties protected if questions arise. Clear documentation benefits ISOs and lenders equally.</p>
                 </div>
             </div>
 
             <!-- Two Column Use Cases -->
             <div class="grid lg:grid-cols-2 gap-8">
-                <!-- Funder Use Case -->
+                <!-- Lender Use Case -->
                 <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 lg:p-10 border border-blue-100">
                     <div class="flex items-center mb-6">
                         <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mr-4 shadow-lg shadow-blue-500/30">
@@ -532,7 +552,7 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-2xl font-bold text-gray-900">For Funders</h3>
+                            <h3 class="text-2xl font-bold text-gray-900">For Lenders</h3>
                             <p class="text-blue-600 font-medium">Lenders, Syndicators & Underwriters</p>
                         </div>
                     </div>
@@ -565,40 +585,111 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
-                            <p class="ml-3 text-gray-700"><strong>Attract Top ISOs:</strong> Professional funders attract professional brokers</p>
+                            <p class="ml-3 text-gray-700"><strong>Attract Top ISOs:</strong> Professional lenders attract professional brokers</p>
                         </div>
                     </div>
 
                     <!-- Example Visual -->
                     <div class="bg-white rounded-xl p-4 border border-blue-200 shadow-sm">
-                        <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wide">Example: Bank Statement with Dual Watermark</p>
-                        <div class="bg-gray-50 rounded-lg p-4 aspect-[4/3] relative overflow-hidden">
-                            <div class="absolute top-3 left-3">
-                                <span class="text-xs text-emerald-600/80 font-mono bg-emerald-50 px-2 py-1 rounded border border-emerald-200">ISO: ABC Partners</span>
-                            </div>
-                            <div class="absolute top-3 right-3">
-                                <span class="text-xs text-blue-600/80 font-mono bg-blue-50 px-2 py-1 rounded border border-blue-200">Lender: Your Company</span>
-                            </div>
-                            <div class="pt-12 space-y-2">
-                                <div class="h-4 bg-gray-300 rounded w-1/2 mx-auto"></div>
-                                <div class="h-2 bg-gray-200 rounded w-3/4 mx-auto"></div>
-                                <div class="mt-4 grid grid-cols-3 gap-2">
-                                    <div class="h-12 bg-blue-100 rounded"></div>
-                                    <div class="h-12 bg-blue-100 rounded"></div>
-                                    <div class="h-12 bg-blue-100 rounded"></div>
+                        <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wide">Example: Bank Statement with Diagonal Watermark + QR Code</p>
+                        <div class="bg-white rounded-lg border border-gray-300 aspect-[4/3] relative overflow-hidden shadow-inner">
+                            <!-- Bank Statement Content -->
+                            <div class="p-3 text-xs">
+                                <!-- Bank Header -->
+                                <div class="flex justify-between items-start mb-3 border-b border-gray-200 pb-2">
+                                    <div>
+                                        <div class="font-bold text-blue-800 text-sm">FIRST NATIONAL BANK</div>
+                                        <div class="text-gray-500 text-[10px]">Account Statement</div>
+                                    </div>
+                                    <div class="text-right text-[10px] text-gray-600">
+                                        <div>Account: ****4521</div>
+                                        <div>Dec 1 - Dec 31, 2024</div>
+                                    </div>
+                                </div>
+                                <!-- Account Summary -->
+                                <div class="grid grid-cols-3 gap-2 mb-3 text-[9px]">
+                                    <div class="bg-gray-50 p-1.5 rounded">
+                                        <div class="text-gray-500">Beginning Bal</div>
+                                        <div class="font-semibold text-gray-800">$24,521.33</div>
+                                    </div>
+                                    <div class="bg-gray-50 p-1.5 rounded">
+                                        <div class="text-gray-500">Total Deposits</div>
+                                        <div class="font-semibold text-green-600">+$18,450.00</div>
+                                    </div>
+                                    <div class="bg-gray-50 p-1.5 rounded">
+                                        <div class="text-gray-500">Ending Bal</div>
+                                        <div class="font-semibold text-gray-800">$31,284.58</div>
+                                    </div>
+                                </div>
+                                <!-- Transactions -->
+                                <div class="text-[8px] text-gray-600">
+                                    <div class="flex justify-between py-0.5 border-b border-gray-100">
+                                        <span>12/05 DEPOSIT - ACH PAYMENT</span>
+                                        <span class="text-green-600">+$8,250.00</span>
+                                    </div>
+                                    <div class="flex justify-between py-0.5 border-b border-gray-100">
+                                        <span>12/12 WIRE TRANSFER IN</span>
+                                        <span class="text-green-600">+$5,200.00</span>
+                                    </div>
+                                    <div class="flex justify-between py-0.5 border-b border-gray-100">
+                                        <span>12/18 CHECK DEPOSIT #1042</span>
+                                        <span class="text-green-600">+$5,000.00</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="absolute bottom-3 left-3">
-                                <span class="text-xs text-emerald-600/80 font-mono bg-emerald-50 px-2 py-1 rounded border border-emerald-200">ISO: ABC Partners</span>
+                            <!-- Single Diagonal Watermark -->
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="transform -rotate-45 text-gray-400/40 font-bold text-base whitespace-nowrap tracking-wider">
+                                    ISO: ABC Partners | Lender: Your Company
+                                </div>
                             </div>
-                            <div class="absolute bottom-3 right-3">
-                                <span class="text-xs text-blue-600/80 font-mono bg-blue-50 px-2 py-1 rounded border border-blue-200">Lender: Your Company</span>
+                            <!-- QR Code -->
+                            <div class="absolute bottom-2 right-2 z-20">
+                                <div class="w-12 h-12 bg-white border border-gray-300 rounded p-1 shadow-sm">
+                                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                                        <!-- Top-left finder pattern -->
+                                        <rect x="0" y="0" width="28" height="28" fill="#1f2937"/>
+                                        <rect x="4" y="4" width="20" height="20" fill="white"/>
+                                        <rect x="8" y="8" width="12" height="12" fill="#1f2937"/>
+                                        <!-- Top-right finder pattern -->
+                                        <rect x="72" y="0" width="28" height="28" fill="#1f2937"/>
+                                        <rect x="76" y="4" width="20" height="20" fill="white"/>
+                                        <rect x="80" y="8" width="12" height="12" fill="#1f2937"/>
+                                        <!-- Bottom-left finder pattern -->
+                                        <rect x="0" y="72" width="28" height="28" fill="#1f2937"/>
+                                        <rect x="4" y="76" width="20" height="20" fill="white"/>
+                                        <rect x="8" y="80" width="12" height="12" fill="#1f2937"/>
+                                        <!-- Data modules -->
+                                        <rect x="36" y="4" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="48" y="4" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="36" y="16" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="54" y="16" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="4" y="36" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="16" y="42" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="36" y="36" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="48" y="42" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="60" y="36" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="72" y="42" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="84" y="36" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="42" y="54" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="60" y="54" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="78" y="54" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="36" y="66" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="54" y="66" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="72" y="72" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="84" y="78" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="36" y="84" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="54" y="90" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="72" y="84" width="6" height="6" fill="#1f2937"/>
+                                    </svg>
+                                </div>
                             </div>
                         </div>
+                        <p class="text-xs text-rose-600 mt-2 text-center font-medium">Diagonal watermark + QR code for complete protection</p>
                     </div>
                 </div>
 
-                <!-- ISO/Broker Use Case -->
+                <!-- ISO Use Case -->
                 <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-8 lg:p-10 border border-emerald-100">
                     <div class="flex items-center mb-6">
                         <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mr-4 shadow-lg shadow-emerald-500/30">
@@ -613,7 +704,7 @@
                     </div>
 
                     <p class="text-gray-600 mb-6">
-                        Stand out as a professional ISO. Send organized submissions that funders love. Get proper credit for your deals. Build lasting relationships with multiple funders.
+                        Stand out as a professional ISO. Send organized submissions that lenders love. Get proper credit for your deals. Build lasting relationships with multiple lenders.
                     </p>
 
                     <!-- Benefits List -->
@@ -624,7 +715,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
-                            <p class="ml-3 text-gray-700"><strong>Get Proper Credit:</strong> Your ISO on every page ensures funders know it's your deal</p>
+                            <p class="ml-3 text-gray-700"><strong>Get Proper Credit:</strong> Your ISO on every page ensures lenders know it's your deal</p>
                         </div>
                         <div class="flex items-start">
                             <div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -632,7 +723,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
-                            <p class="ml-3 text-gray-700"><strong>Shop Multiple Funders:</strong> Same docs to 5 funders — each copy marked for that specific lender</p>
+                            <p class="ml-3 text-gray-700"><strong>Shop Multiple Lenders:</strong> Same docs to 5 lenders — each copy marked for that specific lender</p>
                         </div>
                         <div class="flex items-start">
                             <div class="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -640,35 +731,98 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
                             </div>
-                            <p class="ml-3 text-gray-700"><strong>Look Professional:</strong> Watermarked submissions show funders you're serious</p>
+                            <p class="ml-3 text-gray-700"><strong>Look Professional:</strong> Watermarked submissions show lenders you're serious</p>
                         </div>
                     </div>
 
                     <!-- Example Visual -->
                     <div class="bg-white rounded-xl p-4 border border-emerald-200 shadow-sm">
-                        <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wide">Example: Dual Watermark on Application</p>
-                        <div class="bg-gray-50 rounded-lg p-4 aspect-[4/3] relative overflow-hidden">
-                            <div class="absolute top-3 left-3">
-                                <span class="text-xs text-emerald-600/80 font-mono bg-emerald-50 px-2 py-1 rounded border border-emerald-200">ISO: ABC Partners</span>
-                            </div>
-                            <div class="absolute top-3 right-3">
-                                <span class="text-xs text-blue-600/80 font-mono bg-blue-50 px-2 py-1 rounded border border-blue-200">Lender: FastFund</span>
-                            </div>
-                            <div class="pt-12 space-y-2">
-                                <div class="h-4 bg-gray-300 rounded w-2/3 mx-auto"></div>
-                                <div class="h-2 bg-gray-200 rounded w-1/2 mx-auto"></div>
-                                <div class="mt-4 space-y-1">
-                                    <div class="h-2 bg-emerald-100 rounded w-full"></div>
-                                    <div class="h-2 bg-emerald-100 rounded w-full"></div>
+                        <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wide">Example: MCA Application with Diagonal Watermark + QR Code</p>
+                        <div class="bg-white rounded-lg border border-gray-300 aspect-[4/3] relative overflow-hidden shadow-inner">
+                            <!-- Application Content -->
+                            <div class="p-3 text-xs">
+                                <!-- Header -->
+                                <div class="text-center mb-3 border-b border-gray-200 pb-2">
+                                    <div class="font-bold text-gray-800 text-sm">MERCHANT CASH ADVANCE APPLICATION</div>
+                                    <div class="text-gray-500 text-[10px]">Business Funding Request Form</div>
+                                </div>
+                                <!-- Form Fields -->
+                                <div class="space-y-2 text-[9px]">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <div class="text-gray-500 mb-0.5">Business Name</div>
+                                            <div class="border-b border-gray-300 pb-0.5 text-gray-700">ABC Retail LLC</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-gray-500 mb-0.5">DBA</div>
+                                            <div class="border-b border-gray-300 pb-0.5 text-gray-700">ABC Store</div>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <div class="text-gray-500 mb-0.5">Amount Requested</div>
+                                            <div class="border-b border-gray-300 pb-0.5 text-gray-700 font-semibold">$75,000</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-gray-500 mb-0.5">Monthly Revenue</div>
+                                            <div class="border-b border-gray-300 pb-0.5 text-gray-700">$42,500</div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-gray-500 mb-0.5">Business Address</div>
+                                        <div class="border-b border-gray-300 pb-0.5 text-gray-700">123 Main St, Suite 100, New York, NY</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="absolute bottom-3 left-3">
-                                <span class="text-xs text-emerald-600/80 font-mono bg-emerald-50 px-2 py-1 rounded border border-emerald-200">ISO: ABC Partners</span>
+                            <!-- Single Diagonal Watermark -->
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="transform -rotate-45 text-emerald-600/30 font-bold text-base whitespace-nowrap tracking-wider">
+                                    ISO: ABC Partners | Lender: FastFund
+                                </div>
                             </div>
-                            <div class="absolute bottom-3 right-3">
-                                <span class="text-xs text-blue-600/80 font-mono bg-blue-50 px-2 py-1 rounded border border-blue-200">Lender: FastFund</span>
+                            <!-- QR Code -->
+                            <div class="absolute bottom-2 right-2 z-20">
+                                <div class="w-12 h-12 bg-white border border-gray-300 rounded p-1 shadow-sm">
+                                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                                        <!-- Top-left finder pattern -->
+                                        <rect x="0" y="0" width="28" height="28" fill="#1f2937"/>
+                                        <rect x="4" y="4" width="20" height="20" fill="white"/>
+                                        <rect x="8" y="8" width="12" height="12" fill="#1f2937"/>
+                                        <!-- Top-right finder pattern -->
+                                        <rect x="72" y="0" width="28" height="28" fill="#1f2937"/>
+                                        <rect x="76" y="4" width="20" height="20" fill="white"/>
+                                        <rect x="80" y="8" width="12" height="12" fill="#1f2937"/>
+                                        <!-- Bottom-left finder pattern -->
+                                        <rect x="0" y="72" width="28" height="28" fill="#1f2937"/>
+                                        <rect x="4" y="76" width="20" height="20" fill="white"/>
+                                        <rect x="8" y="80" width="12" height="12" fill="#1f2937"/>
+                                        <!-- Data modules -->
+                                        <rect x="36" y="4" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="48" y="4" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="36" y="16" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="54" y="16" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="4" y="36" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="16" y="42" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="36" y="36" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="48" y="42" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="60" y="36" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="72" y="42" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="84" y="36" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="42" y="54" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="60" y="54" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="78" y="54" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="36" y="66" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="54" y="66" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="72" y="72" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="84" y="78" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="36" y="84" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="54" y="90" width="6" height="6" fill="#1f2937"/>
+                                        <rect x="72" y="84" width="6" height="6" fill="#1f2937"/>
+                                    </svg>
+                                </div>
                             </div>
                         </div>
+                        <p class="text-xs text-rose-600 mt-2 text-center font-medium">Diagonal watermark + QR code for complete protection</p>
                     </div>
                 </div>
             </div>
@@ -700,7 +854,7 @@
                                 </div>
                                 <div class="ml-3">
                                     <p class="text-gray-900 font-semibold">Clear Deal Attribution</p>
-                                    <p class="text-gray-600 text-sm">Your ISO is on every document. Funders always know who brought the deal. No confusion about commissions.</p>
+                                    <p class="text-gray-600 text-sm">Your ISO is on every document. Lenders always know who brought the deal. No confusion about commissions.</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
@@ -710,8 +864,8 @@
                                     </svg>
                                 </div>
                                 <div class="ml-3">
-                                    <p class="text-gray-900 font-semibold">Stronger Funder Relationships</p>
-                                    <p class="text-gray-600 text-sm">Professional submissions get priority. Funders respond faster to organized ISOs they can trust.</p>
+                                    <p class="text-gray-900 font-semibold">Stronger Lender Relationships</p>
+                                    <p class="text-gray-600 text-sm">Professional submissions get priority. Lenders respond faster to organized ISOs they can trust.</p>
                                 </div>
                             </div>
                             <div class="flex items-start">
@@ -728,13 +882,13 @@
                         </div>
                     </div>
 
-                    <!-- Funders Win -->
+                    <!-- Lenders Win -->
                     <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 border border-blue-200">
                         <h4 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
                             <svg class="w-6 h-6 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
-                            Funders Win
+                            Lenders Win
                         </h4>
                         <div class="space-y-4">
                             <div class="flex items-start">
@@ -777,10 +931,10 @@
                 <!-- Bottom Line -->
                 <div class="mt-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-center">
                     <p class="text-xl md:text-2xl font-bold text-white mb-2">
-                        Professional ISOs + Professional Funders = More Funded Deals
+                        Professional ISOs + Professional Lenders = More Funded Deals
                     </p>
                     <p class="text-primary-100">
-                        Watermarking is the new standard. Join the ISOs and funders who are already winning.
+                        Watermarking is the new standard. Join the ISOs and lenders who are already winning.
                     </p>
                 </div>
             </div>
@@ -791,7 +945,7 @@
                     <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                     </svg>
-                    <span class="text-green-800 font-medium">Leading ISOs & funders already watermark every PDF — join them.</span>
+                    <span class="text-green-800 font-medium">Leading ISOs & lenders already watermark every PDF — join them.</span>
                 </div>
             </div>
         </div>
@@ -866,35 +1020,132 @@
                 <div class="relative">
                     <div class="bg-gradient-to-br from-dark-700 to-dark-800 rounded-2xl p-8 border border-dark-700">
                         <div class="bg-dark-900 rounded-xl p-6 border border-dark-700">
-                            <!-- Mock Document Preview -->
+                            <!-- Mock Document Preview - Bank Statement -->
                             <div class="aspect-[8.5/11] bg-white rounded-lg p-4 relative overflow-hidden">
-                                <div class="absolute inset-0 grid grid-cols-3 grid-rows-3 gap-4 p-4">
-                                    @for($i = 0; $i < 9; $i++)
-                                    <div class="flex items-center justify-center">
-                                        <span class="text-xs text-gray-400 font-mono opacity-50 transform -rotate-0">ISO: 12345 | Lender: ABC</span>
+                                <!-- Bank Statement Content -->
+                                <div class="text-[7px] text-gray-700">
+                                    <!-- Bank Header -->
+                                    <div class="flex justify-between items-start mb-3 border-b border-gray-200 pb-2">
+                                        <div>
+                                            <div class="font-bold text-blue-800 text-[10px]">FIRST NATIONAL BANK</div>
+                                            <div class="text-gray-500 text-[6px]">Business Checking Account Statement</div>
+                                        </div>
+                                        <div class="text-right text-[6px] text-gray-500">
+                                            <div>Account: ****4521</div>
+                                            <div>Statement Period: Dec 2024</div>
+                                        </div>
                                     </div>
-                                    @endfor
+                                    <!-- Summary Boxes -->
+                                    <div class="grid grid-cols-3 gap-1 mb-3">
+                                        <div class="bg-gray-50 p-1 rounded text-center">
+                                            <div class="text-[5px] text-gray-500">Beginning</div>
+                                            <div class="font-bold text-[7px]">$24,521</div>
+                                        </div>
+                                        <div class="bg-gray-50 p-1 rounded text-center">
+                                            <div class="text-[5px] text-gray-500">Deposits</div>
+                                            <div class="font-bold text-[7px] text-green-600">+$18,450</div>
+                                        </div>
+                                        <div class="bg-gray-50 p-1 rounded text-center">
+                                            <div class="text-[5px] text-gray-500">Ending</div>
+                                            <div class="font-bold text-[7px]">$31,284</div>
+                                        </div>
+                                    </div>
+                                    <!-- Transaction Table Header -->
+                                    <div class="flex justify-between text-[5px] font-bold text-gray-500 border-b border-gray-300 pb-0.5 mb-1">
+                                        <span>DATE</span>
+                                        <span>DESCRIPTION</span>
+                                        <span>AMOUNT</span>
+                                    </div>
+                                    <!-- Transactions -->
+                                    <div class="space-y-0.5 text-[5px]">
+                                        <div class="flex justify-between border-b border-gray-100 pb-0.5">
+                                            <span class="w-8">12/05</span>
+                                            <span class="flex-1 px-1">ACH DEPOSIT - SALES</span>
+                                            <span class="text-green-600">+$8,250.00</span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-gray-100 pb-0.5">
+                                            <span class="w-8">12/08</span>
+                                            <span class="flex-1 px-1">WIRE TRANSFER IN</span>
+                                            <span class="text-green-600">+$5,200.00</span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-gray-100 pb-0.5">
+                                            <span class="w-8">12/12</span>
+                                            <span class="flex-1 px-1">CHECK DEP #1042</span>
+                                            <span class="text-green-600">+$5,000.00</span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-gray-100 pb-0.5">
+                                            <span class="w-8">12/15</span>
+                                            <span class="flex-1 px-1">UTILITIES PAYMENT</span>
+                                            <span class="text-red-500">-$842.50</span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-gray-100 pb-0.5">
+                                            <span class="w-8">12/18</span>
+                                            <span class="flex-1 px-1">PAYROLL - ADP</span>
+                                            <span class="text-red-500">-$4,200.00</span>
+                                        </div>
+                                        <div class="flex justify-between border-b border-gray-100 pb-0.5">
+                                            <span class="w-8">12/22</span>
+                                            <span class="flex-1 px-1">CREDIT CARD SALES</span>
+                                            <span class="text-green-600">+$3,156.08</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="relative z-10 space-y-3">
-                                    <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-                                    <div class="h-3 bg-gray-100 rounded w-full"></div>
-                                    <div class="h-3 bg-gray-100 rounded w-5/6"></div>
-                                    <div class="h-3 bg-gray-100 rounded w-full"></div>
-                                    <div class="h-3 bg-gray-100 rounded w-2/3"></div>
-                                    <div class="h-8 mt-4"></div>
-                                    <div class="h-3 bg-gray-100 rounded w-full"></div>
-                                    <div class="h-3 bg-gray-100 rounded w-4/5"></div>
-                                    <div class="h-3 bg-gray-100 rounded w-full"></div>
+                                <!-- Single Diagonal Watermark - Large -->
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+                                    <div class="transform -rotate-45 text-gray-400/30 font-bold whitespace-nowrap" style="font-size: clamp(12px, 5vw, 22px); letter-spacing: 0.1em;">
+                                        ISO: ABC Partners | Lender: FastFund
+                                    </div>
+                                </div>
+                                <!-- QR Code in bottom-right -->
+                                <div class="absolute bottom-2 right-2 z-20">
+                                    <div class="w-12 h-12 bg-white border border-gray-300 rounded p-1 shadow-sm">
+                                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                                            <!-- Top-left finder pattern -->
+                                            <rect x="0" y="0" width="28" height="28" fill="#1f2937"/>
+                                            <rect x="4" y="4" width="20" height="20" fill="white"/>
+                                            <rect x="8" y="8" width="12" height="12" fill="#1f2937"/>
+                                            <!-- Top-right finder pattern -->
+                                            <rect x="72" y="0" width="28" height="28" fill="#1f2937"/>
+                                            <rect x="76" y="4" width="20" height="20" fill="white"/>
+                                            <rect x="80" y="8" width="12" height="12" fill="#1f2937"/>
+                                            <!-- Bottom-left finder pattern -->
+                                            <rect x="0" y="72" width="28" height="28" fill="#1f2937"/>
+                                            <rect x="4" y="76" width="20" height="20" fill="white"/>
+                                            <rect x="8" y="80" width="12" height="12" fill="#1f2937"/>
+                                            <!-- Data modules -->
+                                            <rect x="36" y="4" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="48" y="4" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="36" y="16" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="54" y="16" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="4" y="36" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="16" y="42" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="36" y="36" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="48" y="42" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="60" y="36" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="72" y="42" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="84" y="36" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="42" y="54" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="60" y="54" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="78" y="54" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="36" y="66" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="54" y="66" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="72" y="72" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="84" y="78" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="36" y="84" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="54" y="90" width="6" height="6" fill="#1f2937"/>
+                                            <rect x="72" y="84" width="6" height="6" fill="#1f2937"/>
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="mt-4 flex items-center justify-between text-sm">
-                            <span class="text-gray-500">document-protected.pdf</span>
+                            <span class="text-gray-500">bank-statement-dec2024.pdf</span>
                             <span class="text-green-400 flex items-center">
                                 <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
-                                Protected
+                                Protected + Tracked
                             </span>
                         </div>
                     </div>
@@ -910,7 +1161,7 @@
                 Ready to Join the New Standard?
             </h2>
             <p class="text-xl text-primary-100 mb-10">
-                ISOs get proper credit. Funders get organized deals. Everyone closes faster.
+                ISOs get proper credit. Lenders get organized deals. Everyone closes faster.
             </p>
             @guest
             <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-8 py-4 bg-white hover:bg-gray-100 text-primary-700 font-semibold rounded-xl transition-all duration-200 shadow-xl hover:-translate-y-0.5">
@@ -945,7 +1196,7 @@
                         <span class="text-xl font-bold text-white">Blu<span class="text-primary-400">Mark</span></span>
                     </a>
                     <p class="text-sm max-w-md">
-                        PDF watermarking built for the MCA industry. Dual watermarks help ISOs get proper credit and funders get organized submissions. Better for everyone.
+                        PDF watermarking built for the MCA industry. Dual watermarks help ISOs get proper credit and lenders get organized submissions. Better for everyone.
                     </p>
                 </div>
 
