@@ -292,6 +292,8 @@ class PdfWatermarkService
         $tempDir = sys_get_temp_dir() . '/watermark_' . uniqid();
         mkdir($tempDir, 0755, true);
 
+        $preprocessedPdfPath = null;
+
         try {
             // Convert PDF to PNG images using pdftoppm (200 DPI for quality)
             $cmd = sprintf(
@@ -301,8 +303,31 @@ class PdfWatermarkService
             );
             exec($cmd, $output, $returnCode);
 
+            // If conversion fails, try preprocessing with Ghostscript to handle compression issues
             if ($returnCode !== 0) {
-                throw new Exception('Failed to convert PDF to images: ' . implode("\n", $output));
+                \Log::info('Initial PDF conversion failed, attempting Ghostscript preprocessing', [
+                    'input' => $inputPath,
+                    'error' => implode("\n", $output),
+                ]);
+
+                $preprocessedPdfPath = $this->preprocessPdf($inputPath);
+
+                // Retry conversion with preprocessed PDF
+                $cmd = sprintf(
+                    'pdftoppm -png -r 200 %s %s/page 2>&1',
+                    escapeshellarg($preprocessedPdfPath),
+                    escapeshellarg($tempDir)
+                );
+                exec($cmd, $output, $returnCode);
+
+                if ($returnCode !== 0) {
+                    throw new Exception('Failed to convert PDF to images: ' . implode("\n", $output));
+                }
+
+                \Log::info('PDF preprocessing successful', [
+                    'original' => $inputPath,
+                    'preprocessed' => $preprocessedPdfPath,
+                ]);
             }
 
             // Get all generated images sorted by page number
@@ -372,6 +397,11 @@ class PdfWatermarkService
                 @unlink($file);
             }
             @rmdir($tempDir);
+
+            // Cleanup preprocessed PDF if it was created
+            if ($preprocessedPdfPath && file_exists($preprocessedPdfPath) && $preprocessedPdfPath !== $inputPath) {
+                @unlink($preprocessedPdfPath);
+            }
         }
     }
 
