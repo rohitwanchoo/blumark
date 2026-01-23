@@ -19,12 +19,13 @@ class BatchController extends Controller
      */
     public function create()
     {
-        $templates = Auth::user()
+        $user = Auth::user();
+        $templates = $user
             ->watermarkTemplates()
             ->orderByDesc('usage_count')
             ->get();
 
-        return view('batch.create', compact('templates'));
+        return view('batch.create', compact('templates', 'user'));
     }
 
     /**

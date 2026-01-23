@@ -58,6 +58,6 @@ class DashboardController extends Controller
         $presets = config('watermark.presets', []);
         $defaults = config('watermark.defaults', []);
 
-        return view('dashboard', compact('recentJobs', 'recentDistributions', 'stats', 'billing', 'presets', 'defaults'));
+        return view('dashboard', compact('recentJobs', 'recentDistributions', 'stats', 'billing', 'presets', 'defaults', 'user'));
     }
 }

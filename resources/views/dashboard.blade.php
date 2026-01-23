@@ -285,10 +285,58 @@
                         </div>
                     </div>
 
+                    <!-- ISO Name Warning -->
+                    @if(empty(Auth::user()->company_name))
+                    <div class="mb-6 p-4 bg-orange-50 rounded-xl border border-orange-200">
+                        <div class="flex items-start space-x-2">
+                            <svg class="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-orange-800">ISO Name Required</p>
+                                <p class="text-sm text-orange-700 mt-1">Please set your Company Name in your profile to use as your ISO name on watermarks.</p>
+                                <a href="{{ route('profile.edit') }}" class="inline-flex items-center mt-2 text-sm font-medium text-orange-800 hover:text-orange-900">
+                                    Update Profile
+                                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Watermark Text -->
+                    <div class="space-y-4 mb-6">
+                        <!-- ISO Name -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="iso" class="block text-sm font-medium text-gray-700">ISO Name (from profile)</label>
+                                <a href="{{ route('profile.edit') }}" class="text-xs text-primary-600 hover:text-primary-700 flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                    </svg>
+                                    Edit
+                                </a>
+                            </div>
+                            <input type="text" id="iso" x-model="iso" required maxlength="50" readonly
+                                   class="block w-full rounded-xl border-gray-200 bg-gray-50 text-gray-600 cursor-not-allowed text-sm px-4 py-3 border"
+                                   placeholder="Set in your profile">
+                        </div>
+
+                        <!-- Lender Name -->
+                        <div>
+                            <label for="lender" class="block text-sm font-medium text-gray-700 mb-2">Lender Name</label>
+                            <input type="text" id="lender" x-model="lender" required maxlength="50"
+                                   class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border"
+                                   placeholder="Enter Lender Name">
+                        </div>
+                    </div>
+
                     <!-- Template Selection -->
                     <div class="mb-6">
                         <div class="flex items-center justify-between mb-2">
-                            <label for="template" class="block text-sm font-medium text-gray-700">Template</label>
+                            <label for="template" class="block text-sm font-medium text-gray-700">Quick Template</label>
                             <button type="button"
                                     @click="saveAsTemplate()"
                                     :disabled="!iso.trim() || !lender.trim()"
@@ -299,51 +347,52 @@
                         <select x-model="selectedTemplate"
                                 @change="applyTemplate()"
                                 class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border">
-                            <option value="">-- Select a template (optional) --</option>
+                            <option value="">-- None (Custom Settings) --</option>
                             <template x-for="template in templates" :key="template.id">
-                                <option :value="template.id" x-text="template.name + ' (' + template.iso + ' | ' + template.lender + ')'"></option>
+                                <option :value="template.id" x-text="template.name"></option>
                             </template>
                         </select>
                     </div>
 
-                    <!-- ISO & Lender Fields -->
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label for="iso" class="block text-sm font-medium text-gray-700 mb-2">ISO</label>
-                            <input type="text" id="iso" x-model="iso" required maxlength="50"
-                                   class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border"
-                                   placeholder="Enter ISO">
-                        </div>
-                        <div>
-                            <label for="lender" class="block text-sm font-medium text-gray-700 mb-2">Lender</label>
-                            <input type="text" id="lender" x-model="lender" required maxlength="50"
-                                   class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border"
-                                   placeholder="Enter Lender">
-                        </div>
-                    </div>
-
                     <!-- Appearance Settings -->
                     <div class="space-y-4 mb-6">
-                        <div class="flex items-center justify-between">
-                            <label class="text-sm font-medium text-gray-700">Font Size</label>
-                            <span class="text-sm text-gray-500" x-text="fontSize + 'px'"></span>
-                        </div>
-                        <input type="range" id="font_size" min="8" max="48" x-model="fontSize"
-                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600">
-
-                        <div class="flex items-center justify-between">
-                            <label class="text-sm font-medium text-gray-700">Opacity</label>
-                            <span class="text-sm text-gray-500" x-text="opacity + '%'"></span>
-                        </div>
-                        <input type="range" id="opacity" min="1" max="100" x-model="opacity"
-                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600">
-
-                        <div class="flex items-center justify-between">
-                            <label class="text-sm font-medium text-gray-700">Color</label>
-                            <div class="flex items-center space-x-2">
+                        <!-- Color -->
+                        <div>
+                            <label for="color" class="block text-sm font-medium text-gray-700 mb-2">Watermark Color</label>
+                            <div class="flex items-center space-x-3">
                                 <input type="color" id="color" x-model="color"
-                                       class="h-8 w-8 rounded-lg cursor-pointer border border-gray-200 p-0.5">
-                                <span class="text-sm text-gray-500 font-mono" x-text="color"></span>
+                                       class="h-10 w-16 rounded-lg cursor-pointer border border-gray-200">
+                                <span class="text-sm text-gray-600 font-mono bg-gray-50 px-3 py-2 rounded-lg border border-gray-200" x-text="color"></span>
+                            </div>
+                        </div>
+
+                        <!-- Position -->
+                        <div x-show="!selectedTemplate">
+                            <label for="position" class="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                            <select id="position" x-model="position" @change="updateRotationForPosition()"
+                                    class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border">
+                                <option value="diagonal">Diagonal (Center)</option>
+                                <option value="scattered">Scattered (Multiple)</option>
+                                <option value="top-left">Top Left</option>
+                                <option value="top-center">Top Center</option>
+                                <option value="top-right">Top Right</option>
+                                <option value="center">Center</option>
+                                <option value="bottom-left">Bottom Left</option>
+                                <option value="bottom-center">Bottom Center</option>
+                                <option value="bottom-right">Bottom Right</option>
+                            </select>
+                        </div>
+
+                        <!-- Template info when selected -->
+                        <div x-show="selectedTemplate" x-cloak class="p-3 bg-primary-50 rounded-lg border border-primary-200">
+                            <div class="flex items-start space-x-2">
+                                <svg class="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div class="text-xs text-primary-700">
+                                    <p class="font-medium">Template settings active</p>
+                                    <p class="mt-1">Position is controlled by the selected template.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -373,8 +422,8 @@
                     <!-- Submit Button -->
                     <button type="button"
                             @click="startUpload()"
-                            :disabled="!canUpload"
-                            :class="canUpload ? 'bg-primary-600 hover:bg-primary-700 focus:bg-primary-700 shadow-lg shadow-primary-600/25' : 'bg-gray-300 cursor-not-allowed'"
+                            :disabled="!canUpload || !iso.trim()"
+                            :class="(canUpload && iso.trim()) ? 'bg-primary-600 hover:bg-primary-700 focus:bg-primary-700 shadow-lg shadow-primary-600/25' : 'bg-gray-300 cursor-not-allowed'"
                             class="w-full inline-flex justify-center items-center px-6 py-3.5 border border-transparent rounded-xl font-semibold text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200">
                         <template x-if="!isUploading">
                             <span class="flex items-center">
@@ -418,7 +467,7 @@
                             <h3 class="text-lg font-semibold text-gray-900">Live Preview</h3>
                             <p class="text-sm text-gray-500 mt-1">See how your watermark will appear</p>
                         </div>
-                        <div class="flex items-center space-x-1">
+                        <div class="flex items-center space-x-1" x-show="previewReady">
                             <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                             <span class="text-xs text-gray-500">Real-time</span>
                         </div>
@@ -427,33 +476,134 @@
                 <div class="p-6 overflow-hidden">
                     <!-- Preview Document -->
                     <div class="relative bg-white border-2 border-gray-200 rounded-lg shadow-inner mx-auto overflow-hidden" style="aspect-ratio: 8.5/11; max-width: 340px;">
-                        <!-- Document lines (simulated content) -->
-                        <div class="absolute inset-0 p-8 overflow-hidden pointer-events-none">
-                            <div class="space-y-3 mt-6">
-                                <div class="h-3 bg-gray-100 rounded w-3/4"></div>
-                                <div class="h-2 bg-gray-50 rounded w-full"></div>
-                                <div class="h-2 bg-gray-50 rounded w-full"></div>
-                                <div class="h-2 bg-gray-50 rounded w-5/6"></div>
-                                <div class="h-2 bg-gray-50 rounded w-full"></div>
-                                <div class="h-2 bg-gray-50 rounded w-4/5"></div>
-                                <div class="h-3 bg-gray-100 rounded w-1/2 mt-6"></div>
-                                <div class="h-2 bg-gray-50 rounded w-full"></div>
-                                <div class="h-2 bg-gray-50 rounded w-full"></div>
-                                <div class="h-2 bg-gray-50 rounded w-3/4"></div>
-                                <div class="h-2 bg-gray-50 rounded w-full"></div>
+                        <!-- Placeholder when no PDF selected - shows sample document with watermark -->
+                        <div x-show="!previewReady && !previewLoading" class="absolute inset-0" x-ref="previewContainer">
+                            <!-- Simulated document content -->
+                            <div class="absolute inset-0 p-6 overflow-hidden pointer-events-none">
+                                <div class="space-y-2 mt-4">
+                                    <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+                                    <div class="h-2 bg-gray-100 rounded w-full"></div>
+                                    <div class="h-2 bg-gray-100 rounded w-full"></div>
+                                    <div class="h-2 bg-gray-100 rounded w-5/6"></div>
+                                    <div class="h-2 bg-gray-100 rounded w-full"></div>
+                                    <div class="h-2 bg-gray-100 rounded w-4/5"></div>
+                                    <div class="h-3 bg-gray-200 rounded w-1/2 mt-4"></div>
+                                    <div class="h-2 bg-gray-100 rounded w-full"></div>
+                                    <div class="h-2 bg-gray-100 rounded w-full"></div>
+                                    <div class="h-2 bg-gray-100 rounded w-3/4"></div>
+                                </div>
+                            </div>
+                            <!-- Watermark overlay -->
+                            <div class="absolute inset-0 pointer-events-none overflow-visible">
+                                <!-- Single watermark (non-scattered) -->
+                                <template x-if="position !== 'scattered'">
+                                    <div class="absolute watermark-text font-bold whitespace-nowrap"
+                                         style="font-family: Helvetica, Arial, sans-serif;"
+                                         :style="{
+                                             ...getPreviewPositionAbsolute(position),
+                                             transform: getPreviewTransform(position, rotation),
+                                             color: color,
+                                             opacity: opacity / 100,
+                                             fontSize: calculateWatermarkFontSize() + 'px',
+                                             transformOrigin: 'center'
+                                         }"
+                                         x-text="getFullWatermarkText()">
+                                    </div>
+                                </template>
+
+                                <!-- Scattered watermarks -->
+                                <template x-if="position === 'scattered'">
+                                    <div>
+                                        <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 33.33%; top: 10%;"
+                                             :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                             x-text="getFullWatermarkText()"></div>
+                                        <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 66.67%; top: 10%;"
+                                             :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                             x-text="getFullWatermarkText()"></div>
+                                        <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 20%; top: 50%;"
+                                             :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                             x-text="getFullWatermarkText()"></div>
+                                        <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 50%; top: 50%;"
+                                             :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                             x-text="getFullWatermarkText()"></div>
+                                        <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 80%; top: 50%;"
+                                             :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                             x-text="getFullWatermarkText()"></div>
+                                        <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 20%; top: 90%;"
+                                             :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                             x-text="getFullWatermarkText()"></div>
+                                        <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 50%; top: 90%;"
+                                             :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                             x-text="getFullWatermarkText()"></div>
+                                        <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 80%; top: 90%;"
+                                             :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                             x-text="getFullWatermarkText()"></div>
+                                    </div>
+                                </template>
                             </div>
                         </div>
 
-                        <!-- Single diagonal watermark across center (left to right) -->
-                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <span class="font-mono font-bold whitespace-nowrap transform rotate-45"
-                                  :style="{
-                                      color: color,
-                                      opacity: opacity / 100,
-                                      fontSize: '12px'
-                                  }"
-                                  x-text="getWatermarkText()">
-                            </span>
+                        <!-- Loading indicator -->
+                        <div x-show="previewLoading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 z-10">
+                            <div class="flex flex-col items-center">
+                                <svg class="animate-spin w-8 h-8 text-primary-600 mb-2" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span class="text-xs text-gray-500">Loading preview...</span>
+                            </div>
+                        </div>
+
+                        <!-- PDF Canvas -->
+                        <canvas x-ref="pdfCanvas" x-show="previewReady" class="w-full h-full object-contain"></canvas>
+
+                        <!-- Watermark overlay on PDF -->
+                        <div x-show="previewReady" class="absolute inset-0 pointer-events-none overflow-visible">
+                            <!-- Single watermark (non-scattered) -->
+                            <template x-if="position !== 'scattered'">
+                                <div class="absolute watermark-text font-bold whitespace-nowrap"
+                                     style="font-family: Helvetica, Arial, sans-serif;"
+                                     :style="{
+                                         ...getPreviewPositionAbsolute(position),
+                                         transform: getPreviewTransform(position, rotation),
+                                         color: color,
+                                         opacity: opacity / 100,
+                                         fontSize: calculateWatermarkFontSize() + 'px',
+                                         transformOrigin: 'center'
+                                     }"
+                                     x-text="getFullWatermarkText()">
+                                </div>
+                            </template>
+
+                            <!-- Scattered watermarks -->
+                            <template x-if="position === 'scattered'">
+                                <div>
+                                    <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 33.33%; top: 10%;"
+                                         :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                         x-text="getFullWatermarkText()"></div>
+                                    <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 66.67%; top: 10%;"
+                                         :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                         x-text="getFullWatermarkText()"></div>
+                                    <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 20%; top: 50%;"
+                                         :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                         x-text="getFullWatermarkText()"></div>
+                                    <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 50%; top: 50%;"
+                                         :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                         x-text="getFullWatermarkText()"></div>
+                                    <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 80%; top: 50%;"
+                                         :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                         x-text="getFullWatermarkText()"></div>
+                                    <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 20%; top: 90%;"
+                                         :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                         x-text="getFullWatermarkText()"></div>
+                                    <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 50%; top: 90%;"
+                                         :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                         x-text="getFullWatermarkText()"></div>
+                                    <div class="absolute watermark-text font-bold whitespace-nowrap" style="font-family: Helvetica, Arial, sans-serif; left: 80%; top: 90%;"
+                                         :style="{ transform: `translate(-50%, -50%) rotate(${rotation}deg)`, color: color, opacity: opacity / 100, fontSize: (calculateWatermarkFontSize() * 0.35) + 'px', transformOrigin: 'center' }"
+                                         x-text="getFullWatermarkText()"></div>
+                                </div>
+                            </template>
                         </div>
 
                         <!-- Corner fold effect -->
@@ -463,16 +613,12 @@
                     <!-- Preview Info -->
                     <div class="mt-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
                         <div class="flex items-center justify-between text-xs">
-                            <span class="text-gray-500">Watermark layout:</span>
-                            <span class="font-semibold text-gray-700">Diagonal text across center</span>
+                            <span class="text-gray-500">Position:</span>
+                            <span class="font-semibold text-gray-700 capitalize" x-text="position.replace('-', ' ')"></span>
                         </div>
                         <div class="flex items-center justify-between text-xs mt-1">
-                            <span class="text-gray-500">Watermark text:</span>
-                            <span class="font-mono text-gray-700 truncate max-w-[180px]" x-text="getWatermarkText()"></span>
-                        </div>
-                        <div class="flex items-center justify-between text-xs mt-1">
-                            <span class="text-gray-500">Opacity:</span>
-                            <span class="text-gray-700" x-text="opacity + '%'"></span>
+                            <span class="text-gray-500">Text:</span>
+                            <span class="font-mono text-gray-700 truncate max-w-[180px]" x-text="getFullWatermarkText()"></span>
                         </div>
                     </div>
 
@@ -590,19 +736,27 @@
         </div>
     </div>
 
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
+        // Set PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
         function watermarkForm() {
             const defaults = @json($defaults ?? []);
             const maxFileSize = {{ config('watermark.max_upload_mb', 50) }} * 1024 * 1024;
             const csrfToken = '{{ csrf_token() }}';
+            const userCompanyName = @json($user->company_name ?? '');
 
             return {
                 // Form fields
-                iso: '',
+                iso: userCompanyName,
                 lender: '',
                 fontSize: defaults.font_size || 15,
                 color: defaults.color || '#878787',
-                opacity: defaults.opacity || 20,
+                opacity: defaults.opacity || 10,
+                position: defaults.position || 'diagonal',
+                rotation: ((defaults.position || 'diagonal') === 'diagonal' || (defaults.position || 'diagonal') === 'scattered') ? -45 : 0,
 
                 // Templates
                 templates: [],
@@ -616,6 +770,11 @@
                 errorMessage: '',
                 successMessage: '',
                 fileIdCounter: 0,
+
+                // PDF Preview
+                previewReady: false,
+                previewLoading: false,
+                currentPreviewFile: null,
 
                 init() {
                     this.loadTemplates();
@@ -643,6 +802,17 @@
                         this.fontSize = template.font_size;
                         this.color = template.color;
                         this.opacity = template.opacity;
+                        this.position = template.position || 'diagonal';
+                        this.rotation = template.rotation || ((template.position === 'diagonal' || template.position === 'scattered') ? -45 : 0);
+                    }
+                },
+
+                updateRotationForPosition() {
+                    // Automatically set rotation based on position
+                    if (this.position === 'diagonal' || this.position === 'scattered') {
+                        this.rotation = -45;
+                    } else {
+                        this.rotation = 0;
                     }
                 },
 
@@ -666,7 +836,9 @@
                                 lender: this.lender,
                                 font_size: this.fontSize,
                                 color: this.color,
-                                opacity: this.opacity
+                                opacity: this.opacity,
+                                position: this.position,
+                                rotation: this.rotation
                             })
                         });
 
@@ -707,12 +879,108 @@
                     return `${isoText} | ${lenderText}`;
                 },
 
+                getFullWatermarkText() {
+                    const isoText = this.iso || 'ISO Name';
+                    const lenderText = this.lender || 'Lender Name';
+                    return `ISO: ${isoText} | Lender: ${lenderText}`;
+                },
+
+                calculateWatermarkFontSize() {
+                    // Preview container is 340px wide with aspect ratio 8.5/11
+                    const containerWidth = 340;
+                    const containerHeight = containerWidth * (11 / 8.5); // ~440px
+
+                    // Calculate diagonal (like the actual watermark does)
+                    const diagonal = Math.sqrt(containerWidth * containerWidth + containerHeight * containerHeight);
+
+                    // Target: text should span 80% of diagonal
+                    const targetWidth = diagonal * 0.80;
+
+                    // Get the watermark text
+                    const text = this.getFullWatermarkText();
+
+                    // Approximate character width ratio (Helvetica bold averages ~0.6 of font size)
+                    const charWidthRatio = 0.55;
+
+                    // Calculate font size: targetWidth = textLength * fontSize * charWidthRatio
+                    // fontSize = targetWidth / (textLength * charWidthRatio)
+                    let fontSize = targetWidth / (text.length * charWidthRatio);
+
+                    // Clamp between reasonable bounds (like actual watermark: min 10, max 72 scaled for preview)
+                    fontSize = Math.max(12, Math.min(fontSize, 48));
+
+                    return Math.round(fontSize);
+                },
+
                 formatFileSize(bytes) {
                     if (bytes === 0) return '0 Bytes';
                     const k = 1024;
                     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
                     const i = Math.floor(Math.log(bytes) / Math.log(k));
                     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                },
+
+                getPreviewPosition(position) {
+                    const padding = 10; // pixels from edge
+
+                    switch(position) {
+                        case 'top-left':
+                            return { left: padding + 'px', top: padding + 'px' };
+                        case 'top-center':
+                            return { left: '50%', top: padding + 'px', transform: 'translateX(-50%)' };
+                        case 'top-right':
+                            return { right: padding + 'px', top: padding + 'px' };
+                        case 'center':
+                            return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
+                        case 'bottom-left':
+                            return { left: padding + 'px', bottom: padding + 'px' };
+                        case 'bottom-center':
+                            return { left: '50%', bottom: padding + 'px', transform: 'translateX(-50%)' };
+                        case 'bottom-right':
+                            return { right: padding + 'px', bottom: padding + 'px' };
+                        case 'diagonal':
+                        default:
+                            return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
+                    }
+                },
+
+                getPreviewPositionAbsolute(position) {
+                    const padding = 10; // pixels from edge
+
+                    switch(position) {
+                        case 'top-left':
+                            return { left: padding + 'px', top: padding + 'px' };
+                        case 'top-center':
+                            return { left: '50%', top: padding + 'px' };
+                        case 'top-right':
+                            return { right: padding + 'px', top: padding + 'px' };
+                        case 'center':
+                            return { left: '50%', top: '50%' };
+                        case 'bottom-left':
+                            return { left: padding + 'px', bottom: padding + 'px' };
+                        case 'bottom-center':
+                            return { left: '50%', bottom: padding + 'px' };
+                        case 'bottom-right':
+                            return { right: padding + 'px', bottom: padding + 'px' };
+                        case 'diagonal':
+                        default:
+                            return { left: '50%', top: '50%' };
+                    }
+                },
+
+                getPreviewTransform(position, rotation) {
+                    // Use rotation directly for CSS preview
+                    // Positions that need centering with translate
+                    switch(position) {
+                        case 'top-center':
+                        case 'bottom-center':
+                            return `translateX(-50%) rotate(${rotation}deg)`;
+                        case 'center':
+                        case 'diagonal':
+                            return `translate(-50%, -50%) rotate(${rotation}deg)`;
+                        default:
+                            return `rotate(${rotation}deg)`;
+                    }
                 },
 
                 handleFileSelect(event) {
@@ -761,14 +1029,69 @@
                             jobId: null,
                             jobUrl: null
                         });
+
+                        // Render preview for the first added file
+                        if (this.files.length === 1 || !this.previewReady) {
+                            this.renderPdfPreview(file);
+                        }
+                    }
+                },
+
+                async renderPdfPreview(file) {
+                    if (this.previewLoading) return;
+
+                    this.previewLoading = true;
+                    this.previewReady = false;
+                    this.currentPreviewFile = file;
+
+                    try {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        const page = await pdf.getPage(1);
+
+                        const canvas = this.$refs.pdfCanvas;
+                        const context = canvas.getContext('2d');
+
+                        // Calculate scale to fit the container
+                        const containerWidth = 340;
+                        const containerHeight = containerWidth * (11 / 8.5); // Letter aspect ratio
+
+                        const viewport = page.getViewport({ scale: 1 });
+                        const scaleX = containerWidth / viewport.width;
+                        const scaleY = containerHeight / viewport.height;
+                        const scale = Math.min(scaleX, scaleY);
+
+                        const scaledViewport = page.getViewport({ scale: scale });
+
+                        canvas.width = scaledViewport.width;
+                        canvas.height = scaledViewport.height;
+
+                        await page.render({
+                            canvasContext: context,
+                            viewport: scaledViewport
+                        }).promise;
+
+                        this.previewReady = true;
+                    } catch (error) {
+                        console.error('Failed to render PDF preview:', error);
+                        this.previewReady = false;
+                    } finally {
+                        this.previewLoading = false;
                     }
                 },
 
                 removeFile(index) {
+                    const removedFile = this.files[index];
                     this.files.splice(index, 1);
+
                     if (this.files.length === 0) {
                         this.errorMessage = '';
                         this.successMessage = '';
+                        this.previewReady = false;
+                        this.currentPreviewFile = null;
+                    } else if (removedFile === this.currentPreviewFile && this.files.length > 0) {
+                        // If we removed the previewed file, preview the first remaining file
+                        this.renderPdfPreview(this.files[0].file);
                     }
                 },
 
@@ -777,6 +1100,8 @@
                     this.errorMessage = '';
                     this.successMessage = '';
                     this.uploadedCount = 0;
+                    this.previewReady = false;
+                    this.currentPreviewFile = null;
                 },
 
                 async startUpload() {
@@ -825,6 +1150,8 @@
                         formData.append('font_size', this.fontSize);
                         formData.append('color', this.color);
                         formData.append('opacity', this.opacity);
+                        formData.append('position', this.position);
+                        formData.append('rotation', this.rotation);
 
                         const xhr = new XMLHttpRequest();
 
