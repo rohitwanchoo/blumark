@@ -47,10 +47,10 @@ class AppServiceProvider extends ServiceProvider
         // Register event listeners
         Event::listen(Registered::class, SendWelcomeEmail::class);
 
-        // Register SocialiteProviders
-        Event::listen(SocialiteWasCalled::class, [
-            \SocialiteProviders\Apple\AppleExtendSocialite::class . '@handle',
-            \SocialiteProviders\LinkedIn\LinkedInExtendSocialite::class . '@handle',
-        ]);
+        // Register SocialiteProviders using closure for Laravel 11+
+        Event::listen(function (SocialiteWasCalled $event) {
+            $event->extendSocialite('apple', \SocialiteProviders\Apple\Provider::class);
+            $event->extendSocialite('linkedin', \SocialiteProviders\LinkedIn\Provider::class);
+        });
     }
 }
