@@ -35,8 +35,9 @@
     31 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
     32 => 'Termwind\\Laravel\\TermwindServiceProvider',
     33 => 'PragmaRX\\Google2FALaravel\\ServiceProvider',
-    34 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
-    35 => 'App\\Providers\\AppServiceProvider',
+    34 => 'SocialiteProviders\\Manager\\ServiceProvider',
+    35 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
+    36 => 'App\\Providers\\AppServiceProvider',
   ),
   'eager' => 
   array (
@@ -214,7 +215,7 @@
     'Laravel\\Breeze\\Console\\InstallCommand' => 'Laravel\\Breeze\\BreezeServiceProvider',
     'Laravel\\Sail\\Console\\InstallCommand' => 'Laravel\\Sail\\SailServiceProvider',
     'Laravel\\Sail\\Console\\PublishCommand' => 'Laravel\\Sail\\SailServiceProvider',
-    'Laravel\\Socialite\\Contracts\\Factory' => 'Laravel\\Socialite\\SocialiteServiceProvider',
+    'Laravel\\Socialite\\Contracts\\Factory' => 'SocialiteProviders\\Manager\\ServiceProvider',
     'command.tinker' => 'Laravel\\Tinker\\TinkerServiceProvider',
   ),
   'when' => 
@@ -268,6 +269,9 @@
     array (
     ),
     'Laravel\\Tinker\\TinkerServiceProvider' => 
+    array (
+    ),
+    'SocialiteProviders\\Manager\\ServiceProvider' => 
     array (
     ),
   ),

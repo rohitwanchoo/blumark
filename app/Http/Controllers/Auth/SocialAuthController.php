@@ -14,7 +14,7 @@ use Laravel\Socialite\Contracts\User as SocialiteUser;
 
 class SocialAuthController extends Controller
 {
-    protected array $providers = ['google', 'github', 'facebook'];
+    protected array $providers = ['google', 'github', 'facebook', 'apple', 'linkedin'];
 
     public function redirect(string $provider): RedirectResponse
     {

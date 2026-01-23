@@ -19,6 +19,8 @@
         "laravel/tinker": "^2.9",
         "pragmarx/google2fa-laravel": "^2.3",
         "setasign/fpdi": "^2.6",
+        "socialiteproviders/apple": "^5.7",
+        "socialiteproviders/linkedin": "^5.0",
         "symfony/google-mailer": "^7.4",
         "tecnickcom/tcpdf": "^6.7"
     },

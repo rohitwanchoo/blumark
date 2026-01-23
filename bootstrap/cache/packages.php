@@ -84,6 +84,13 @@
       0 => 'PragmaRX\\Google2FALaravel\\ServiceProvider',
     ),
   ),
+  'socialiteproviders/manager' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'SocialiteProviders\\Manager\\ServiceProvider',
+    ),
+  ),
   'spatie/laravel-ignition' => 
   array (
     'aliases' => 

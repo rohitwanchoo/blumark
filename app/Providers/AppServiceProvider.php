@@ -12,6 +12,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -45,5 +46,11 @@ class AppServiceProvider extends ServiceProvider
 
         // Register event listeners
         Event::listen(Registered::class, SendWelcomeEmail::class);
+
+        // Register SocialiteProviders
+        Event::listen(SocialiteWasCalled::class, [
+            \SocialiteProviders\Apple\AppleExtendSocialite::class . '@handle',
+            \SocialiteProviders\LinkedIn\LinkedInExtendSocialite::class . '@handle',
+        ]);
     }
 }
