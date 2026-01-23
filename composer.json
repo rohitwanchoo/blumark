@@ -10,6 +10,7 @@
         "dedoc/scramble": "^0.13.10",
         "doctrine/dbal": "^4.4",
         "endroid/qr-code": "^6.0",
+        "google/apiclient": "^2.0",
         "laravel/breeze": "^2.0",
         "laravel/cashier": "^16.2",
         "laravel/framework": "^11.0",
@@ -18,6 +19,7 @@
         "laravel/tinker": "^2.9",
         "pragmarx/google2fa-laravel": "^2.3",
         "setasign/fpdi": "^2.6",
+        "symfony/google-mailer": "^7.4",
         "tecnickcom/tcpdf": "^6.7"
     },
     "require-dev": {

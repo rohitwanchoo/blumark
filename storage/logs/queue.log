@@ -1,0 +1,106 @@
+  2026-01-17 05:06:58 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-17 05:07:06 App\Jobs\ProcessWatermarkPdf ................... 7s DONE
+  2026-01-17 05:29:41 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-17 05:29:48 App\Jobs\ProcessWatermarkPdf ................... 7s DONE
+  2026-01-17 07:12:11 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-17 07:12:17 App\Jobs\ProcessWatermarkPdf ................... 6s DONE
+  2026-01-17 07:16:30 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-17 07:16:34 App\Jobs\ProcessWatermarkPdf ................... 4s DONE
+  2026-01-17 07:18:21 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-17 07:18:25 App\Jobs\ProcessWatermarkPdf ................... 4s DONE
+  2026-01-17 07:19:40 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-17 07:19:43 App\Jobs\ProcessWatermarkPdf ................... 3s DONE
+  2026-01-17 15:21:40 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-17 15:21:41 App\Jobs\ProcessWatermarkPdf ................... 1s DONE
+  2026-01-17 19:44:15 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-17 19:44:22 App\Jobs\ProcessWatermarkPdf ................... 6s DONE
+  2026-01-18 06:17:13 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-18 06:17:13 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-18 06:17:17 App\Jobs\ProcessWatermarkPdf ................... 3s DONE
+  2026-01-18 06:17:17 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-18 06:17:17 App\Jobs\ProcessWatermarkPdf ................... 3s DONE
+  2026-01-18 06:17:19 App\Jobs\ProcessWatermarkPdf ................... 2s DONE
+  2026-01-18 06:27:18 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-18 06:27:21 App\Jobs\ProcessWatermarkPdf ................... 3s DONE
+  2026-01-18 06:44:04 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-18 06:44:08 App\Jobs\ProcessWatermarkPdf ................... 3s DONE
+  2026-01-18 06:45:02 App\Jobs\ProcessWatermarkPdf ................... RUNNING
+  2026-01-18 06:45:06 App\Jobs\ProcessWatermarkPdf ................... 4s DONE
+  2026-01-18 06:54:45 App\Notifications\VerifyEmailNotification ...... RUNNING
+PHP Fatal error:  Trait "Laravel\Sanctum\HasApiTokens" not found in /var/www/html/watermarking/app/Models/User.php on line 15
+
+   Symfony\Component\ErrorHandler\Error\FatalError 
+
+  Trait "Laravel\Sanctum\HasApiTokens" not found
+
+  at app/Models/User.php:15
+     11▕ use Illuminate\Notifications\Notifiable;
+     12▕ use Laravel\Cashier\Billable;
+     13▕ use Laravel\Sanctum\HasApiTokens;
+     14▕ 
+  ➜  15▕ class User extends Authenticatable implements MustVerifyEmail
+     16▕ {
+     17▕     use HasApiTokens, HasFactory, Notifiable, Billable;
+     18▕ 
+     19▕     protected $fillable = [
+
+
+   Whoops\Exception\ErrorException 
+
+  Trait "Laravel\Sanctum\HasApiTokens" not found
+
+  at app/Models/User.php:15
+     11▕ use Illuminate\Notifications\Notifiable;
+     12▕ use Laravel\Cashier\Billable;
+     13▕ use Laravel\Sanctum\HasApiTokens;
+     14▕ 
+  ➜  15▕ class User extends Authenticatable implements MustVerifyEmail
+     16▕ {
+     17▕     use HasApiTokens, HasFactory, Notifiable, Billable;
+     18▕ 
+     19▕     protected $fillable = [
+
+      [2m+1 vendor frames [22m
+
+  2   [internal]:0
+      Whoops\Run::handleShutdown()
+
+  2026-01-18 06:56:16 App\Notifications\VerifyEmailNotification ...... RUNNING
+PHP Fatal error:  Trait "Laravel\Sanctum\HasApiTokens" not found in /var/www/html/watermarking/app/Models/User.php on line 15
+
+   Symfony\Component\ErrorHandler\Error\FatalError 
+
+  Trait "Laravel\Sanctum\HasApiTokens" not found
+
+  at app/Models/User.php:15
+     11▕ use Illuminate\Notifications\Notifiable;
+     12▕ use Laravel\Cashier\Billable;
+     13▕ use Laravel\Sanctum\HasApiTokens;
+     14▕ 
+  ➜  15▕ class User extends Authenticatable implements MustVerifyEmail
+     16▕ {
+     17▕     use HasApiTokens, HasFactory, Notifiable, Billable;
+     18▕ 
+     19▕     protected $fillable = [
+
+
+   Whoops\Exception\ErrorException 
+
+  Trait "Laravel\Sanctum\HasApiTokens" not found
+
+  at app/Models/User.php:15
+     11▕ use Illuminate\Notifications\Notifiable;
+     12▕ use Laravel\Cashier\Billable;
+     13▕ use Laravel\Sanctum\HasApiTokens;
+     14▕ 
+  ➜  15▕ class User extends Authenticatable implements MustVerifyEmail
+     16▕ {
+     17▕     use HasApiTokens, HasFactory, Notifiable, Billable;
+     18▕ 
+     19▕     protected $fillable = [
+
+      [2m+1 vendor frames [22m
+
+  2   [internal]:0
+      Whoops\Run::handleShutdown()
+

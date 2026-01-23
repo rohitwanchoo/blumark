@@ -9,6 +9,7 @@ use App\Models\Lender;
 use App\Models\LenderDistribution;
 use App\Models\LenderDistributionItem;
 use App\Models\WatermarkJob;
+use App\Services\CustomSmtpMailer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -30,17 +31,30 @@ class LenderDistributionController extends Controller
 
     public function create()
     {
-        $lenders = Auth::user()->lenders()->active()->orderBy('company_name')->get();
-        $emailTemplates = Auth::user()->emailTemplates()
+        $user = Auth::user();
+
+        // Check if user has set their ISO/company name
+        $hasIsoName = !empty($user->company_name);
+
+        $lenders = $user->lenders()->active()->orderBy('company_name')->get();
+        $emailTemplates = $user->emailTemplates()
             ->orderByDesc('is_default')
             ->orderBy('name')
             ->get();
+        $smtpSettings = $user->smtpSettings()->latest()->get();
 
-        return view('distributions.create', compact('lenders', 'emailTemplates'));
+        return view('distributions.create', compact('lenders', 'emailTemplates', 'smtpSettings', 'hasIsoName'));
     }
 
     public function store(Request $request)
     {
+        $user = Auth::user();
+
+        // Check if user has set their ISO/company name
+        if (empty($user->company_name)) {
+            return back()->withErrors(['iso' => 'Please update your ISO/Company name in your Profile before creating submissions.']);
+        }
+
         $validated = $request->validate([
             'files' => 'required|array|min:1',
             'files.*' => 'file|mimes:pdf|max:' . (config('watermark.max_upload_mb', 50) * 1024),
@@ -51,9 +65,8 @@ class LenderDistributionController extends Controller
             'color' => 'nullable|string|max:7',
             'opacity' => 'nullable|integer|min:1|max:100',
             'email_template_id' => 'nullable|exists:email_templates,id',
+            'smtp_setting_id' => 'nullable|exists:smtp_settings,id',
         ]);
-
-        $user = Auth::user();
         $files = $request->file('files');
         $fileCount = count($files);
 
@@ -91,7 +104,7 @@ class LenderDistributionController extends Controller
             'type' => 'iso_lender',
             'font_size' => $validated['font_size'] ?? config('watermark.defaults.font_size', 15),
             'color' => $validated['color'] ?? config('watermark.defaults.color', '#878787'),
-            'opacity' => $validated['opacity'] ?? config('watermark.defaults.opacity', 20),
+            'opacity' => $validated['opacity'] ?? config('watermark.defaults.opacity', 10),
             'iso' => $user->company_name ?? $user->name,
         ];
 
@@ -117,6 +130,7 @@ class LenderDistributionController extends Controller
             'source_files' => $sourceFiles,
             'settings' => $settings,
             'email_template_id' => $validated['email_template_id'] ?? null,
+            'smtp_setting_id' => $validated['smtp_setting_id'] ?? null,
             'status' => 'pending',
             'total_lenders' => $totalItems, // Actually total items (files × lenders)
         ]);
@@ -284,15 +298,41 @@ class LenderDistributionController extends Controller
             $template = EmailTemplate::getDefaultForUser($user->id);
         }
 
-        // Send the email
-        Mail::to($email)->send(new LenderDocumentMail(
-            distribution: $distribution,
-            item: $item,
-            senderName: $user->getFullName(),
-            senderCompany: $user->company_name ?? $user->name,
-            attachPdf: $sendVia === 'email_attachment',
-            template: $template,
-        ));
+        // Get SMTP settings to determine from address
+        $fromEmail = null;
+        $fromName = null;
+        if ($distribution->smtp_setting_id) {
+            $smtpSetting = \App\Models\SmtpSetting::where('id', $distribution->smtp_setting_id)
+                ->where('user_id', $user->id)
+                ->first();
+            if ($smtpSetting) {
+                $fromEmail = $smtpSetting->from_email;
+                $fromName = $smtpSetting->from_name;
+            }
+        } else {
+            $smtpSetting = \App\Models\SmtpSetting::getActiveForUser($user->id);
+            if ($smtpSetting) {
+                $fromEmail = $smtpSetting->from_email;
+                $fromName = $smtpSetting->from_name;
+            }
+        }
+
+        // Send the email using custom SMTP if configured
+        CustomSmtpMailer::sendWithCustomSmtp(
+            $user->id,
+            new LenderDocumentMail(
+                distribution: $distribution,
+                items: collect([$item]),
+                senderName: $user->getFullName(),
+                senderCompany: $user->company_name ?? $user->name,
+                attachPdf: $sendVia === 'email_attachment',
+                template: $template,
+                fromEmail: $fromEmail,
+                fromName: $fromName,
+            ),
+            $email,
+            $distribution->smtp_setting_id
+        );
 
         $item->markAsSent($sendVia);
 
@@ -310,7 +350,6 @@ class LenderDistributionController extends Controller
 
         $sendVia = $validated['send_via'];
         $user = Auth::user();
-        $sentEmails = [];
 
         // Get email template: request override > distribution template > user default
         $template = null;
@@ -322,25 +361,58 @@ class LenderDistributionController extends Controller
             $template = EmailTemplate::getDefaultForUser($user->id);
         }
 
-        foreach ($distribution->items as $item) {
-            if ($item->canSend() && !$item->isSent()) {
-                $email = $item->getLenderEmail();
+        // Get SMTP settings to determine from address
+        $fromEmail = null;
+        $fromName = null;
+        if ($distribution->smtp_setting_id) {
+            $smtpSetting = \App\Models\SmtpSetting::where('id', $distribution->smtp_setting_id)
+                ->where('user_id', $user->id)
+                ->first();
+            if ($smtpSetting) {
+                $fromEmail = $smtpSetting->from_email;
+                $fromName = $smtpSetting->from_name;
+            }
+        } else {
+            $smtpSetting = \App\Models\SmtpSetting::getActiveForUser($user->id);
+            if ($smtpSetting) {
+                $fromEmail = $smtpSetting->from_email;
+                $fromName = $smtpSetting->from_name;
+            }
+        }
 
-                Mail::to($email)->send(new LenderDocumentMail(
+        // Group items by lender email (only items that can be sent and haven't been sent)
+        $itemsByLender = $distribution->items
+            ->filter(fn($item) => $item->canSend() && !$item->isSent())
+            ->groupBy(fn($item) => $item->getLenderEmail());
+
+        $lenderCount = 0;
+
+        foreach ($itemsByLender as $email => $lenderItems) {
+            // Send ONE consolidated email with all documents for this lender using custom SMTP if configured
+            CustomSmtpMailer::sendWithCustomSmtp(
+                $user->id,
+                new LenderDocumentMail(
                     distribution: $distribution,
-                    item: $item,
+                    items: $lenderItems,
                     senderName: $user->getFullName(),
                     senderCompany: $user->company_name ?? $user->name,
                     attachPdf: $sendVia === 'email_attachment',
                     template: $template,
-                ));
+                    fromEmail: $fromEmail,
+                    fromName: $fromName,
+                ),
+                $email,
+                $distribution->smtp_setting_id
+            );
 
+            // Mark all items for this lender as sent
+            foreach ($lenderItems as $item) {
                 $item->markAsSent($sendVia);
-                $sentEmails[$email] = true;
             }
+
+            $lenderCount++;
         }
 
-        $lenderCount = count($sentEmails);
         return back()->with('success', "Sent documents to {$lenderCount} " . ($lenderCount === 1 ? 'lender' : 'lenders') . ".");
     }
 

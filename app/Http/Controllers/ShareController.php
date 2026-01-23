@@ -6,9 +6,9 @@ use App\Mail\SharedDocumentMail;
 use App\Models\SharedLink;
 use App\Models\WatermarkJob;
 use App\Services\AccessTrackingService;
+use App\Services\CustomSmtpMailer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class ShareController extends Controller
@@ -52,8 +52,20 @@ class ShareController extends Controller
         // Send email if requested
         if ($request->boolean('send_email') && $validated['recipient_email']) {
             try {
-                Mail::to($validated['recipient_email'])
-                    ->send(new SharedDocumentMail($sharedLink, $job, Auth::user()));
+                // Get SMTP settings to determine from address
+                $fromEmail = null;
+                $fromName = null;
+                $smtpSetting = \App\Models\SmtpSetting::getActiveForUser(Auth::id());
+                if ($smtpSetting) {
+                    $fromEmail = $smtpSetting->from_email;
+                    $fromName = $smtpSetting->from_name;
+                }
+
+                CustomSmtpMailer::sendWithCustomSmtp(
+                    Auth::id(),
+                    new SharedDocumentMail($sharedLink, $job, Auth::user(), $fromEmail, $fromName),
+                    $validated['recipient_email']
+                );
             } catch (\Exception $e) {
                 // Log but don't fail
                 \Log::warning('Failed to send share email: ' . $e->getMessage());

@@ -28,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'website',
         'address',
+        'timezone',
         'role',
     ];
 
@@ -106,6 +107,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function emailTemplates(): HasMany
     {
         return $this->hasMany(EmailTemplate::class);
+    }
+
+    public function smtpSettings(): HasMany
+    {
+        return $this->hasMany(SmtpSetting::class);
     }
 
     public function hasSocialAccount(string $provider): bool

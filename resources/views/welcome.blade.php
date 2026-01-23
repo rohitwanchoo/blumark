@@ -321,25 +321,6 @@
                     </p>
                 </div>
 
-                <!-- Feature 7 - QR Code Tracking -->
-                <div class="group p-8 rounded-2xl border border-gray-200 hover:border-primary-200 hover:shadow-xl transition-all duration-300 bg-white md:col-span-2 lg:col-span-3">
-                    <div class="flex flex-col lg:flex-row lg:items-center gap-6">
-                        <div class="w-14 h-14 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
-                            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
-                            </svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center gap-3 mb-3">
-                                <h3 class="text-xl font-semibold text-gray-900">QR Code Tracking</h3>
-                                <span class="px-2.5 py-1 bg-rose-100 text-rose-700 text-xs font-bold rounded-full uppercase tracking-wide">100% Theft Protection</span>
-                            </div>
-                            <p class="text-gray-600">
-                                Every watermarked document includes a unique QR code. When scanned, it reveals <strong>exactly who received that document</strong> — the ISO, the lender, and when it was created. If your documents leak, you'll know exactly where they came from. <strong>The ultimate way to stop data theft.</strong>
-                            </p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -594,7 +575,7 @@
 
                     <!-- Example Visual -->
                     <div class="bg-white rounded-xl p-4 border border-blue-200 shadow-sm">
-                        <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wide">Example: Bank Statement with Diagonal Watermark + QR Code</p>
+                        <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wide">Example: Bank Statement with Diagonal Watermark</p>
                         <div class="bg-white rounded-lg border border-gray-300 aspect-[4/3] relative overflow-hidden shadow-inner">
                             <!-- Bank Statement Content -->
                             <div class="p-3 text-xs">
@@ -646,49 +627,8 @@
                                     ISO: ABC Partners | Lender: Your Company
                                 </div>
                             </div>
-                            <!-- QR Code -->
-                            <div class="absolute bottom-2 right-2 z-20">
-                                <div class="w-12 h-12 bg-white border border-gray-300 rounded p-1 shadow-sm">
-                                    <svg viewBox="0 0 100 100" class="w-full h-full">
-                                        <!-- Top-left finder pattern -->
-                                        <rect x="0" y="0" width="28" height="28" fill="#1f2937"/>
-                                        <rect x="4" y="4" width="20" height="20" fill="white"/>
-                                        <rect x="8" y="8" width="12" height="12" fill="#1f2937"/>
-                                        <!-- Top-right finder pattern -->
-                                        <rect x="72" y="0" width="28" height="28" fill="#1f2937"/>
-                                        <rect x="76" y="4" width="20" height="20" fill="white"/>
-                                        <rect x="80" y="8" width="12" height="12" fill="#1f2937"/>
-                                        <!-- Bottom-left finder pattern -->
-                                        <rect x="0" y="72" width="28" height="28" fill="#1f2937"/>
-                                        <rect x="4" y="76" width="20" height="20" fill="white"/>
-                                        <rect x="8" y="80" width="12" height="12" fill="#1f2937"/>
-                                        <!-- Data modules -->
-                                        <rect x="36" y="4" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="48" y="4" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="36" y="16" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="54" y="16" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="4" y="36" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="16" y="42" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="36" y="36" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="48" y="42" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="60" y="36" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="72" y="42" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="84" y="36" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="42" y="54" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="60" y="54" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="78" y="54" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="36" y="66" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="54" y="66" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="72" y="72" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="84" y="78" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="36" y="84" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="54" y="90" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="72" y="84" width="6" height="6" fill="#1f2937"/>
-                                    </svg>
-                                </div>
-                            </div>
                         </div>
-                        <p class="text-xs text-rose-600 mt-2 text-center font-medium">Diagonal watermark + QR code for complete protection</p>
+                        <p class="text-xs text-rose-600 mt-2 text-center font-medium">Diagonal watermark for complete protection</p>
                     </div>
                 </div>
 
@@ -740,7 +680,7 @@
 
                     <!-- Example Visual -->
                     <div class="bg-white rounded-xl p-4 border border-emerald-200 shadow-sm">
-                        <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wide">Example: MCA Application with Diagonal Watermark + QR Code</p>
+                        <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wide">Example: MCA Application with Diagonal Watermark</p>
                         <div class="bg-white rounded-lg border border-gray-300 aspect-[4/3] relative overflow-hidden shadow-inner">
                             <!-- Application Content -->
                             <div class="p-3 text-xs">
@@ -783,49 +723,8 @@
                                     ISO: ABC Partners | Lender: FastFund
                                 </div>
                             </div>
-                            <!-- QR Code -->
-                            <div class="absolute bottom-2 right-2 z-20">
-                                <div class="w-12 h-12 bg-white border border-gray-300 rounded p-1 shadow-sm">
-                                    <svg viewBox="0 0 100 100" class="w-full h-full">
-                                        <!-- Top-left finder pattern -->
-                                        <rect x="0" y="0" width="28" height="28" fill="#1f2937"/>
-                                        <rect x="4" y="4" width="20" height="20" fill="white"/>
-                                        <rect x="8" y="8" width="12" height="12" fill="#1f2937"/>
-                                        <!-- Top-right finder pattern -->
-                                        <rect x="72" y="0" width="28" height="28" fill="#1f2937"/>
-                                        <rect x="76" y="4" width="20" height="20" fill="white"/>
-                                        <rect x="80" y="8" width="12" height="12" fill="#1f2937"/>
-                                        <!-- Bottom-left finder pattern -->
-                                        <rect x="0" y="72" width="28" height="28" fill="#1f2937"/>
-                                        <rect x="4" y="76" width="20" height="20" fill="white"/>
-                                        <rect x="8" y="80" width="12" height="12" fill="#1f2937"/>
-                                        <!-- Data modules -->
-                                        <rect x="36" y="4" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="48" y="4" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="36" y="16" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="54" y="16" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="4" y="36" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="16" y="42" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="36" y="36" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="48" y="42" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="60" y="36" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="72" y="42" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="84" y="36" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="42" y="54" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="60" y="54" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="78" y="54" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="36" y="66" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="54" y="66" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="72" y="72" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="84" y="78" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="36" y="84" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="54" y="90" width="6" height="6" fill="#1f2937"/>
-                                        <rect x="72" y="84" width="6" height="6" fill="#1f2937"/>
-                                    </svg>
-                                </div>
-                            </div>
                         </div>
-                        <p class="text-xs text-rose-600 mt-2 text-center font-medium">Diagonal watermark + QR code for complete protection</p>
+                        <p class="text-xs text-rose-600 mt-2 text-center font-medium">Diagonal watermark for complete protection</p>
                     </div>
                 </div>
             </div>

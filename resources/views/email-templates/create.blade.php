@@ -102,11 +102,11 @@
                             <textarea name="body"
                                       id="body"
                                       x-model="body"
-                                      rows="10"
+                                      rows="12"
                                       required
-                                      placeholder="Dear {lender_contact},&#10;&#10;Please find attached..."
+                                      placeholder="<p>Dear {lender_contact},</p>&#10;&#10;<p>Please find attached...</p>"
                                       class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 focus:border-primary-500 focus:ring-primary-500 focus:outline-none font-mono text-sm">{{ old('body') }}</textarea>
-                            <p class="text-xs text-gray-500 mt-1">Plain text only. Placeholders will be replaced when sending.</p>
+                            <p class="text-xs text-gray-500 mt-1">HTML supported. Use &lt;p&gt;, &lt;br&gt;, &lt;strong&gt;, &lt;ul&gt;, etc. Placeholders will be replaced when sending.</p>
                         </div>
                     </div>
                 </div>
@@ -120,18 +120,24 @@
                         </button>
                     </div>
                     <div class="p-6">
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="mb-3">
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <div class="bg-gray-100 px-4 py-2 border-b border-gray-200">
                                 <span class="text-xs font-medium text-gray-500">Subject:</span>
                                 <p class="text-gray-900 font-medium" x-text="previewSubject || 'Enter a subject above...'"></p>
                             </div>
-                            <div class="border-t border-gray-200 pt-3">
-                                <span class="text-xs font-medium text-gray-500">Body:</span>
-                                <pre class="text-gray-700 text-sm whitespace-pre-wrap font-sans mt-1" x-text="previewBody || 'Enter email body above...'"></pre>
+                            <div class="p-4">
+                                <div class="email-preview text-gray-700" x-html="previewBody || '<p class=\'text-gray-400\'>Enter email body above...</p>'"></div>
                             </div>
+                            <style>
+                                .email-preview p { margin: 0 0 1em 0; }
+                                .email-preview p:last-child { margin-bottom: 0; }
+                                .email-preview ul, .email-preview ol { margin: 1em 0; padding-left: 1.5em; }
+                                .email-preview li { margin: 0.25em 0; }
+                                .email-preview br { display: block; margin: 0.5em 0; }
+                            </style>
                         </div>
                         <p class="text-xs text-gray-500 mt-2">
-                            Sample values: Lender = "Sample Lending Corp", Contact = "John Smith", Sender = "{{ Auth::user()->getFullName() }}", Company = "{{ Auth::user()->company_name ?? Auth::user()->name }}"
+                            Sample values: Application = "Sample Application", Lender = "Sample Lending Corp", Contact = "John Smith", Sender = "{{ Auth::user()->getFullName() }}", Company = "{{ Auth::user()->company_name ?? Auth::user()->name }}"
                         </p>
                     </div>
                 </div>
@@ -151,17 +157,28 @@
 
     <script>
         function emailTemplateForm() {
+            const defaultBody = `<p>Dear {lender_contact},</p>
+
+<p>Please find the attached document "<strong>{document_name}</strong>" for <strong>{application_name}</strong> from {sender_company}.</p>
+
+<p>If you have any questions, please don't hesitate to reach out.</p>
+
+<p>Best regards,<br>
+{sender_name}<br>
+{sender_company}</p>`;
+
             return {
-                subject: '{{ old('subject', 'Document from {sender_company}') }}',
-                body: `{{ old('body', "Dear {lender_contact},\n\nPlease find the attached document \"{document_name}\" from {sender_company}.\n\nIf you have any questions, please don't hesitate to reach out.\n\nBest regards,\n{sender_name}\n{sender_company}") }}`,
+                subject: @json(old('subject', 'Document from {sender_company}: {application_name}')),
+                body: @json(old('body')) || defaultBody,
                 previewSubject: '',
                 previewBody: '',
                 sampleData: {
+                    '{application_name}': 'Sample Application',
                     '{lender_name}': 'Sample Lending Corp',
                     '{lender_contact}': 'John Smith',
-                    '{sender_name}': '{{ Auth::user()->getFullName() }}',
-                    '{sender_company}': '{{ Auth::user()->company_name ?? Auth::user()->name }}',
-                    '{document_name}': 'Q1 2026 Loan Package'
+                    '{sender_name}': @json(Auth::user()->getFullName()),
+                    '{sender_company}': @json(Auth::user()->company_name ?? Auth::user()->name),
+                    '{document_name}': 'Q1 2026 Loan Package.pdf'
                 },
                 init() {
                     this.updatePreview();

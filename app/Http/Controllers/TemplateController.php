@@ -35,6 +35,8 @@ class TemplateController extends Controller
             'font_size' => 'required|integer|min:8|max:48',
             'color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'opacity' => 'required|integer|min:1|max:100',
+            'position' => 'required|string|in:diagonal,scattered,top-left,top-right,top-center,bottom-left,bottom-right,bottom-center,center',
+            'rotation' => 'required|integer|min:0|max:360',
             'is_default' => 'boolean',
         ]);
 
@@ -74,6 +76,8 @@ class TemplateController extends Controller
             'font_size' => 'required|integer|min:8|max:48',
             'color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'opacity' => 'required|integer|min:1|max:100',
+            'position' => 'required|string|in:diagonal,scattered,top-left,top-right,top-center,bottom-left,bottom-right,bottom-center,center',
+            'rotation' => 'required|integer|min:0|max:360',
             'is_default' => 'boolean',
         ]);
 
@@ -145,12 +149,16 @@ class TemplateController extends Controller
             'font_size' => 'integer|min:8|max:48',
             'color' => ['regex:/^#[0-9A-Fa-f]{6}$/'],
             'opacity' => 'integer|min:1|max:100',
+            'position' => 'string|in:diagonal,scattered,top-left,top-right,top-center,bottom-left,bottom-right,bottom-center,center',
+            'rotation' => 'integer|min:0|max:360',
         ]);
 
         // Set defaults if not provided
         $validated['font_size'] = $validated['font_size'] ?? config('watermark.defaults.font_size', 15);
         $validated['color'] = $validated['color'] ?? config('watermark.defaults.color', '#878787');
         $validated['opacity'] = $validated['opacity'] ?? config('watermark.defaults.opacity', 20);
+        $validated['position'] = $validated['position'] ?? config('watermark.defaults.position', 'diagonal');
+        $validated['rotation'] = $validated['rotation'] ?? config('watermark.defaults.rotation', 45);
 
         $template = Auth::user()->watermarkTemplates()->create($validated);
 

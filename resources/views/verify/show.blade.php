@@ -95,7 +95,21 @@
                         @endif
 
                         @if($job)
-                            <div class="border-t border-gray-200 pt-4">
+                            <div class="border-t border-gray-200 pt-4 space-y-4">
+                                @if(isset($job->settings['iso']) && $job->settings['iso'])
+                                    <div class="sm:flex sm:justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">ISO</dt>
+                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 font-semibold">{{ $job->settings['iso'] }}</dd>
+                                    </div>
+                                @endif
+
+                                @if(isset($job->settings['lender']) && $job->settings['lender'])
+                                    <div class="sm:flex sm:justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Lender</dt>
+                                        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 font-semibold">{{ $job->settings['lender'] }}</dd>
+                                    </div>
+                                @endif
+
                                 <div class="sm:flex sm:justify-between">
                                     <dt class="text-sm font-medium text-gray-500">Original Filename</dt>
                                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0">{{ $job->original_filename }}</dd>

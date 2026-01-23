@@ -26,11 +26,12 @@ class EmailTemplate extends Model
      * Available placeholders for templates
      */
     public static array $placeholders = [
+        '{application_name}' => 'Application/Submission name',
         '{lender_name}' => 'Lender company name',
         '{lender_contact}' => 'Lender contact name (first name or full name)',
         '{sender_name}' => 'Your name',
         '{sender_company}' => 'Your company name',
-        '{document_name}' => 'Document/Distribution name',
+        '{document_name}' => 'Document filename',
     ];
 
     public function user(): BelongsTo
@@ -60,6 +61,7 @@ class EmailTemplate extends Model
     protected function replacePlaceholders(string $text, array $data): string
     {
         $replacements = [
+            '{application_name}' => $data['application_name'] ?? '',
             '{lender_name}' => $data['lender_name'] ?? '',
             '{lender_contact}' => $data['lender_contact'] ?? '',
             '{sender_name}' => $data['sender_name'] ?? '',
@@ -115,8 +117,16 @@ class EmailTemplate extends Model
         return static::create([
             'user_id' => $userId,
             'name' => 'Default Template',
-            'subject' => 'Document from {sender_company}',
-            'body' => "Dear {lender_contact},\n\nPlease find the attached document \"{document_name}\" from {sender_company}.\n\nIf you have any questions, please don't hesitate to reach out.\n\nBest regards,\n{sender_name}\n{sender_company}",
+            'subject' => 'Document from {sender_company}: {application_name}',
+            'body' => '<p>Dear {lender_contact},</p>
+
+<p>Please find the attached document "<strong>{document_name}</strong>" for <strong>{application_name}</strong> from {sender_company}.</p>
+
+<p>If you have any questions, please don\'t hesitate to reach out.</p>
+
+<p>Best regards,<br>
+{sender_name}<br>
+{sender_company}</p>',
             'is_default' => true,
         ]);
     }

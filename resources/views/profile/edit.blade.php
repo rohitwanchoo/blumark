@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex items-center space-x-3">
@@ -104,7 +104,7 @@
                                             class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border @error('company_type') border-red-500 @enderror">
                                         <option value="">Select type...</option>
                                         <option value="iso" {{ old('company_type', $user->company_type) === 'iso' ? 'selected' : '' }}>ISO</option>
-                                        <option value="funder" {{ old('company_type', $user->company_type) === 'funder' ? 'selected' : '' }}>Funder</option>
+                                        <option value="lender" {{ old('company_type', $user->company_type) === 'lender' ? 'selected' : '' }}>Lender</option>
                                     </select>
                                     @error('company_type')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -128,6 +128,44 @@
                                               class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border @error('address') border-red-500 @enderror"
                                               placeholder="123 Main Street, Suite 100&#10;New York, NY 10001">{{ old('address', $user->address) }}</textarea>
                                     @error('address')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label for="timezone" class="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+                                    <select name="timezone" id="timezone"
+                                            class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-4 py-3 border @error('timezone') border-red-500 @enderror">
+                                        @php
+                                            $timezones = [
+                                                'America/New_York' => 'Eastern Time (ET)',
+                                                'America/Chicago' => 'Central Time (CT)',
+                                                'America/Denver' => 'Mountain Time (MT)',
+                                                'America/Phoenix' => 'Arizona (MST - No DST)',
+                                                'America/Los_Angeles' => 'Pacific Time (PT)',
+                                                'America/Anchorage' => 'Alaska Time (AKT)',
+                                                'Pacific/Honolulu' => 'Hawaii Time (HST)',
+                                                'UTC' => 'UTC (Coordinated Universal Time)',
+                                                'Europe/London' => 'London (GMT/BST)',
+                                                'Europe/Paris' => 'Paris (CET/CEST)',
+                                                'Asia/Dubai' => 'Dubai (GST)',
+                                                'Asia/Kolkata' => 'India (IST)',
+                                                'Asia/Singapore' => 'Singapore (SGT)',
+                                                'Asia/Tokyo' => 'Tokyo (JST)',
+                                                'Australia/Sydney' => 'Sydney (AEDT/AEST)',
+                                            ];
+                                        @endphp
+                                        @foreach($timezones as $tz => $label)
+                                            @php
+                                                $datetime = new DateTime('now', new DateTimeZone($tz));
+                                                $offset = $datetime->format('P');
+                                            @endphp
+                                            <option value="{{ $tz }}" {{ old('timezone', $user->timezone ?? 'UTC') === $tz ? 'selected' : '' }}>
+                                                {{ $label }} (UTC{{ $offset }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('timezone')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>

@@ -19,6 +19,8 @@ class WatermarkTemplate extends Model
         'font_size',
         'color',
         'opacity',
+        'position',
+        'rotation',
         'is_default',
         'usage_count',
     ];
@@ -27,6 +29,7 @@ class WatermarkTemplate extends Model
         'is_default' => 'boolean',
         'font_size' => 'integer',
         'opacity' => 'integer',
+        'rotation' => 'integer',
         'usage_count' => 'integer',
     ];
 
@@ -55,6 +58,8 @@ class WatermarkTemplate extends Model
             'font_size' => $this->font_size,
             'color' => $this->color,
             'opacity' => $this->opacity,
+            'position' => $this->position ?? 'diagonal',
+            'rotation' => $this->rotation ?? 45,
             'flatten_pdf' => true,
         ];
     }

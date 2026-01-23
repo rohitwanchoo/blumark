@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <a href="{{ route('billing.index') }}" class="text-sm text-gray-500 hover:text-gray-700 flex items-center mb-2">

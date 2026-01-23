@@ -3,7 +3,7 @@
         <h1 class="text-2xl font-bold text-gray-900">Activity Log</h1>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="px-4 sm:px-6 lg:px-8">
         <!-- Filters -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
             <form action="{{ route('admin.activity') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">

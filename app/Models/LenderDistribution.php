@@ -17,6 +17,7 @@ class LenderDistribution extends Model
         'source_files',
         'settings',
         'email_template_id',
+        'smtp_setting_id',
         'status',
         'total_lenders',
         'processed_count',
@@ -63,6 +64,11 @@ class LenderDistribution extends Model
     public function emailTemplate(): BelongsTo
     {
         return $this->belongsTo(EmailTemplate::class);
+    }
+
+    public function smtpSetting(): BelongsTo
+    {
+        return $this->belongsTo(SmtpSetting::class);
     }
 
     public function getSourceFullPathAttribute(): ?string

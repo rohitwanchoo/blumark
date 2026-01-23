@@ -2,14 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Mail\LenderDocumentMail;
+use App\Models\EmailTemplate;
 use App\Models\WatermarkJob;
+use App\Services\CustomSmtpMailer;
 use App\Services\DocumentFingerprintService;
 use App\Services\PdfWatermarkService;
-use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\RoundBlockSizeMode;
-use Endroid\QrCode\Writer\PngWriter;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Throwable;
@@ -18,6 +16,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -66,8 +65,6 @@ class ProcessWatermarkPdf implements ShouldQueue
 
         $this->watermarkJob->markAsProcessing();
 
-        $qrCodePath = null;
-
         try {
             $inputPath = $this->watermarkJob->getOriginalFullPath();
             $outputPath = $this->generateOutputPath();
@@ -77,14 +74,6 @@ class ProcessWatermarkPdf implements ShouldQueue
             $outputDir = dirname($outputPath);
             if (!is_dir($outputDir)) {
                 mkdir($outputDir, 0755, true);
-            }
-
-            // Generate QR code with verification URL before watermarking
-            if (config('watermark.security.qr_watermark_enabled', true)) {
-                $qrCodePath = $this->generateVerificationQrCode();
-                if ($qrCodePath) {
-                    $settings['qr_code_path'] = $qrCodePath;
-                }
             }
 
             // Process based on watermark type
@@ -112,55 +101,17 @@ class ProcessWatermarkPdf implements ShouldQueue
 
         } catch (Exception $e) {
             $this->handleFailure($e);
-        } finally {
-            // Cleanup QR code temp file
-            if ($qrCodePath && file_exists($qrCodePath)) {
-                @unlink($qrCodePath);
-            }
-        }
-    }
-
-    /**
-     * Generate QR code with verification URL.
-     */
-    protected function generateVerificationQrCode(): ?string
-    {
-        try {
-            // Generate verification URL using job ID
-            $verificationUrl = url('/verify/job/' . $this->watermarkJob->id);
-
-            $builder = new Builder(
-                writer: new PngWriter(),
-                data: $verificationUrl,
-                encoding: new Encoding('UTF-8'),
-                errorCorrectionLevel: ErrorCorrectionLevel::High,
-                size: 400, // Large size for better scanning
-                margin: 10,
-                roundBlockSizeMode: RoundBlockSizeMode::Margin,
-            );
-
-            $result = $builder->build();
-
-            // Save to temp file
-            $tempPath = sys_get_temp_dir() . '/qr_' . uniqid() . '.png';
-            $result->saveToFile($tempPath);
-
-            return $tempPath;
-        } catch (Exception $e) {
-            Log::warning('Failed to generate QR code', [
-                'job_id' => $this->watermarkJob->id,
-                'error' => $e->getMessage(),
-            ]);
-            return null;
         }
     }
 
     /**
      * Process ISO/Lender watermark (9-position grid).
+     * Uses text-preserving method to keep PDFs searchable.
      */
     protected function processIsoLenderWatermark(PdfWatermarkService $service, string $inputPath, string $outputPath, array $settings): array
     {
-        return $service->watermarkIsoLender($inputPath, $outputPath, $settings);
+        // Use text-preserving watermark method to keep PDF searchable
+        return $service->watermarkIsoLenderPreserveText($inputPath, $outputPath, $settings);
     }
 
     /**
@@ -269,8 +220,118 @@ class ProcessWatermarkPdf implements ShouldQueue
 
         if ($success) {
             $item->markAsDone();
+            $this->sendEmailToLender($item);
         } else {
             $item->markAsFailed($errorMessage);
+        }
+    }
+
+    /**
+     * Send consolidated email to lender after ALL their files are watermarked.
+     */
+    protected function sendEmailToLender($item): void
+    {
+        // Skip if already sent
+        if ($item->isSent()) {
+            return;
+        }
+
+        $distribution = $item->distribution;
+
+        // Get all items for the same lender in this distribution
+        $lenderEmail = $item->getLenderEmail();
+        $lenderItems = $distribution->items()
+            ->where('lender_snapshot->email', $lenderEmail)
+            ->get();
+
+        // Check if ALL items for this lender are done (watermarking complete)
+        $allDone = $lenderItems->every(fn($i) => $i->watermarkJob?->status === 'done');
+
+        if (!$allDone) {
+            Log::info('Waiting for all lender files to complete before sending email', [
+                'item_id' => $item->id,
+                'lender' => $item->getLenderCompanyName(),
+                'done' => $lenderItems->filter(fn($i) => $i->watermarkJob?->status === 'done')->count(),
+                'total' => $lenderItems->count(),
+            ]);
+            return;
+        }
+
+        // Check if any items for this lender are already sent (email already dispatched)
+        $anySent = $lenderItems->contains(fn($i) => $i->isSent());
+        if ($anySent) {
+            return;
+        }
+
+        // Get only items that can be sent (have valid output files)
+        $sendableItems = $lenderItems->filter(fn($i) => $i->canSend());
+
+        if ($sendableItems->isEmpty()) {
+            Log::info('Skipping auto-send: no sendable items for lender', [
+                'lender' => $item->getLenderCompanyName(),
+            ]);
+            return;
+        }
+
+        try {
+            $user = $distribution->user;
+
+            // Get email template: distribution template > user default
+            $template = $distribution->emailTemplate
+                ?? EmailTemplate::getDefaultForUser($user->id);
+
+            // Get SMTP settings to determine from address
+            $fromEmail = null;
+            $fromName = null;
+            if ($distribution->smtp_setting_id) {
+                $smtpSetting = \App\Models\SmtpSetting::where('id', $distribution->smtp_setting_id)
+                    ->where('user_id', $user->id)
+                    ->first();
+                if ($smtpSetting) {
+                    $fromEmail = $smtpSetting->from_email;
+                    $fromName = $smtpSetting->from_name;
+                }
+            } else {
+                $smtpSetting = \App\Models\SmtpSetting::getActiveForUser($user->id);
+                if ($smtpSetting) {
+                    $fromEmail = $smtpSetting->from_email;
+                    $fromName = $smtpSetting->from_name;
+                }
+            }
+
+            // Send ONE email with ALL attachments for this lender using custom SMTP if configured
+            CustomSmtpMailer::sendWithCustomSmtp(
+                $user->id,
+                new LenderDocumentMail(
+                    distribution: $distribution,
+                    items: $sendableItems,
+                    senderName: $user->getFullName(),
+                    senderCompany: $user->company_name ?? $user->name,
+                    attachPdf: true,
+                    template: $template,
+                    fromEmail: $fromEmail,
+                    fromName: $fromName,
+                ),
+                $lenderEmail,
+                $distribution->smtp_setting_id
+            );
+
+            // Mark ALL items for this lender as sent
+            foreach ($sendableItems as $lenderItem) {
+                $lenderItem->markAsSent('email_attachment');
+            }
+
+            Log::info('Auto-sent consolidated email to lender', [
+                'lender' => $item->getLenderCompanyName(),
+                'email' => $lenderEmail,
+                'documents_count' => $sendableItems->count(),
+                'item_ids' => $sendableItems->pluck('id')->toArray(),
+            ]);
+        } catch (Exception $e) {
+            Log::error('Failed to auto-send email to lender', [
+                'lender' => $item->getLenderCompanyName(),
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 

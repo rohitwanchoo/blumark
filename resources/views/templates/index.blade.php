@@ -1,5 +1,5 @@
 <x-app-layout>
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" x-data="templatesManager()">
+<div class="px-4 sm:px-6 lg:px-8" x-data="templatesManager()">
     <div class="mb-8 flex items-center justify-between">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Saved Templates</h1>
@@ -75,13 +75,20 @@
                     <span class="text-gray-600 truncate">{{ $template->lender_email }}</span>
                 </div>
                 @endif
+                <div class="flex items-center">
+                    <span class="text-gray-500 w-16">Position:</span>
+                    <span class="text-gray-900 truncate">{{ ucwords(str_replace('-', ' ', $template->position ?? 'diagonal')) }}</span>
+                </div>
             </div>
 
             <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
                 <span>Used {{ $template->usage_count }} times</span>
-                <div class="flex items-center space-x-2">
-                    <span class="w-4 h-4 rounded" style="background-color: {{ $template->color }}"></span>
-                    <span>{{ $template->opacity }}%</span>
+                <div class="flex items-center space-x-3">
+                    <div class="flex items-center space-x-1">
+                        <span class="w-4 h-4 rounded" style="background-color: {{ $template->color }}"></span>
+                        <span>{{ $template->opacity }}%</span>
+                    </div>
+                    <span>{{ $template->rotation ?? 45 }}°</span>
                 </div>
             </div>
         </div>
@@ -101,20 +108,23 @@
         <div class="flex items-center justify-center min-h-screen px-4">
             <div class="fixed inset-0 bg-black/50" @click="closeModal()"></div>
 
-            <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+            <div class="relative bg-white rounded-2xl shadow-xl max-w-6xl w-full p-6"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 transform scale-95"
                  x-transition:enter-end="opacity-100 transform scale-100">
                 <h2 class="text-xl font-bold text-gray-900 mb-4" x-text="editingId ? 'Edit Template' : 'New Template'"></h2>
 
-                <form :action="editingId ? '/templates/' + editingId : '{{ route('templates.store') }}'"
-                      method="POST" @submit="handleSubmit">
-                    @csrf
-                    <template x-if="editingId">
-                        <input type="hidden" name="_method" value="PUT">
-                    </template>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Form Section (Left) -->
+                    <div class="w-full">
+                        <form :action="editingId ? '/templates/' + editingId : '{{ route('templates.store') }}'"
+                              method="POST" @submit="handleSubmit">
+                            @csrf
+                            <template x-if="editingId">
+                                <input type="hidden" name="_method" value="PUT">
+                            </template>
 
-                    <div class="space-y-4">
+                            <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Template Name *</label>
                             <input type="text" name="name" x-model="form.name" required
@@ -160,24 +170,211 @@
                             </div>
                         </div>
 
-                        <label class="flex items-center">
-                            <input type="checkbox" name="is_default" x-model="form.is_default"
-                                   class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
-                            <span class="ml-2 text-sm text-gray-700">Set as default template</span>
-                        </label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                                <select name="position" x-model="form.position"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                                    <option value="diagonal">Diagonal (Center)</option>
+                                    <option value="scattered">Scattered (Multiple Random)</option>
+                                    <option value="top-left">Top Left</option>
+                                    <option value="top-center">Top Center</option>
+                                    <option value="top-right">Top Right</option>
+                                    <option value="center">Center</option>
+                                    <option value="bottom-left">Bottom Left</option>
+                                    <option value="bottom-center">Bottom Center</option>
+                                    <option value="bottom-right">Bottom Right</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Rotation (degrees)</label>
+                                <input type="number" name="rotation" x-model="form.rotation"
+                                       min="0" max="360" step="45"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                            </div>
+                        </div>
+
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="is_default" x-model="form.is_default"
+                                           class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                                    <span class="ml-2 text-sm text-gray-700">Set as default template</span>
+                                </label>
+
+                                <div class="mt-6 flex justify-end space-x-3">
+                                    <button type="button" @click="closeModal()"
+                                            class="px-4 py-2 text-gray-700 hover:text-gray-900">
+                                        Cancel
+                                    </button>
+                                    <button type="submit"
+                                            class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg">
+                                        <span x-text="editingId ? 'Update' : 'Create'"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
 
-                    <div class="mt-6 flex justify-end space-x-3">
-                        <button type="button" @click="closeModal()"
-                                class="px-4 py-2 text-gray-700 hover:text-gray-900">
-                            Cancel
-                        </button>
-                        <button type="submit"
-                                class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg">
-                            <span x-text="editingId ? 'Update' : 'Create'"></span>
-                        </button>
+                    <!-- Preview Section (Right) -->
+                    <div class="w-full">
+                        <div class="sticky top-6">
+                            <h3 class="text-sm font-medium text-gray-700 mb-3">Live Preview</h3>
+                            <div class="relative bg-white border-2 border-gray-300 rounded-lg shadow-sm" style="height: 500px; width: 100%; overflow: hidden;">
+                                <!-- Background to represent PDF page -->
+                                <div class="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100"></div>
+
+                                <!-- Single watermark preview (for non-scattered positions) -->
+                                <template x-if="form.position !== 'scattered'">
+                                    <div class="absolute"
+                                         :style="{
+                                             ...getPreviewPosition(form.position),
+                                             transform: `rotate(${form.rotation}deg)`,
+                                             color: form.color,
+                                             opacity: form.opacity / 100,
+                                             fontSize: '12px',
+                                             fontWeight: 'bold',
+                                             whiteSpace: 'nowrap',
+                                             transformOrigin: 'center'
+                                         }">
+                                        ISO: <span x-text="form.iso || 'Sample ISO'"></span> | Lender: <span x-text="form.lender || 'Sample Lender'"></span>
+                                    </div>
+                                </template>
+
+                                <!-- Scattered watermarks preview -->
+                                <template x-if="form.position === 'scattered'">
+                                    <div>
+                                        <!-- Top Left -->
+                                        <div class="absolute"
+                                             :style="{
+                                                 left: '33.33%',
+                                                 top: '10%',
+                                                 transform: `translate(-50%, -50%) rotate(${form.rotation}deg)`,
+                                                 color: form.color,
+                                                 opacity: form.opacity / 100,
+                                                 fontSize: '9px',
+                                                 fontWeight: 'bold',
+                                                 whiteSpace: 'nowrap',
+                                                 transformOrigin: 'center'
+                                             }">
+                                            ISO: <span x-text="form.iso || 'ISO'"></span> | <span x-text="form.lender || 'Lender'"></span>
+                                        </div>
+
+                                        <!-- Top Right -->
+                                        <div class="absolute"
+                                             :style="{
+                                                 left: '66.67%',
+                                                 top: '10%',
+                                                 transform: `translate(-50%, -50%) rotate(${form.rotation}deg)`,
+                                                 color: form.color,
+                                                 opacity: form.opacity / 100,
+                                                 fontSize: '9px',
+                                                 fontWeight: 'bold',
+                                                 whiteSpace: 'nowrap',
+                                                 transformOrigin: 'center'
+                                             }">
+                                            ISO: <span x-text="form.iso || 'ISO'"></span> | <span x-text="form.lender || 'Lender'"></span>
+                                        </div>
+
+                                        <!-- Middle Left -->
+                                        <div class="absolute"
+                                             :style="{
+                                                 left: '20%',
+                                                 top: '50%',
+                                                 transform: `translate(-50%, -50%) rotate(${form.rotation}deg)`,
+                                                 color: form.color,
+                                                 opacity: form.opacity / 100,
+                                                 fontSize: '9px',
+                                                 fontWeight: 'bold',
+                                                 whiteSpace: 'nowrap',
+                                                 transformOrigin: 'center'
+                                             }">
+                                            ISO: <span x-text="form.iso || 'ISO'"></span> | <span x-text="form.lender || 'Lender'"></span>
+                                        </div>
+
+                                        <!-- Middle Center -->
+                                        <div class="absolute"
+                                             :style="{
+                                                 left: '50%',
+                                                 top: '50%',
+                                                 transform: `translate(-50%, -50%) rotate(${form.rotation}deg)`,
+                                                 color: form.color,
+                                                 opacity: form.opacity / 100,
+                                                 fontSize: '9px',
+                                                 fontWeight: 'bold',
+                                                 whiteSpace: 'nowrap',
+                                                 transformOrigin: 'center'
+                                             }">
+                                            ISO: <span x-text="form.iso || 'ISO'"></span> | <span x-text="form.lender || 'Lender'"></span>
+                                        </div>
+
+                                        <!-- Middle Right -->
+                                        <div class="absolute"
+                                             :style="{
+                                                 left: '80%',
+                                                 top: '50%',
+                                                 transform: `translate(-50%, -50%) rotate(${form.rotation}deg)`,
+                                                 color: form.color,
+                                                 opacity: form.opacity / 100,
+                                                 fontSize: '9px',
+                                                 fontWeight: 'bold',
+                                                 whiteSpace: 'nowrap',
+                                                 transformOrigin: 'center'
+                                             }">
+                                            ISO: <span x-text="form.iso || 'ISO'"></span> | <span x-text="form.lender || 'Lender'"></span>
+                                        </div>
+
+                                        <!-- Bottom Left -->
+                                        <div class="absolute"
+                                             :style="{
+                                                 left: '20%',
+                                                 top: '90%',
+                                                 transform: `translate(-50%, -50%) rotate(${form.rotation}deg)`,
+                                                 color: form.color,
+                                                 opacity: form.opacity / 100,
+                                                 fontSize: '9px',
+                                                 fontWeight: 'bold',
+                                                 whiteSpace: 'nowrap',
+                                                 transformOrigin: 'center'
+                                             }">
+                                            ISO: <span x-text="form.iso || 'ISO'"></span> | <span x-text="form.lender || 'Lender'"></span>
+                                        </div>
+
+                                        <!-- Bottom Center -->
+                                        <div class="absolute"
+                                             :style="{
+                                                 left: '50%',
+                                                 top: '90%',
+                                                 transform: `translate(-50%, -50%) rotate(${form.rotation}deg)`,
+                                                 color: form.color,
+                                                 opacity: form.opacity / 100,
+                                                 fontSize: '9px',
+                                                 fontWeight: 'bold',
+                                                 whiteSpace: 'nowrap',
+                                                 transformOrigin: 'center'
+                                             }">
+                                            ISO: <span x-text="form.iso || 'ISO'"></span> | <span x-text="form.lender || 'Lender'"></span>
+                                        </div>
+
+                                        <!-- Bottom Right -->
+                                        <div class="absolute"
+                                             :style="{
+                                                 left: '80%',
+                                                 top: '90%',
+                                                 transform: `translate(-50%, -50%) rotate(${form.rotation}deg)`,
+                                                 color: form.color,
+                                                 opacity: form.opacity / 100,
+                                                 fontSize: '9px',
+                                                 fontWeight: 'bold',
+                                                 whiteSpace: 'nowrap',
+                                                 transformOrigin: 'center'
+                                             }">
+                                            ISO: <span x-text="form.iso || 'ISO'"></span> | <span x-text="form.lender || 'Lender'"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -195,7 +392,9 @@ function templatesManager() {
             lender_email: '',
             font_size: {{ config('watermark.defaults.font_size', 15) }},
             color: '{{ config('watermark.defaults.color', '#878787') }}',
-            opacity: {{ config('watermark.defaults.opacity', 20) }},
+            opacity: {{ config('watermark.defaults.opacity', 10) }},
+            position: '{{ config('watermark.defaults.position', 'diagonal') }}',
+            rotation: {{ config('watermark.defaults.rotation', 45) }},
             is_default: false
         },
 
@@ -210,6 +409,8 @@ function templatesManager() {
                     font_size: template.font_size,
                     color: template.color,
                     opacity: template.opacity,
+                    position: template.position || 'diagonal',
+                    rotation: template.rotation || 45,
                     is_default: template.is_default
                 };
             } else {
@@ -221,7 +422,9 @@ function templatesManager() {
                     lender_email: '',
                     font_size: {{ config('watermark.defaults.font_size', 15) }},
                     color: '{{ config('watermark.defaults.color', '#878787') }}',
-                    opacity: {{ config('watermark.defaults.opacity', 20) }},
+                    opacity: {{ config('watermark.defaults.opacity', 10) }},
+                    position: '{{ config('watermark.defaults.position', 'diagonal') }}',
+                    rotation: {{ config('watermark.defaults.rotation', 45) }},
                     is_default: false
                 };
             }
@@ -235,6 +438,30 @@ function templatesManager() {
 
         handleSubmit(e) {
             // Form will submit normally
+        },
+
+        getPreviewPosition(position) {
+            const padding = 10; // pixels from edge
+
+            switch(position) {
+                case 'top-left':
+                    return { left: padding + 'px', top: padding + 'px' };
+                case 'top-center':
+                    return { left: '50%', top: padding + 'px', transform: 'translateX(-50%)' };
+                case 'top-right':
+                    return { right: padding + 'px', top: padding + 'px' };
+                case 'center':
+                    return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
+                case 'bottom-left':
+                    return { left: padding + 'px', bottom: padding + 'px' };
+                case 'bottom-center':
+                    return { left: '50%', bottom: padding + 'px', transform: 'translateX(-50%)' };
+                case 'bottom-right':
+                    return { right: padding + 'px', bottom: padding + 'px' };
+                case 'diagonal':
+                default:
+                    return { left: '50%', top: '50%', transform: 'translate(-50%, -50%)' };
+            }
         }
     }
 }

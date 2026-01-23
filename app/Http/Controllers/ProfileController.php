@@ -48,6 +48,7 @@ class ProfileController extends Controller
             'phone' => ['nullable', 'string', 'regex:/^\+1 \(\d{3}\) \d{3}-\d{4}$/'],
             'website' => ['nullable', 'url', 'max:255'],
             'address' => ['nullable', 'string', 'max:500'],
+            'timezone' => ['nullable', 'string', 'timezone'],
         ], [
             'phone.regex' => 'Phone number must be in format +1 (XXX) XXX-XXXX',
         ]);

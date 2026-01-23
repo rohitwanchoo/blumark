@@ -210,6 +210,29 @@ Route::middleware('auth')->group(function () {
         Route::post('/preview', [EmailTemplateController::class, 'preview'])->name('preview');
     });
 
+    // SMTP Settings (requires verified email)
+    Route::prefix('smtp-settings')->name('smtp-settings.')->middleware('verified')->group(function () {
+        Route::get('/', [App\Http\Controllers\SmtpSettingController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\SmtpSettingController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\SmtpSettingController::class, 'store'])->name('store');
+        Route::get('/{smtpSetting}/edit', [App\Http\Controllers\SmtpSettingController::class, 'edit'])->name('edit');
+        Route::put('/{smtpSetting}', [App\Http\Controllers\SmtpSettingController::class, 'update'])->name('update');
+        Route::delete('/{smtpSetting}', [App\Http\Controllers\SmtpSettingController::class, 'destroy'])->name('destroy');
+        Route::post('/{smtpSetting}/test', [App\Http\Controllers\SmtpSettingController::class, 'test'])->name('test');
+        Route::post('/{smtpSetting}/activate', [App\Http\Controllers\SmtpSettingController::class, 'activate'])->name('activate');
+
+        // Provider-based connections
+        Route::get('/providers', [App\Http\Controllers\EmailProviderController::class, 'index'])->name('providers');
+        Route::get('/provider/{provider}/connect', [App\Http\Controllers\EmailProviderController::class, 'connect'])->name('provider.connect');
+        Route::get('/provider/{provider}/callback', [App\Http\Controllers\EmailProviderController::class, 'callback'])->name('provider.callback');
+        Route::post('/provider/{provider}/api-key', [App\Http\Controllers\EmailProviderController::class, 'storeApiKey'])->name('provider.api-key');
+
+        // Help page
+        Route::get('/help', function () {
+            return view('smtp-settings.help');
+        })->name('help');
+    });
+
     // Billing routes (requires verified email)
     Route::prefix('billing')->name('billing.')->middleware('verified')->group(function () {
         // Billing dashboard

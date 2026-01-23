@@ -36,6 +36,8 @@ class StoreWatermarkJobRequest extends FormRequest
             'font_size' => 'required|integer|min:8|max:48',
             'color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'opacity' => 'required|integer|min:1|max:100',
+            'position' => 'nullable|string|in:diagonal,scattered,top-left,top-right,top-center,bottom-left,bottom-right,bottom-center,center',
+            'rotation' => 'nullable|integer|min:0|max:360',
         ];
     }
 
@@ -73,9 +75,11 @@ class StoreWatermarkJobRequest extends FormRequest
         $defaults = config('watermark.defaults', []);
 
         $this->merge([
-            'opacity' => $this->input('opacity', $defaults['opacity'] ?? 33),
+            'opacity' => $this->input('opacity', $defaults['opacity'] ?? 10),
             'font_size' => $this->input('font_size', $defaults['font_size'] ?? 15),
             'color' => $this->input('color', $defaults['color'] ?? '#878787'),
+            'position' => $this->input('position', $defaults['position'] ?? 'diagonal'),
+            'rotation' => $this->input('rotation', $defaults['rotation'] ?? 45),
         ]);
     }
 
@@ -91,6 +95,8 @@ class StoreWatermarkJobRequest extends FormRequest
             'font_size' => (int) $this->input('font_size'),
             'color' => $this->input('color'),
             'opacity' => (int) $this->input('opacity'),
+            'position' => $this->input('position', 'diagonal'),
+            'rotation' => (int) $this->input('rotation', 45),
             'flatten_pdf' => true, // Always enabled for security
         ];
     }

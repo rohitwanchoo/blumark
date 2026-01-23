@@ -1,5 +1,5 @@
 <x-app-layout>
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="px-4 sm:px-6 lg:px-8">
     <div class="mb-8 flex items-center justify-between">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Batch Jobs</h1>

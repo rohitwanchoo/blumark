@@ -31,9 +31,10 @@ return [
     */
 
     'defaults' => [
-        'opacity' => (int) env('WATERMARK_DEFAULT_OPACITY', 20),
+        'opacity' => (int) env('WATERMARK_DEFAULT_OPACITY', 25),
         'font_size' => (int) env('WATERMARK_DEFAULT_FONT_SIZE', 15),
-        'color' => env('WATERMARK_DEFAULT_COLOR', '#878787'),
+        'color' => env('WATERMARK_DEFAULT_COLOR', '#000000'),
+        'position' => env('WATERMARK_DEFAULT_POSITION', 'diagonal'),
         'rotation' => (int) env('WATERMARK_DEFAULT_ROTATION', 45),
     ],
 
@@ -133,8 +134,8 @@ return [
         // Enable document fingerprinting for tracking
         'fingerprint_enabled' => env('WATERMARK_FINGERPRINT_ENABLED', true),
 
-        // Enable QR code watermarks for verification
-        'qr_watermark_enabled' => env('WATERMARK_QR_ENABLED', true),
+        // QR code watermarks disabled
+        'qr_watermark_enabled' => false,
 
         // Enable multi-layer watermarks for anti-removal
         'multi_layer_enabled' => env('WATERMARK_MULTI_LAYER_ENABLED', true),
@@ -231,37 +232,6 @@ return [
         'ocr_resistant' => env('WATERMARK_OCR_RESISTANT', false),
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | QR Code Settings
-    |--------------------------------------------------------------------------
-    |
-    | Settings for QR code watermarks.
-    |
-    */
-
-    'qr' => [
-        // QR code size in pixels
-        'size' => (int) env('WATERMARK_QR_SIZE', 150),
-
-        // QR code position: 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'center'
-        'position' => env('WATERMARK_QR_POSITION', 'bottom-right'),
-
-        // QR code size in PDF (mm)
-        'pdf_size' => (int) env('WATERMARK_QR_PDF_SIZE', 20),
-
-        // Page(s) to add QR: 'all', 'first', 'last', or page number
-        'page' => env('WATERMARK_QR_PAGE', 'first'),
-
-        // QR code opacity (0.1-1.0)
-        'opacity' => (float) env('WATERMARK_QR_OPACITY', 0.9),
-
-        // Include URL only in QR (smaller) or full data
-        'url_only' => env('WATERMARK_QR_URL_ONLY', true),
-
-        // Label text below QR
-        'label' => env('WATERMARK_QR_LABEL', 'Scan to verify'),
-    ],
 
     /*
     |--------------------------------------------------------------------------

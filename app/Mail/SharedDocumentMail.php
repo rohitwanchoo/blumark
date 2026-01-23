@@ -18,12 +18,16 @@ class SharedDocumentMail extends Mailable
     public SharedLink $sharedLink;
     public WatermarkJob $job;
     public User $sender;
+    protected ?string $fromEmail = null;
+    protected ?string $fromName = null;
 
-    public function __construct(SharedLink $sharedLink, WatermarkJob $job, User $sender)
+    public function __construct(SharedLink $sharedLink, WatermarkJob $job, User $sender, ?string $fromEmail = null, ?string $fromName = null)
     {
         $this->sharedLink = $sharedLink;
         $this->job = $job;
         $this->sender = $sender;
+        $this->fromEmail = $fromEmail;
+        $this->fromName = $fromName;
     }
 
     public function envelope(): Envelope
@@ -32,9 +36,19 @@ class SharedDocumentMail extends Mailable
         $settings = $this->job->settings ?? [];
         $iso = $settings['iso'] ?? 'Unknown ISO';
 
-        return new Envelope(
+        $envelope = new Envelope(
             subject: "Document shared by {$iso}",
         );
+
+        // Set custom from address if provided
+        if ($this->fromEmail) {
+            $envelope = new Envelope(
+                from: new \Illuminate\Mail\Mailables\Address($this->fromEmail, $this->fromName ?? $this->fromEmail),
+                subject: "Document shared by {$iso}",
+            );
+        }
+
+        return $envelope;
     }
 
     public function content(): Content

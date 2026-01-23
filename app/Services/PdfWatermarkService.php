@@ -83,8 +83,18 @@ class PdfWatermarkService
 
             // Create new PDF with multi-layer watermarks
             $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
-            $pdf->SetCreator('PDF Watermark Platform');
-            $pdf->SetAuthor('PDF Watermark Platform');
+            $pdf->SetCreator('BluMark.pro');
+            $pdf->SetAuthor('BluMark.pro');
+            $pdf->SetSubject('Watermarked by BluMark.pro');
+
+            // Set ISO and Lender metadata
+            if (!empty($settings['iso'])) {
+                $pdf->SetTitle('ISO: ' . $settings['iso']);
+            }
+            if (!empty($settings['lender'])) {
+                $pdf->SetKeywords('Lender: ' . $settings['lender']);
+            }
+
             $pdf->setPrintHeader(false);
             $pdf->setPrintFooter(false);
             $pdf->SetMargins(0, 0, 0);
@@ -262,7 +272,9 @@ class PdfWatermarkService
     }
 
     /**
-     * Apply watermark with OCR-resistant font rendering.
+     * Apply watermark with OCR-resistant rendering.
+     * NOTE: This intentionally uses image-based rendering to prevent text extraction.
+     * The resulting PDF will NOT have a searchable text layer.
      */
     public function watermarkOcrResistant(string $inputPath, string $outputPath, array $settings): array
     {
@@ -272,17 +284,81 @@ class PdfWatermarkService
         // Fragment the watermark text with special rendering
         $settings['fragment_text'] = true;
 
+        // Use image-based method to prevent text extraction
         return $this->watermarkIsoLender($inputPath, $outputPath, $settings);
     }
 
     /**
-     * Apply ISO/Lender watermark in a 9-position grid layout.
+     * Apply ISO/Lender watermark while PRESERVING the text layer.
+     * Uses FPDI to overlay watermark on original PDF pages without rasterization.
      *
      * @param string $inputPath Full path to the input PDF
      * @param string $outputPath Full path for the output PDF
      * @param array $settings Watermark settings (iso, lender, font_size, color, opacity)
      * @return array Result with page_count
      * @throws Exception
+     */
+    public function watermarkIsoLenderPreserveText(string $inputPath, string $outputPath, array $settings): array
+    {
+        $this->validateInputFile($inputPath);
+
+        $pdf = $this->createPdfInstance($settings);
+
+        try {
+            $pageCount = $pdf->setSourceFile($inputPath);
+        } catch (Exception $e) {
+            // If FPDI fails, try preprocessing the PDF first
+            \Log::info('FPDI failed, attempting Ghostscript preprocessing', [
+                'input' => $inputPath,
+                'error' => $e->getMessage(),
+            ]);
+
+            $preprocessedPath = $this->preprocessPdf($inputPath);
+
+            try {
+                $pageCount = $pdf->setSourceFile($preprocessedPath);
+            } catch (Exception $e2) {
+                throw new Exception("Failed to read PDF file even after preprocessing: " . $e2->getMessage());
+            } finally {
+                if ($preprocessedPath !== $inputPath && file_exists($preprocessedPath)) {
+                    @unlink($preprocessedPath);
+                }
+            }
+        }
+
+        $this->validatePageCount($pageCount);
+
+        // Process each page
+        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+            $templateId = $pdf->importPage($pageNo);
+            $size = $pdf->getTemplateSize($templateId);
+
+            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+
+            // Place the original page (preserves text layer!)
+            $pdf->useTemplate($templateId, 0, 0, $size['width'], $size['height']);
+
+            // Add watermark on top of the original content
+            $this->applyWatermarkDirect($pdf, $settings, $size['width'], $size['height']);
+        }
+
+        $this->savePdf($pdf, $outputPath);
+
+        return ['page_count' => $pageCount];
+    }
+
+
+    /**
+     * Apply ISO/Lender watermark in a 9-position grid layout.
+     * WARNING: This method converts to images and destroys the text layer!
+     * Use watermarkIsoLenderPreserveText() instead for searchable PDFs.
+     *
+     * @param string $inputPath Full path to the input PDF
+     * @param string $outputPath Full path for the output PDF
+     * @param array $settings Watermark settings (iso, lender, font_size, color, opacity)
+     * @return array Result with page_count
+     * @throws Exception
+     * @deprecated Use watermarkIsoLenderPreserveText() to preserve text layer
      */
     public function watermarkIsoLender(string $inputPath, string $outputPath, array $settings): array
     {
@@ -345,17 +421,22 @@ class PdfWatermarkService
             // Apply watermark directly to images (makes it unextractable as text)
             foreach ($images as $index => $imagePath) {
                 $this->applyWatermarkToImage($imagePath, $settings);
-
-                // Add QR code to first page only
-                if ($index === 0 && !empty($settings['qr_code_path']) && file_exists($settings['qr_code_path'])) {
-                    $this->addQrCodeToImage($imagePath, $settings['qr_code_path']);
-                }
             }
 
             // Create new PDF from watermarked images
             $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
-            $pdf->SetCreator('PDF Watermark Platform');
-            $pdf->SetAuthor('PDF Watermark Platform');
+            $pdf->SetCreator('BluMark.pro');
+            $pdf->SetAuthor('BluMark.pro');
+            $pdf->SetSubject('Watermarked by BluMark.pro');
+
+            // Set ISO and Lender metadata
+            if (!empty($settings['iso'])) {
+                $pdf->SetTitle('ISO: ' . $settings['iso']);
+            }
+            if (!empty($settings['lender'])) {
+                $pdf->SetKeywords('Lender: ' . $settings['lender']);
+            }
+
             $pdf->setPrintHeader(false);
             $pdf->setPrintFooter(false);
             $pdf->SetMargins(0, 0, 0);
@@ -416,7 +497,7 @@ class PdfWatermarkService
         $lender = $settings['lender'] ?? '';
         $watermarkText = "ISO: {$iso} | Lender: {$lender}";
 
-        $opacity = ($settings['opacity'] ?? 20) / 100;
+        $opacity = ($settings['opacity'] ?? 10) / 100;
         $color = $this->hexToRgb($settings['color'] ?? '#878787');
 
         // Load the image
@@ -448,8 +529,8 @@ class PdfWatermarkService
             // Calculate page diagonal - this is the max width for rotated text
             $pageDiagonal = sqrt($imgWidth * $imgWidth + $imgHeight * $imgHeight);
 
-            // Target text width: 80% of the page diagonal to leave margins
-            $targetTextWidth = $pageDiagonal * 0.80;
+            // Target text width: 50% of the page diagonal to stay well within bounds
+            $targetTextWidth = $pageDiagonal * 0.50;
 
             // Start with a reference font size to measure text
             $referenceFontSize = 50;
@@ -459,46 +540,27 @@ class PdfWatermarkService
             // Calculate the font size needed to achieve target width
             $fontSize = ($targetTextWidth / $referenceTextWidth) * $referenceFontSize;
 
-            // Clamp font size to reasonable bounds (min 16, max 120)
-            $fontSize = max(16, min($fontSize, 120));
+            // Clamp font size to reasonable bounds (min 16, max 80)
+            // Reduced max to prevent oversized text
+            $fontSize = max(16, min($fontSize, 80));
 
-            // Get final text bounding box with calculated font size
-            $bbox = imagettfbbox($fontSize, 0, $fontFile, $watermarkText);
-            $textWidth = abs($bbox[2] - $bbox[0]);
-            $textHeight = abs($bbox[7] - $bbox[1]);
+            // Get final text bounding box with calculated font size at 45 degree angle
+            $bbox = imagettfbbox($fontSize, 45, $fontFile, $watermarkText);
 
-            // Calculate center position
-            $centerX = $imgWidth / 2;
-            $centerY = $imgHeight / 2;
+            // Calculate the center of the bounding box
+            $bboxCenterX = ($bbox[0] + $bbox[2] + $bbox[4] + $bbox[6]) / 4;
+            $bboxCenterY = ($bbox[1] + $bbox[3] + $bbox[5] + $bbox[7]) / 4;
 
-            // Create a temporary image for the rotated text
-            $diagonal = sqrt($textWidth * $textWidth + $textHeight * $textHeight) * 1.5;
-            $tempImg = imagecreatetruecolor((int) $diagonal, (int) $diagonal);
-            imagealphablending($tempImg, true);
-            imagesavealpha($tempImg, true);
-            $transparent = imagecolorallocatealpha($tempImg, 0, 0, 0, 127);
-            imagefill($tempImg, 0, 0, $transparent);
+            // Calculate page center
+            $pageCenterX = $imgWidth / 2;
+            $pageCenterY = $imgHeight / 2;
 
-            // Draw text on temp image (centered)
-            $tempCenterX = $diagonal / 2 - $textWidth / 2;
-            $tempCenterY = $diagonal / 2 + $textHeight / 2;
-            imagettftext($tempImg, $fontSize, 0, (int) $tempCenterX, (int) $tempCenterY, $textColor, $fontFile, $watermarkText);
+            // Calculate position to draw text so its bounding box center aligns with page center
+            $x = $pageCenterX - $bboxCenterX;
+            $y = $pageCenterY - $bboxCenterY;
 
-            // Rotate the temp image
-            $rotated = imagerotate($tempImg, 45, $transparent);
-            imagedestroy($tempImg);
-
-            if ($rotated) {
-                $rotWidth = imagesx($rotated);
-                $rotHeight = imagesy($rotated);
-
-                // Copy rotated watermark to main image (centered)
-                $destX = (int) (($imgWidth - $rotWidth) / 2);
-                $destY = (int) (($imgHeight - $rotHeight) / 2);
-
-                imagecopy($image, $rotated, $destX, $destY, 0, 0, $rotWidth, $rotHeight);
-                imagedestroy($rotated);
-            }
+            // Draw the rotated text directly on the main image
+            imagettftext($image, $fontSize, 45, (int) $x, (int) $y, $textColor, $fontFile, $watermarkText);
         } else {
             // Fallback to built-in font (less pretty but works)
             $font = 5; // Largest built-in font
@@ -517,83 +579,6 @@ class PdfWatermarkService
         imagedestroy($image);
     }
 
-    /**
-     * Add QR code to an image file (bottom-right corner).
-     */
-    protected function addQrCodeToImage(string $imagePath, string $qrCodePath): void
-    {
-        $image = imagecreatefrompng($imagePath);
-        if (!$image) {
-            return;
-        }
-
-        $qrImage = imagecreatefrompng($qrCodePath);
-        if (!$qrImage) {
-            imagedestroy($image);
-            return;
-        }
-
-        $imgWidth = imagesx($image);
-        $imgHeight = imagesy($image);
-        $qrWidth = imagesx($qrImage);
-        $qrHeight = imagesy($qrImage);
-
-        // Calculate QR size - make it about 12% of page width for good visibility
-        $targetQrSize = (int) ($imgWidth * 0.12);
-        $targetQrSize = max(80, min($targetQrSize, 200)); // Clamp between 80-200 pixels
-
-        // Resize QR if needed
-        if ($qrWidth != $targetQrSize) {
-            $resizedQr = imagecreatetruecolor($targetQrSize, $targetQrSize);
-            imagealphablending($resizedQr, false);
-            imagesavealpha($resizedQr, true);
-            imagecopyresampled($resizedQr, $qrImage, 0, 0, 0, 0, $targetQrSize, $targetQrSize, $qrWidth, $qrHeight);
-            imagedestroy($qrImage);
-            $qrImage = $resizedQr;
-            $qrWidth = $targetQrSize;
-            $qrHeight = $targetQrSize;
-        }
-
-        // Position in bottom-right corner with margin
-        $margin = (int) ($imgWidth * 0.03); // 3% margin
-        $destX = $imgWidth - $qrWidth - $margin;
-        $destY = $imgHeight - $qrHeight - $margin;
-
-        // Add white background behind QR for better contrast
-        $white = imagecolorallocate($image, 255, 255, 255);
-        $padding = 8;
-        imagefilledrectangle(
-            $image,
-            $destX - $padding,
-            $destY - $padding,
-            $destX + $qrWidth + $padding,
-            $destY + $qrHeight + $padding,
-            $white
-        );
-
-        // Copy QR code onto image
-        imagecopy($image, $qrImage, $destX, $destY, 0, 0, $qrWidth, $qrHeight);
-
-        // Add "Scan to verify" label below QR
-        $fontFile = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
-        if (file_exists($fontFile)) {
-            $labelFontSize = max(8, (int) ($targetQrSize * 0.08));
-            $label = 'Scan to verify';
-            $labelColor = imagecolorallocate($image, 100, 100, 100);
-
-            $bbox = imagettfbbox($labelFontSize, 0, $fontFile, $label);
-            $labelWidth = abs($bbox[2] - $bbox[0]);
-            $labelX = $destX + ($qrWidth - $labelWidth) / 2;
-            $labelY = $destY + $qrHeight + $padding + $labelFontSize + 2;
-
-            imagettftext($image, $labelFontSize, 0, (int) $labelX, (int) $labelY, $labelColor, $fontFile, $label);
-        }
-
-        // Save the image
-        imagepng($image, $imagePath);
-        imagedestroy($image);
-        imagedestroy($qrImage);
-    }
 
     /**
      * Apply watermark to a single page using TCPDF (no FPDI templates).
@@ -606,14 +591,15 @@ class PdfWatermarkService
         $lender = $settings['lender'] ?? '';
         $watermarkText = "ISO: {$iso} | Lender: {$lender}";
 
-        $opacity = ($settings['opacity'] ?? 20) / 100;
+        $opacity = ($settings['opacity'] ?? 10) / 100;
         $color = $this->hexToRgb($settings['color'] ?? '#878787');
 
         // Calculate page diagonal - this is the max available width for rotated text
         $pageDiagonal = sqrt($pageWidth * $pageWidth + $pageHeight * $pageHeight);
 
-        // Target text width: 80% of diagonal to leave comfortable margins
-        $targetTextWidth = $pageDiagonal * 0.80;
+        // Target text width: 50% of diagonal to ensure it stays well within page bounds
+        // Conservative to prevent text from going outside page when rotated 45 degrees
+        $targetTextWidth = $pageDiagonal * 0.50;
 
         // Use a reference font size to measure the text width
         $referenceFontSize = 24;
@@ -623,8 +609,9 @@ class PdfWatermarkService
         // Calculate the font size needed to achieve target width
         $fontSize = ($targetTextWidth / $referenceTextWidth) * $referenceFontSize;
 
-        // Clamp font size to reasonable bounds (min 10, max 72)
-        $fontSize = max(10, min($fontSize, 72));
+        // Clamp font size to reasonable bounds (min 10, max 50)
+        // Reduced max from 72 to 50 to prevent oversized text going off page
+        $fontSize = max(10, min($fontSize, 50));
 
         // Center of page
         $centerX = $pageWidth / 2;
@@ -638,18 +625,35 @@ class PdfWatermarkService
         $textWidth = $pdf->GetStringWidth($watermarkText);
         $textHeight = $fontSize * 0.35; // Approximate text height in mm
 
-        // Position text so its CENTER is exactly at page CENTER
-        // This ensures when rotated around the text center, it stays visually centered
-        $textX = $centerX - ($textWidth / 2);
-        $textY = $centerY - ($textHeight / 2);
+        // Get position from settings (default to diagonal for backward compatibility)
+        $position = $settings['position'] ?? 'diagonal';
+        $rotation = $settings['rotation'] ?? 45;
+
+        // Negate rotation for TCPDF (TCPDF rotates counter-clockwise, our stored values are for CSS clockwise)
+        $tcpdfRotation = -$rotation;
+
+        // Handle scattered watermarks
+        if ($position === 'scattered') {
+            $this->applyScatteredWatermarksToTcpdf($pdf, $watermarkText, $pageWidth, $pageHeight, $color, $opacity, $tcpdfRotation);
+            $pdf->SetAlpha(1);
+            return;
+        }
 
         // Apply diagonal watermark using TCPDF's rotation
         $pdf->StartTransform();
 
-        // Rotate 45° around the PAGE CENTER (not text corner)
-        // The text center is at (centerX, centerY), so rotating around page center
-        // keeps the text centered on the page
-        $pdf->Rotate(45, $centerX, $centerY);
+        // Rotate around the PAGE CENTER
+        $pdf->Rotate($tcpdfRotation, $centerX, $centerY);
+
+        // Position text centered on page
+        // Calculate the starting X position to center the text horizontally
+        $textX = $centerX - ($textWidth / 2);
+
+        // For vertical positioning, use the center Y with baseline adjustment
+        // Text() in TCPDF uses baseline positioning
+        $fontHeight = $fontSize * 0.35; // Convert pt to mm
+        $baselineOffset = $fontHeight * 0.25; // Offset from center to baseline
+        $textY = $centerY + $baselineOffset;
 
         $pdf->Text($textX, $textY, $watermarkText);
         $pdf->StopTransform();
@@ -793,14 +797,15 @@ class PdfWatermarkService
         $lender = $settings['lender'] ?? '';
         $watermarkText = "ISO: {$iso} | Lender: {$lender}";
 
-        $opacity = ($settings['opacity'] ?? 20) / 100;
+        $opacity = ($settings['opacity'] ?? 10) / 100;
         $color = $this->hexToRgb($settings['color'] ?? '#878787');
 
         // Calculate page diagonal - this is the max available width for rotated text
         $pageDiagonal = sqrt($pageWidth * $pageWidth + $pageHeight * $pageHeight);
 
-        // Target text width: 80% of diagonal to leave comfortable margins
-        $targetTextWidth = $pageDiagonal * 0.80;
+        // Target text width: 50% of diagonal to ensure it stays well within page bounds
+        // Conservative to prevent text from going outside page when rotated 45 degrees
+        $targetTextWidth = $pageDiagonal * 0.50;
 
         // Use a reference font size to measure the text width
         $referenceFontSize = 24;
@@ -810,8 +815,9 @@ class PdfWatermarkService
         // Calculate the font size needed to achieve target width
         $fontSize = ($targetTextWidth / $referenceTextWidth) * $referenceFontSize;
 
-        // Clamp font size to reasonable bounds (min 10, max 72)
-        $fontSize = max(10, min($fontSize, 72));
+        // Clamp font size to reasonable bounds (min 10, max 50)
+        // Reduced max from 72 to 50 to prevent oversized text going off page
+        $fontSize = max(10, min($fontSize, 50));
 
         // Center of page
         $centerX = $pageWidth / 2;
@@ -827,23 +833,255 @@ class PdfWatermarkService
         // Get the actual text width after setting font
         $textWidth = $pdf->GetStringWidth($watermarkText);
 
-        // Use TCPDF's transformation but ensure we're not inside a clipped region
-        // by resetting the graphics state first
+        // Calculate text height (approximate)
+        $textHeight = $fontSize * 0.35; // Convert pt to mm (approximate)
+
+        // Get position and rotation from settings
+        $position = $settings['position'] ?? 'diagonal';
+        $rotation = $settings['rotation'] ?? 45;
+
+        // Negate rotation for TCPDF (TCPDF rotates counter-clockwise, our stored values are for CSS clockwise)
+        $tcpdfRotation = -$rotation;
+
+        // Handle scattered watermarks (multiple small watermarks randomly placed)
+        if ($position === 'scattered') {
+            $this->applyScatteredWatermarks($pdf, $watermarkText, $pageWidth, $pageHeight, $color, $opacity, $tcpdfRotation);
+            $pdf->SetAlpha(1);
+            return;
+        }
+
+        // Calculate coordinates based on position
+        $coordinates = $this->calculateWatermarkPosition($position, $pageWidth, $pageHeight, $textWidth, $textHeight, $tcpdfRotation);
+
+        // Use TCPDF's transformation to rotate and position text
         $pdf->StartTransform();
 
-        // Rotate around page center
-        $pdf->Rotate(45, $centerX, $centerY);
+        // Rotate around the calculated center point
+        $pdf->Rotate($tcpdfRotation, $coordinates['rotateX'], $coordinates['rotateY']);
 
-        // Draw the text centered
-        $textX = $centerX - ($textWidth / 2);
-        $textY = $centerY;
-
-        $pdf->Text($textX, $textY, $watermarkText);
+        // Position text
+        $pdf->Text($coordinates['textX'], $coordinates['textY'], $watermarkText);
 
         $pdf->StopTransform();
 
         // Reset alpha
         $pdf->SetAlpha(1);
+    }
+
+    /**
+     * Calculate watermark position coordinates based on position setting.
+     *
+     * @param string $position Position type (diagonal, top-left, top-right, etc.)
+     * @param float $pageWidth Page width in mm
+     * @param float $pageHeight Page height in mm
+     * @param float $textWidth Text width in mm
+     * @param float $textHeight Text height in mm
+     * @param int $rotation Rotation angle
+     * @return array Array with textX, textY, rotateX, rotateY
+     */
+    protected function calculateWatermarkPosition(
+        string $position,
+        float $pageWidth,
+        float $pageHeight,
+        float $textWidth,
+        float $textHeight,
+        int $rotation
+    ): array {
+        $padding = 10; // Padding from edges in mm
+        $fontHeight = $textHeight;
+        $baselineOffset = $fontHeight * 0.25;
+
+        switch ($position) {
+            case 'top-left':
+                return [
+                    'textX' => $padding,
+                    'textY' => $padding + $fontHeight,
+                    'rotateX' => $padding,
+                    'rotateY' => $padding,
+                ];
+
+            case 'top-right':
+                return [
+                    'textX' => $pageWidth - $textWidth - $padding,
+                    'textY' => $padding + $fontHeight,
+                    'rotateX' => $pageWidth - $padding,
+                    'rotateY' => $padding,
+                ];
+
+            case 'top-center':
+                $centerX = $pageWidth / 2;
+                return [
+                    'textX' => $centerX - ($textWidth / 2),
+                    'textY' => $padding + $fontHeight,
+                    'rotateX' => $centerX,
+                    'rotateY' => $padding,
+                ];
+
+            case 'bottom-left':
+                return [
+                    'textX' => $padding,
+                    'textY' => $pageHeight - $padding,
+                    'rotateX' => $padding,
+                    'rotateY' => $pageHeight - $padding,
+                ];
+
+            case 'bottom-right':
+                return [
+                    'textX' => $pageWidth - $textWidth - $padding,
+                    'textY' => $pageHeight - $padding,
+                    'rotateX' => $pageWidth - $padding,
+                    'rotateY' => $pageHeight - $padding,
+                ];
+
+            case 'bottom-center':
+                $centerX = $pageWidth / 2;
+                return [
+                    'textX' => $centerX - ($textWidth / 2),
+                    'textY' => $pageHeight - $padding,
+                    'rotateX' => $centerX,
+                    'rotateY' => $pageHeight - $padding,
+                ];
+
+            case 'center':
+                $centerX = $pageWidth / 2;
+                $centerY = $pageHeight / 2;
+                return [
+                    'textX' => $centerX - ($textWidth / 2),
+                    'textY' => $centerY + $baselineOffset,
+                    'rotateX' => $centerX,
+                    'rotateY' => $centerY,
+                ];
+
+            case 'diagonal':
+            default:
+                // Default diagonal position (center with 45-degree rotation)
+                $centerX = $pageWidth / 2;
+                $centerY = $pageHeight / 2;
+                return [
+                    'textX' => $centerX - ($textWidth / 2),
+                    'textY' => $centerY + $baselineOffset,
+                    'rotateX' => $centerX,
+                    'rotateY' => $centerY,
+                ];
+        }
+    }
+
+    /**
+     * Apply multiple small watermarks in a strategic pattern across the page.
+     * Pattern: 2 top (equally spaced), 3 middle (equally spaced), 3 bottom (equally spaced)
+     *
+     * @param Fpdi $pdf PDF object
+     * @param string $watermarkText Text to watermark
+     * @param float $pageWidth Page width in mm
+     * @param float $pageHeight Page height in mm
+     * @param array $color RGB color array
+     * @param float $opacity Opacity value (0-1)
+     * @param int $baseRotation Base rotation angle
+     * @return void
+     */
+    protected function applyScatteredWatermarks(
+        Fpdi $pdf,
+        string $watermarkText,
+        float $pageWidth,
+        float $pageHeight,
+        array $color,
+        float $opacity,
+        int $baseRotation
+    ): void {
+        // Use smaller font size for scattered watermarks
+        $fontSize = 10; // Smaller for better coverage
+        $pdf->SetFont('helvetica', 'B', $fontSize);
+        $pdf->SetTextColor($color['r'], $color['g'], $color['b']);
+        $pdf->SetAlpha($opacity);
+
+        $textWidth = $pdf->GetStringWidth($watermarkText);
+
+        // Define strategic positions (8 watermarks total)
+        $positions = [
+            // Top row: 2 equally spaced
+            ['x' => 0.3333, 'y' => 0.10], // Top left
+            ['x' => 0.6667, 'y' => 0.10], // Top right
+
+            // Middle row: 3 equally spaced
+            ['x' => 0.20, 'y' => 0.50], // Middle left
+            ['x' => 0.50, 'y' => 0.50], // Middle center
+            ['x' => 0.80, 'y' => 0.50], // Middle right
+
+            // Bottom row: 3 equally spaced
+            ['x' => 0.20, 'y' => 0.90], // Bottom left
+            ['x' => 0.50, 'y' => 0.90], // Bottom center
+            ['x' => 0.80, 'y' => 0.90], // Bottom right
+        ];
+
+        foreach ($positions as $pos) {
+            $x = $pos['x'] * $pageWidth;
+            $y = $pos['y'] * $pageHeight;
+
+            // Apply transformation and place watermark
+            $pdf->StartTransform();
+            $pdf->Rotate($baseRotation, $x, $y);
+            $pdf->Text($x - ($textWidth / 2), $y, $watermarkText);
+            $pdf->StopTransform();
+        }
+    }
+
+    /**
+     * Apply multiple small watermarks in a strategic pattern across the page (TCPDF version).
+     * Pattern: 1 top-left, 1 top-right, 3 middle (equally spaced), 3 bottom (equally spaced)
+     *
+     * @param \TCPDF $pdf PDF object
+     * @param string $watermarkText Text to watermark
+     * @param float $pageWidth Page width in mm
+     * @param float $pageHeight Page height in mm
+     * @param array $color RGB color array
+     * @param float $opacity Opacity value (0-1)
+     * @param int $baseRotation Base rotation angle
+     * @return void
+     */
+    protected function applyScatteredWatermarksToTcpdf(
+        \TCPDF $pdf,
+        string $watermarkText,
+        float $pageWidth,
+        float $pageHeight,
+        array $color,
+        float $opacity,
+        int $baseRotation
+    ): void {
+        // Use smaller font size for scattered watermarks
+        $fontSize = 10; // Smaller for better coverage
+        $pdf->SetFont('helvetica', 'B', $fontSize);
+        $pdf->SetTextColor($color['r'], $color['g'], $color['b']);
+        $pdf->SetAlpha($opacity);
+
+        $textWidth = $pdf->GetStringWidth($watermarkText);
+
+        // Define strategic positions (8 watermarks total)
+        $positions = [
+            // Top row: 2 equally spaced
+            ['x' => 0.3333, 'y' => 0.10], // Top left
+            ['x' => 0.6667, 'y' => 0.10], // Top right
+
+            // Middle row: 3 equally spaced
+            ['x' => 0.20, 'y' => 0.50], // Middle left
+            ['x' => 0.50, 'y' => 0.50], // Middle center
+            ['x' => 0.80, 'y' => 0.50], // Middle right
+
+            // Bottom row: 3 equally spaced
+            ['x' => 0.20, 'y' => 0.90], // Bottom left
+            ['x' => 0.50, 'y' => 0.90], // Bottom center
+            ['x' => 0.80, 'y' => 0.90], // Bottom right
+        ];
+
+        foreach ($positions as $pos) {
+            $x = $pos['x'] * $pageWidth;
+            $y = $pos['y'] * $pageHeight;
+
+            // Apply transformation and place watermark
+            $pdf->StartTransform();
+            $pdf->Rotate($baseRotation, $x, $y);
+            $pdf->Text($x - ($textWidth / 2), $y, $watermarkText);
+            $pdf->StopTransform();
+        }
     }
 
     /**
@@ -870,7 +1108,7 @@ class PdfWatermarkService
     {
         $this->validateInputFile($inputPath);
 
-        $pdf = $this->createPdfInstance();
+        $pdf = $this->createPdfInstance($settings);
 
         try {
             $pageCount = $pdf->setSourceFile($inputPath);
@@ -911,7 +1149,7 @@ class PdfWatermarkService
         $this->validateInputFile($inputPath);
         $this->validateImageFile($imagePath);
 
-        $pdf = $this->createPdfInstance();
+        $pdf = $this->createPdfInstance($settings);
 
         try {
             $pageCount = $pdf->setSourceFile($inputPath);
@@ -940,13 +1178,22 @@ class PdfWatermarkService
     /**
      * Create and configure the FPDI/TCPDF instance.
      */
-    protected function createPdfInstance(): Fpdi
+    protected function createPdfInstance(array $settings = []): Fpdi
     {
         $pdf = new Fpdi();
 
         // Set document information
-        $pdf->SetCreator('PDF Watermark Platform');
-        $pdf->SetAuthor('PDF Watermark Platform');
+        $pdf->SetCreator('BluMark.pro');
+        $pdf->SetAuthor('BluMark.pro');
+        $pdf->SetSubject('Watermarked by BluMark.pro');
+
+        // Set ISO and Lender metadata
+        if (!empty($settings['iso'])) {
+            $pdf->SetTitle('ISO: ' . $settings['iso']);
+        }
+        if (!empty($settings['lender'])) {
+            $pdf->SetKeywords('Lender: ' . $settings['lender']);
+        }
 
         // Remove default header/footer
         $pdf->setPrintHeader(false);
@@ -966,10 +1213,13 @@ class PdfWatermarkService
     {
         $text = $settings['text'] ?? 'WATERMARK';
         $fontSize = $settings['font_size'] ?? 48;
-        $opacity = ($settings['opacity'] ?? 50) / 100;
+        $opacity = ($settings['opacity'] ?? 10) / 100;
         $color = $this->hexToRgb($settings['color'] ?? '#888888');
         $rotation = $settings['rotation'] ?? -45;
         $position = $settings['position'] ?? 'diagonal';
+
+        // Negate rotation for TCPDF (TCPDF rotates counter-clockwise, our stored values are for CSS clockwise)
+        $tcpdfRotation = -$rotation;
 
         // Set font and color with alpha
         $pdf->SetFont('helvetica', 'B', $fontSize);
@@ -978,16 +1228,16 @@ class PdfWatermarkService
 
         switch ($position) {
             case 'center':
-                $this->applyTextCenter($pdf, $text, $fontSize, $rotation, $pageWidth, $pageHeight);
+                $this->applyTextCenter($pdf, $text, $fontSize, $tcpdfRotation, $pageWidth, $pageHeight);
                 break;
 
             case 'tiled':
-                $this->applyTextTiled($pdf, $text, $fontSize, $rotation, $pageWidth, $pageHeight, $settings);
+                $this->applyTextTiled($pdf, $text, $fontSize, $tcpdfRotation, $pageWidth, $pageHeight, $settings);
                 break;
 
             case 'diagonal':
             default:
-                $this->applyTextDiagonal($pdf, $text, $fontSize, $rotation, $pageWidth, $pageHeight);
+                $this->applyTextDiagonal($pdf, $text, $fontSize, $tcpdfRotation, $pageWidth, $pageHeight);
                 break;
         }
 
@@ -1061,10 +1311,13 @@ class PdfWatermarkService
      */
     protected function applyImageWatermark(Fpdi $pdf, string $imagePath, array $settings, float $pageWidth, float $pageHeight): void
     {
-        $opacity = ($settings['opacity'] ?? 50) / 100;
+        $opacity = ($settings['opacity'] ?? 10) / 100;
         $scale = ($settings['scale'] ?? 50) / 100;
         $position = $settings['position'] ?? 'center';
         $rotation = $settings['rotation'] ?? 0;
+
+        // Negate rotation for TCPDF (TCPDF rotates counter-clockwise, our stored values are for CSS clockwise)
+        $tcpdfRotation = -$rotation;
 
         // Get image dimensions
         $imageInfo = @getimagesize($imagePath);
@@ -1094,16 +1347,16 @@ class PdfWatermarkService
 
         switch ($position) {
             case 'center':
-                $this->applyImageCenter($pdf, $imagePath, $imgWidthMm, $imgHeightMm, $rotation, $pageWidth, $pageHeight);
+                $this->applyImageCenter($pdf, $imagePath, $imgWidthMm, $imgHeightMm, $tcpdfRotation, $pageWidth, $pageHeight);
                 break;
 
             case 'tiled':
-                $this->applyImageTiled($pdf, $imagePath, $imgWidthMm, $imgHeightMm, $rotation, $pageWidth, $pageHeight, $settings);
+                $this->applyImageTiled($pdf, $imagePath, $imgWidthMm, $imgHeightMm, $tcpdfRotation, $pageWidth, $pageHeight, $settings);
                 break;
 
             case 'diagonal':
             default:
-                $this->applyImageDiagonal($pdf, $imagePath, $imgWidthMm, $imgHeightMm, $rotation, $pageWidth, $pageHeight);
+                $this->applyImageDiagonal($pdf, $imagePath, $imgWidthMm, $imgHeightMm, $tcpdfRotation, $pageWidth, $pageHeight);
                 break;
         }
 

@@ -3,7 +3,7 @@
         <h1 class="text-2xl font-bold text-gray-900">Jobs</h1>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="px-4 sm:px-6 lg:px-8">
         <!-- Filters -->
         <div class="mb-6">
             <form action="{{ route('admin.jobs.index') }}" method="GET" class="flex flex-wrap gap-4">

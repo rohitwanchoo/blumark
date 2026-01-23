@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -32,6 +32,7 @@
                 <div class="ml-3">
                     <p class="text-sm text-blue-700">
                         <strong>Available placeholders:</strong>
+                        <span class="font-mono text-xs bg-blue-100 px-1 rounded">{application_name}</span>,
                         <span class="font-mono text-xs bg-blue-100 px-1 rounded">{lender_name}</span>,
                         <span class="font-mono text-xs bg-blue-100 px-1 rounded">{lender_contact}</span>,
                         <span class="font-mono text-xs bg-blue-100 px-1 rounded">{sender_name}</span>,

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="px-4 sm:px-6 lg:px-8">
         <!-- Page Header -->
         <div class="mb-8">
             <h1 class="text-2xl font-bold text-gray-900">My Profile</h1>
@@ -119,6 +119,35 @@
                             <div class="space-y-1">
                                 <p class="text-sm text-gray-500">Address</p>
                                 <p class="text-base font-medium text-gray-900 whitespace-pre-line">{{ $user->address ?: '-' }}</p>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-sm text-gray-500">Timezone</p>
+                                @if($user->timezone)
+                                    @php
+                                        $datetime = new DateTime('now', new DateTimeZone($user->timezone));
+                                        $offset = $datetime->format('P');
+                                        $tzName = [
+                                            'America/New_York' => 'Eastern Time',
+                                            'America/Chicago' => 'Central Time',
+                                            'America/Denver' => 'Mountain Time',
+                                            'America/Phoenix' => 'Arizona (MST)',
+                                            'America/Los_Angeles' => 'Pacific Time',
+                                            'America/Anchorage' => 'Alaska Time',
+                                            'Pacific/Honolulu' => 'Hawaii Time',
+                                            'UTC' => 'UTC',
+                                            'Europe/London' => 'London',
+                                            'Europe/Paris' => 'Paris',
+                                            'Asia/Dubai' => 'Dubai',
+                                            'Asia/Kolkata' => 'India',
+                                            'Asia/Singapore' => 'Singapore',
+                                            'Asia/Tokyo' => 'Tokyo',
+                                            'Australia/Sydney' => 'Sydney',
+                                        ][$user->timezone] ?? $user->timezone;
+                                    @endphp
+                                    <p class="text-base font-medium text-gray-900">{{ $tzName }} (UTC{{ $offset }})</p>
+                                @else
+                                    <p class="text-base font-medium text-gray-900">-</p>
+                                @endif
                             </div>
                         </div>
                     </div>
