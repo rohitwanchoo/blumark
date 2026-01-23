@@ -43,7 +43,10 @@ class LenderDistributionController extends Controller
             ->get();
         $smtpSettings = $user->smtpSettings()->latest()->get();
 
-        return view('distributions.create', compact('lenders', 'emailTemplates', 'smtpSettings', 'hasIsoName'));
+        // Get watermark templates for this user
+        $templates = $user->watermarkTemplates()->orderByDesc('usage_count')->get();
+
+        return view('distributions.create', compact('lenders', 'emailTemplates', 'smtpSettings', 'hasIsoName', 'templates'));
     }
 
     public function store(Request $request)
