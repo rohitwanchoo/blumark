@@ -315,6 +315,14 @@ class User extends Authenticatable implements MustVerifyEmail
         };
     }
 
+    public function canDisconnectSocialAccount(string $provider): bool
+    {
+        $hasPassword = $this->password !== null && $this->password !== '';
+        $otherSocialAccounts = $this->socialAccounts()->where('provider', '!=', $provider)->count();
+
+        return $hasPassword || $otherSocialAccounts > 0;
+    }
+
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmailNotification);

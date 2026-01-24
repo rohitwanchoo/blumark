@@ -13,3 +13,6 @@ Schedule::command('watermark:cleanup')->daily();
 
 // Purge old admin activity logs weekly (keeps 90 days by default)
 Schedule::command('admin:purge-activity-logs --no-interaction')->weekly();
+
+// Send daily user activity report to super admin
+Schedule::command('report:daily-users')->dailyAt('00:00');

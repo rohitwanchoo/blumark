@@ -22,6 +22,34 @@
                     <p class="text-3xl font-bold text-gray-900">{{ $currentPlan?->name ?? 'Free' }}</p>
                     <p class="text-gray-500 mt-1">{{ $currentPlan?->getMonthlyPrice() ?? '$0' }}/month</p>
                 </div>
+
+                @if($subscription && $subscription->active() && !$currentPlan?->isFree())
+                    <!-- Auto-Renew Toggle -->
+                    <div class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-900">Auto-Renew</p>
+                                <p class="text-xs text-gray-500 mt-0.5">
+                                    @if($subscription->onGracePeriod())
+                                        Disabled - Expires {{ $subscription->ends_at->format('M d, Y') }}
+                                    @else
+                                        Enabled - Renews {{ $subscription->asStripeSubscription()->current_period_end ? \Carbon\Carbon::createFromTimestamp($subscription->asStripeSubscription()->current_period_end)->format('M d, Y') : 'automatically' }}
+                                    @endif
+                                </p>
+                            </div>
+                            <form action="{{ route('billing.subscription.toggle-auto-renew') }}" method="POST" class="ml-3">
+                                @csrf
+                                <button type="submit"
+                                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2 {{ $subscription->onGracePeriod() ? 'bg-gray-200' : 'bg-primary-600' }}"
+                                        role="switch"
+                                        aria-checked="{{ $subscription->onGracePeriod() ? 'false' : 'true' }}">
+                                    <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $subscription->onGracePeriod() ? 'translate-x-0' : 'translate-x-5' }}"></span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @endif
+
                 <a href="{{ route('billing.plans') }}" class="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium">
                     {{ $currentPlan?->isFree() ? 'Upgrade Plan' : 'Manage Plan' }}
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

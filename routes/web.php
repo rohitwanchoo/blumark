@@ -120,6 +120,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
         Route::put('/', [ProfileController::class, 'update'])->name('update');
         Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password');
+        Route::delete('/social/{provider}', [ProfileController::class, 'disconnectSocial'])->name('social.disconnect');
     });
 
     // Two-factor authentication settings
@@ -245,6 +246,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
         Route::post('/subscription/resume', [SubscriptionController::class, 'resume'])->name('subscription.resume');
         Route::post('/subscription/swap/{plan}', [SubscriptionController::class, 'swap'])->name('subscription.swap');
+        Route::post('/subscription/toggle-auto-renew', [BillingController::class, 'toggleAutoRenew'])->name('subscription.toggle-auto-renew');
 
         // Credit management
         Route::get('/credits', [CreditController::class, 'index'])->name('credits');

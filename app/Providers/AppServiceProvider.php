@@ -49,7 +49,6 @@ class AppServiceProvider extends ServiceProvider
 
         // Register SocialiteProviders using closure for Laravel 11+
         Event::listen(function (SocialiteWasCalled $event) {
-            $event->extendSocialite('apple', \SocialiteProviders\Apple\Provider::class);
             $event->extendSocialite('linkedin', \SocialiteProviders\LinkedIn\Provider::class);
         });
     }

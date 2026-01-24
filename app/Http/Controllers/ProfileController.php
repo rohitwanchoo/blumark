@@ -89,4 +89,33 @@ class ProfileController extends Controller
             ->route('profile.show')
             ->with('success', 'Password changed successfully.');
     }
+
+    /**
+     * Disconnect a social account from the user's profile.
+     */
+    public function disconnectSocial(Request $request, string $provider): RedirectResponse
+    {
+        $user = $request->user();
+
+        // Validate provider
+        if (!in_array($provider, ['google', 'linkedin', 'facebook'])) {
+            return back()->with('error', 'Invalid social provider.');
+        }
+
+        // Check if account is connected
+        $socialAccount = $user->socialAccounts()->where('provider', $provider)->first();
+        if (!$socialAccount) {
+            return back()->with('error', 'This social account is not connected.');
+        }
+
+        // Safety check: User must have password OR another social account
+        if (!$user->canDisconnectSocialAccount($provider)) {
+            return back()->with('error', 'Cannot disconnect your only sign-in method. Please set a password first or connect another social account.');
+        }
+
+        // Delete the social account
+        $socialAccount->delete();
+
+        return back()->with('success', ucfirst($provider) . ' account disconnected successfully.');
+    }
 }

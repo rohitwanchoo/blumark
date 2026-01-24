@@ -47,22 +47,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
     ],
 
-    'github' => [
-        'client_id' => env('GITHUB_CLIENT_ID'),
-        'client_secret' => env('GITHUB_CLIENT_SECRET'),
-        'redirect' => env('GITHUB_REDIRECT_URI', '/auth/github/callback'),
-    ],
-
     'facebook' => [
         'client_id' => env('FACEBOOK_CLIENT_ID'),
         'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
         'redirect' => env('FACEBOOK_REDIRECT_URI', '/auth/facebook/callback'),
-    ],
-
-    'apple' => [
-        'client_id' => env('APPLE_CLIENT_ID'),
-        'client_secret' => env('APPLE_CLIENT_SECRET'),
-        'redirect' => env('APPLE_REDIRECT_URI', '/auth/apple/callback'),
     ],
 
     'linkedin' => [

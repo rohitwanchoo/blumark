@@ -233,6 +233,17 @@
                     </form>
                 </div>
 
+                <!-- Connected Social Accounts -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="px-6 py-5 border-b border-gray-100">
+                        <h3 class="text-lg font-semibold text-gray-900">Connected Social Accounts</h3>
+                        <p class="text-sm text-gray-500 mt-1">Manage your social login connections</p>
+                    </div>
+                    <div class="p-6">
+                        @include('profile.partials.social-accounts')
+                    </div>
+                </div>
+
                 <!-- Quick Actions -->
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                     <div class="px-6 py-5 border-b border-gray-100">

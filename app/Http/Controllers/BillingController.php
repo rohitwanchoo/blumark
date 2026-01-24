@@ -12,10 +12,12 @@ class BillingController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
+        $subscription = $user->subscription('default');
 
         return view('billing.index', [
             'user' => $user,
             'currentPlan' => $user->getCurrentPlan(),
+            'subscription' => $subscription,
             'credits' => $user->getCredits(),
             'monthlyUsage' => $user->getMonthlyJobCount(),
             'remainingJobs' => $user->getRemainingJobs(),
@@ -91,5 +93,32 @@ class BillingController extends Controller
             'vendor' => 'BluMark',
             'product' => 'PDF Watermarking Service',
         ]);
+    }
+
+    public function toggleAutoRenew(Request $request)
+    {
+        $user = $request->user();
+        $subscription = $user->subscription('default');
+
+        if (!$subscription || !$subscription->active()) {
+            return redirect()->route('billing.index')
+                ->with('error', 'No active subscription found.');
+        }
+
+        // Check if auto-renew is currently enabled
+        if ($subscription->onGracePeriod()) {
+            // Auto-renew is disabled (subscription is cancelled but still active until period end)
+            // Enable auto-renew by resuming the subscription
+            $subscription->resume();
+            $message = 'Auto-renew has been enabled. Your subscription will automatically renew.';
+        } else {
+            // Auto-renew is enabled
+            // Disable auto-renew by cancelling at period end
+            $subscription->cancel();
+            $message = 'Auto-renew has been disabled. Your subscription will remain active until the end of your billing period.';
+        }
+
+        return redirect()->route('billing.index')
+            ->with('success', $message);
     }
 }

@@ -82,7 +82,7 @@ MARKDOWN,
         /*
          * URL to an image that displays as a small square logo next to the title, above the table of contents.
          */
-        'logo' => '',
+        'logo' => 'https://www.blumark.pro/blumark-logo-square.svg',
 
         /*
          * Use to fetch the credential policy for the Try It feature. Options are: omit, include (default), and same-origin
@@ -152,9 +152,7 @@ MARKDOWN,
 
     'middleware' => [
         'web',
-        // RestrictedDocsAccess limits docs to local environments by default
-        // Remove or customize this middleware for production access control
-        RestrictedDocsAccess::class,
+        // Docs are publicly accessible - authentication is documented within the API
     ],
 
     'extensions' => [],

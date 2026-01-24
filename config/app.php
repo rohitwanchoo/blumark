@@ -81,4 +81,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Super Admin Email
+    |--------------------------------------------------------------------------
+    |
+    | This email address will receive notifications about new user registrations
+    | and daily activity reports.
+    |
+    */
+
+    'super_admin_email' => env('SUPER_ADMIN_EMAIL'),
+
 ];

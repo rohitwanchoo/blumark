@@ -1,0 +1,42 @@
+<svg width="800" height="300" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="300" fill="#1F2937"/>
+
+  <!-- Icon with gradient background -->
+  <rect x="30" y="75" width="150" height="150" rx="30" fill="url(#iconGradient)"/>
+
+  <!-- Document icon inside -->
+  <g transform="translate(70, 110)">
+    <path d="M 5 0 L 45 0 L 65 20 L 65 85 L 5 85 L 5 0 Z"
+          fill="none"
+          stroke="white"
+          stroke-width="5"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+    <path d="M 45 0 L 45 20 L 65 20"
+          fill="none"
+          stroke="white"
+          stroke-width="5"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+    <line x1="18" y1="35" x2="52" y2="35" stroke="white" stroke-width="4" stroke-linecap="round"/>
+    <line x1="18" y1="50" x2="52" y2="50" stroke="white" stroke-width="4" stroke-linecap="round"/>
+    <line x1="18" y1="65" x2="42" y2="65" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- BluMark Text - Blu in white -->
+  <text x="220" y="180" font-family="Arial, Helvetica, sans-serif" font-size="100" font-weight="bold" fill="#FFFFFF">Blu</text>
+
+  <!-- Mark in blue -->
+  <text x="405" y="180" font-family="Arial, Helvetica, sans-serif" font-size="100" font-weight="bold" fill="#60A5FA">Mark</text>
+
+  <!-- Tagline -->
+  <text x="225" y="215" font-family="Arial, Helvetica, sans-serif" font-size="24" fill="#9CA3AF">Security Built Into Every File</text>
+</svg>

@@ -41,7 +41,12 @@
                                         <p class="font-medium text-gray-900">
                                             {{ ucfirst($method->card->brand) }} ending in {{ $method->card->last4 }}
                                         </p>
-                                        <p class="text-sm text-gray-500">Expires {{ $method->card->exp_month }}/{{ $method->card->exp_year }}</p>
+                                        <p class="text-sm text-gray-500">
+                                            @if($method->billing_details->name)
+                                                {{ $method->billing_details->name }} •
+                                            @endif
+                                            Expires {{ $method->card->exp_month }}/{{ $method->card->exp_year }}
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="flex items-center space-x-3">
@@ -79,7 +84,26 @@
             </div>
             <div class="p-6">
                 <form id="payment-form">
-                    <div id="card-element" class="p-4 border border-gray-200 rounded-xl"></div>
+                    <!-- Cardholder Name -->
+                    <div class="mb-4">
+                        <label for="cardholder-name" class="block text-sm font-medium text-gray-700 mb-2">
+                            Cardholder Name
+                        </label>
+                        <input type="text"
+                               id="cardholder-name"
+                               name="cardholder_name"
+                               placeholder="John Doe"
+                               required
+                               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                    </div>
+
+                    <!-- Card Details -->
+                    <div class="mb-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Card Information
+                        </label>
+                        <div id="card-element" class="p-4 border border-gray-200 rounded-xl"></div>
+                    </div>
                     <div id="card-errors" class="mt-2 text-sm text-red-600" role="alert"></div>
                     <button type="submit" id="submit-button" class="mt-4 w-full inline-flex justify-center items-center px-4 py-3 bg-primary-600 border border-transparent rounded-xl font-semibold text-sm text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors">
                         Add Card
@@ -116,11 +140,16 @@
             submitButton.disabled = true;
             submitButton.textContent = 'Processing...';
 
+            const cardholderName = document.getElementById('cardholder-name').value;
+
             const { setupIntent, error } = await stripe.confirmCardSetup(
                 '{{ $intent->client_secret }}',
                 {
                     payment_method: {
                         card: cardElement,
+                        billing_details: {
+                            name: cardholderName,
+                        }
                     }
                 }
             );
