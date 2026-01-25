@@ -1,211 +1,198 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Welcome to {{ config('app.name', 'Blumark') }}</title>
     <style type="text/css">
         @media only screen and (max-width: 600px) {
-            .email-container {
+            .email-wrapper {
+                padding: 20px 5% !important;
+            }
+            .feature-row td {
+                display: block !important;
                 width: 100% !important;
+                padding: 10px 0 !important;
             }
-            .content-padding {
-                padding: 20px !important;
+            .stats-row td {
+                display: block !important;
+                width: 100% !important;
+                border-left: none !important;
+                border-right: none !important;
+                border-bottom: 1px solid #cbd5e1 !important;
             }
-            .header-padding {
-                padding: 30px 20px !important;
-            }
-            .footer-padding {
-                padding: 20px !important;
-            }
-            h1 {
-                font-size: 24px !important;
-            }
-            h2 {
-                font-size: 16px !important;
-            }
-            .feature-icon {
-                width: 28px !important;
-                height: 28px !important;
+            .stats-row td:last-child {
+                border-bottom: none !important;
             }
         }
     </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-    <center style="width: 100%; background-color: #f3f4f6;">
-        <div style="max-width: 600px; margin: 0 auto;">
-            <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" width="100%" style="max-width: 600px;" class="email-container">
-                <tr>
-                    <td style="padding: 20px 0;">
-                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #ffffff; border-radius: 16px; overflow: hidden;">
-                            <!-- Header with Logo -->
-                            <tr>
-                                <td class="header-padding" style="background: linear-gradient(135deg, #1d4ed8, #3b82f6); padding: 40px 30px; text-align: center;">
-                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-                                        <tr>
-                                            <td style="text-align: center; padding-bottom: 20px;">
-                                                <div style="display: inline-block; width: 60px; height: 60px; background: rgba(255, 255, 255, 0.2); border-radius: 15px; padding: 12px;">
-                                                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                                        <line x1="9" y1="13" x2="15" y2="13"></line>
-                                                        <line x1="9" y1="17" x2="15" y2="17"></line>
-                                                    </svg>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold; letter-spacing: -0.5px;">
-                                                    Welcome to BluMark!
-                                                </h1>
-                                                <p style="color: #93c5fd; margin: 8px 0 0 0; font-size: 14px;">
-                                                    Security Built Into Every File
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
+<body style="margin: 0; padding: 0; background-color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, sans-serif;">
 
-                            <!-- Body -->
-                            <tr>
-                                <td class="content-padding" style="background-color: #ffffff; padding: 40px 30px;">
-                                    <p style="font-size: 17px; color: #111827; margin: 0 0 10px 0; font-weight: 600;">
-                                        Hi {{ $userName }},
-                                    </p>
+    <!-- Preheader text -->
+    <div style="display: none; max-height: 0; overflow: hidden;">
+        Welcome to BluMark Pro - Your secure document watermarking platform is ready!
+    </div>
 
-                                    <p style="font-size: 15px; color: #374151; margin: 0 0 20px 0; line-height: 1.6;">
-                                        Thank you for joining BluMark! We're thrilled to have you as part of our community. Your account is now active and ready to help you protect and manage your important documents.
-                                    </p>
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #e2e8f0;">
+        <tr>
+            <td align="center" class="email-wrapper" style="padding: 30px 10%;">
 
-                                    <p style="font-size: 15px; color: #374151; margin: 0 0 24px 0; line-height: 1.6;">
-                                        Your account has been successfully created with the email address <strong style="color: #1d4ed8;">{{ $userEmail }}</strong>. You can now start watermarking your PDFs with professional-grade security features.
-                                    </p>
+                <!-- Main Container - 80% width -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; width: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 25px rgba(0, 0, 0, 0.12);">
 
-                                    <!-- Divider -->
-                                    <div style="border-top: 2px solid #e5e7eb; margin: 30px 0;"></div>
+                    <!-- Header with Logo -->
+                    <tr>
+                        <td style="padding: 0;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td style="background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #172554 100%); padding: 50px 40px; text-align: center;">
+                                        <!-- Logo Icon -->
+                                        <div style="width: 80px; height: 80px; background-color: rgba(255,255,255,0.15); border-radius: 20px; margin: 0 auto 20px auto; line-height: 80px;">
+                                            <span style="font-size: 40px;">📄</span>
+                                        </div>
+                                        <h1 style="margin: 0; color: #ffffff; font-size: 38px; font-weight: 800; letter-spacing: -1px;">BluMark</h1>
+                                        <p style="margin: 10px 0 0 0; color: #93c5fd; font-size: 14px; text-transform: uppercase; letter-spacing: 2px;">Secure Document Platform</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-                                    <!-- What You Can Do -->
-                                    <h2 style="color: #111827; font-size: 18px; margin: 0 0 16px 0; font-weight: 600;">
-                                        What you can do with BluMark:
-                                    </h2>
+                    <!-- Welcome Message -->
+                    <tr>
+                        <td style="padding: 40px 40px 25px 40px; background-color: #f8fafc;">
+                            <h2 style="margin: 0; color: #0f172a; font-size: 28px; font-weight: 700;">Welcome, {{ $userName }}! 👋</h2>
+                            <p style="margin: 15px 0 0 0; color: #475569; font-size: 16px; line-height: 1.7;">
+                                Thank you for joining <span style="color: #1e40af; font-weight: 600;">BluMark Pro</span>. We are excited to have you on board. Start protecting your documents today!
+                            </p>
+                        </td>
+                    </tr>
 
-                                    <!-- Feature 1 -->
-                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 16px;">
-                                        <tr>
-                                            <td style="width: 40px; vertical-align: top; padding-top: 2px;">
-                                                <div class="feature-icon" style="width: 32px; height: 32px; background-color: #dbeafe; border-radius: 8px; text-align: center; line-height: 32px;">
-                                                    <span style="font-size: 18px;">🔒</span>
-                                                </div>
-                                            </td>
-                                            <td style="vertical-align: top; padding-left: 12px;">
-                                                <p style="margin: 0; font-size: 15px; color: #111827; font-weight: 600;">Secure PDF Watermarking</p>
-                                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #6b7280; line-height: 1.5;">Add custom watermarks with ISO and lender information to protect your documents</p>
-                                            </td>
-                                        </tr>
-                                    </table>
+                    <!-- Features Grid -->
+                    <tr>
+                        <td style="padding: 15px 30px; background-color: #f8fafc;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
 
-                                    <!-- Feature 2 -->
-                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 16px;">
-                                        <tr>
-                                            <td style="width: 40px; vertical-align: top; padding-top: 2px;">
-                                                <div class="feature-icon" style="width: 32px; height: 32px; background-color: #dbeafe; border-radius: 8px; text-align: center; line-height: 32px;">
-                                                    <span style="font-size: 18px;">📊</span>
-                                                </div>
-                                            </td>
-                                            <td style="vertical-align: top; padding-left: 12px;">
-                                                <p style="margin: 0; font-size: 15px; color: #111827; font-weight: 600;">Track & Manage Files</p>
-                                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #6b7280; line-height: 1.5;">Monitor your watermarked documents and manage all your files in one place</p>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                <!-- Feature Row 1 -->
+                                <tr class="feature-row">
+                                    <td width="50%" style="padding: 10px; vertical-align: top;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 14px; border: 1px solid #cbd5e1;">
+                                            <tr>
+                                                <td style="padding: 25px;">
+                                                    <div style="width: 55px; height: 55px; background: linear-gradient(135deg, #1e40af, #1e3a8a); border-radius: 14px; text-align: center; line-height: 55px; margin-bottom: 15px;">
+                                                        <span style="font-size: 26px;">🔒</span>
+                                                    </div>
+                                                    <h3 style="margin: 0 0 10px 0; color: #0f172a; font-size: 17px; font-weight: 700;">Watermark PDFs</h3>
+                                                    <p style="margin: 0; color: #475569; font-size: 14px; line-height: 1.5;">Custom text watermarks with full styling control</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td width="50%" style="padding: 10px; vertical-align: top;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 14px; border: 1px solid #cbd5e1;">
+                                            <tr>
+                                                <td style="padding: 25px;">
+                                                    <div style="width: 55px; height: 55px; background: linear-gradient(135deg, #059669, #047857); border-radius: 14px; text-align: center; line-height: 55px; margin-bottom: 15px;">
+                                                        <span style="font-size: 26px;">📤</span>
+                                                    </div>
+                                                    <h3 style="margin: 0 0 10px 0; color: #0f172a; font-size: 17px; font-weight: 700;">Secure Distributions</h3>
+                                                    <p style="margin: 0; color: #475569; font-size: 14px; line-height: 1.5;">Share & track document access in real-time</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
 
-                                    <!-- Feature 3 -->
-                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 16px;">
-                                        <tr>
-                                            <td style="width: 40px; vertical-align: top; padding-top: 2px;">
-                                                <div class="feature-icon" style="width: 32px; height: 32px; background-color: #dbeafe; border-radius: 8px; text-align: center; line-height: 32px;">
-                                                    <span style="font-size: 18px;">🔗</span>
-                                                </div>
-                                            </td>
-                                            <td style="vertical-align: top; padding-left: 12px;">
-                                                <p style="margin: 0; font-size: 15px; color: #111827; font-weight: 600;">Secure Sharing</p>
-                                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #6b7280; line-height: 1.5;">Share documents with controlled access and track who views your files</p>
-                                            </td>
-                                        </tr>
-                                    </table>
+                                <!-- Feature Row 2 -->
+                                <tr class="feature-row">
+                                    <td width="50%" style="padding: 10px; vertical-align: top;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 14px; border: 1px solid #cbd5e1;">
+                                            <tr>
+                                                <td style="padding: 25px;">
+                                                    <div style="width: 55px; height: 55px; background: linear-gradient(135deg, #d97706, #b45309); border-radius: 14px; text-align: center; line-height: 55px; margin-bottom: 15px;">
+                                                        <span style="font-size: 26px;">🏦</span>
+                                                    </div>
+                                                    <h3 style="margin: 0 0 10px 0; color: #0f172a; font-size: 17px; font-weight: 700;">Manage Lenders</h3>
+                                                    <p style="margin: 0; color: #475569; font-size: 14px; line-height: 1.5;">Submit applications directly from BluMark</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td width="50%" style="padding: 10px; vertical-align: top;">
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 14px; border: 1px solid #cbd5e1;">
+                                            <tr>
+                                                <td style="padding: 25px;">
+                                                    <div style="width: 55px; height: 55px; background: linear-gradient(135deg, #7c3aed, #6d28d9); border-radius: 14px; text-align: center; line-height: 55px; margin-bottom: 15px;">
+                                                        <span style="font-size: 26px;">✅</span>
+                                                    </div>
+                                                    <h3 style="margin: 0 0 10px 0; color: #0f172a; font-size: 17px; font-weight: 700;">Verify Authenticity</h3>
+                                                    <p style="margin: 0; color: #475569; font-size: 14px; line-height: 1.5;">Confirm document origin instantly</p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
 
-                                    <!-- Feature 4 -->
-                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 24px;">
-                                        <tr>
-                                            <td style="width: 40px; vertical-align: top; padding-top: 2px;">
-                                                <div class="feature-icon" style="width: 32px; height: 32px; background-color: #dbeafe; border-radius: 8px; text-align: center; line-height: 32px;">
-                                                    <span style="font-size: 18px;">✓</span>
-                                                </div>
-                                            </td>
-                                            <td style="vertical-align: top; padding-left: 12px;">
-                                                <p style="margin: 0; font-size: 15px; color: #111827; font-weight: 600;">Document Verification</p>
-                                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #6b7280; line-height: 1.5;">Verify document authenticity and ensure your files haven't been tampered with</p>
-                                            </td>
-                                        </tr>
-                                    </table>
+                            </table>
+                        </td>
+                    </tr>
 
-                                    <!-- CTA Button -->
-                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 32px 0 24px 0;">
-                                        <tr>
-                                            <td style="text-align: center;">
-                                                <a href="{{ $dashboardUrl }}"
-                                                   style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; border-radius: 10px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);">
-                                                    Get Started Now →
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </table>
+                    <!-- CTA Section -->
+                    <tr>
+                        <td style="padding: 30px 40px; background-color: #f8fafc;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); border-radius: 14px;">
+                                <tr>
+                                    <td style="padding: 35px; text-align: center;">
+                                        <p style="margin: 0 0 20px 0; color: #ffffff; font-size: 20px; font-weight: 700;">Ready to secure your documents?</p>
+                                        <a href="{{ $dashboardUrl }}" style="display: inline-block; background-color: #ffffff; color: #1e3a8a; padding: 16px 50px; text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: 700; box-shadow: 0 6px 16px rgba(0,0,0,0.2);">Launch Dashboard →</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-                                    <!-- Divider -->
-                                    <div style="border-top: 2px solid #e5e7eb; margin: 30px 0;"></div>
+                    <!-- Stats Section -->
+                    <tr>
+                        <td style="padding: 0 40px 30px 40px; background-color: #f8fafc;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-top: 1px solid #cbd5e1;">
+                                <tr class="stats-row">
+                                    <td width="33.33%" style="text-align: center; padding: 30px 15px;">
+                                        <p style="margin: 0; color: #1e40af; font-size: 30px; font-weight: 800;">256-bit</p>
+                                        <p style="margin: 6px 0 0 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Encryption</p>
+                                    </td>
+                                    <td width="33.33%" style="text-align: center; padding: 30px 15px; border-left: 1px solid #cbd5e1; border-right: 1px solid #cbd5e1;">
+                                        <p style="margin: 0; color: #1e40af; font-size: 30px; font-weight: 800;">99.9%</p>
+                                        <p style="margin: 6px 0 0 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Uptime</p>
+                                    </td>
+                                    <td width="33.33%" style="text-align: center; padding: 30px 15px;">
+                                        <p style="margin: 0; color: #1e40af; font-size: 30px; font-weight: 800;">24/7</p>
+                                        <p style="margin: 6px 0 0 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Support</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
 
-                                    <!-- Need Help Section -->
-                                    <div style="background-color: #f9fafb; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb;">
-                                        <p style="font-size: 15px; color: #111827; margin: 0 0 8px 0; font-weight: 600;">
-                                            Need help getting started?
-                                        </p>
-                                        <p style="font-size: 14px; color: #6b7280; margin: 0; line-height: 1.6;">
-                                            Our team is here to help! If you have any questions or need assistance, don't hesitate to reach out. We're committed to making your experience with BluMark seamless and secure.
-                                        </p>
-                                    </div>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #1e293b; padding: 35px 40px; text-align: center;">
+                            <p style="margin: 0 0 12px 0; color: #f1f5f9; font-size: 18px; font-weight: 700;">The BluMark Team</p>
+                            <p style="margin: 0 0 20px 0;">
+                                <a href="{{ config('app.url') }}" style="color: #60a5fa; text-decoration: none; font-size: 15px;">www.blumark.pro</a>
+                            </p>
+                            <p style="margin: 0; color: #94a3b8; font-size: 12px; line-height: 1.7;">
+                                Need help? Simply reply to this email.<br>
+                                &copy; {{ date('Y') }} BluMark. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
 
-                                    <!-- Signature -->
-                                    <p style="font-size: 15px; color: #374151; margin: 32px 0 8px 0; line-height: 1.6;">
-                                        Best regards,<br>
-                                        <strong style="color: #111827;">The BluMark Team</strong>
-                                    </p>
-                                    <p style="font-size: 14px; color: #6b7280; margin: 0; font-style: italic;">
-                                        Security Built Into Every File
-                                    </p>
-                                </td>
-                            </tr>
+                </table>
 
-                            <!-- Footer -->
-                            <tr>
-                                <td class="footer-padding" style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
-                                    <p style="font-size: 14px; color: #6b7280; margin: 0 0 12px 0;">
-                                        <a href="{{ config('app.url') }}/dashboard" style="color: #3b82f6; text-decoration: none; margin: 0 8px;">Dashboard</a> •
-                                        <a href="{{ config('app.url') }}/billing" style="color: #3b82f6; text-decoration: none; margin: 0 8px;">Billing</a> •
-                                        <a href="{{ config('app.url') }}/docs/api" style="color: #3b82f6; text-decoration: none; margin: 0 8px;">API Docs</a>
-                                    </p>
-                                    <p style="font-size: 13px; color: #9ca3af; margin: 0;">
-                                        © {{ date('Y') }} BluMark. All rights reserved.<br>
-                                        <a href="{{ config('app.url') }}" style="color: #3b82f6; text-decoration: none;">www.blumark.pro</a>
-                                    </p>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </center>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

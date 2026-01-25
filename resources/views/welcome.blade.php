@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Secure PDF watermarking platform for financial documents. Add ISO and Lender watermarks to protect your sensitive documents.">
-    <title>{{ config('app.name', 'PDF Watermark Platform') }} - Secure Document Protection</title>
+    <title>{{ config('app.name', 'Blumark : Security Built Into Every File') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
