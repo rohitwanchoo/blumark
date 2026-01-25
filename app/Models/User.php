@@ -227,6 +227,63 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->getPlanSlug() === 'free';
     }
 
+    /**
+     * Check if user has access to a specific feature based on their plan.
+     * Super admins bypass all feature restrictions.
+     */
+    public function hasFeature(string $feature): bool
+    {
+        // Super admins have access to all features
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        $plan = $this->getCurrentPlan();
+
+        if (!$plan || !$plan->features) {
+            return false;
+        }
+
+        // Check if feature exists in plan (without ~ prefix means it's enabled)
+        foreach ($plan->features as $planFeature) {
+            // Skip disabled features (prefixed with ~)
+            if (str_starts_with($planFeature, '~')) {
+                continue;
+            }
+
+            // Case-insensitive match
+            if (strcasecmp($planFeature, $feature) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if user can access batch uploads feature.
+     */
+    public function canUseBatchUploads(): bool
+    {
+        return $this->hasFeature('Batch uploads');
+    }
+
+    /**
+     * Check if user can access API.
+     */
+    public function canUseApi(): bool
+    {
+        return $this->hasFeature('API access');
+    }
+
+    /**
+     * Check if user can use custom watermark templates.
+     */
+    public function canUseTemplates(): bool
+    {
+        return $this->hasFeature('Custom watermark templates');
+    }
+
     public function getMonthlyJobCount(): int
     {
         // Count jobs for billing: batch uploads count as 1 job, individual uploads count as 1 each

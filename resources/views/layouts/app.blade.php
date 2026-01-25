@@ -114,6 +114,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                         </svg>
                         Batch Jobs
+                        @if(Auth::check() && !Auth::user()->hasFeature('Batch uploads'))
+                            <span class="ml-auto text-[10px] font-semibold bg-primary-500/20 text-primary-400 px-1.5 py-0.5 rounded">PRO</span>
+                        @endif
                     </a>
                     <a href="{{ route('templates.index') }}"
                        class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors {{ request()->routeIs('templates.*') ? 'bg-primary-600 text-white' : 'text-gray-400 hover:text-white hover:bg-dark-700' }}">
@@ -121,6 +124,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
                         </svg>
                         Templates
+                        @if(Auth::check() && !Auth::user()->hasFeature('Custom watermark templates'))
+                            <span class="ml-auto text-[10px] font-semibold bg-primary-500/20 text-primary-400 px-1.5 py-0.5 rounded">PRO</span>
+                        @endif
                     </a>
                 </div>
 
@@ -298,8 +304,18 @@
                             <div class="border-t border-dark-700"></div>
                             <p class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Watermarking</p>
                             <a href="{{ route('jobs.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">My Jobs</a>
-                            <a href="{{ route('batch.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">Batch Jobs</a>
-                            <a href="{{ route('templates.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">Templates</a>
+                            <a href="{{ route('batch.index') }}" class="flex items-center justify-between px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">
+                                Batch Jobs
+                                @if(Auth::check() && !Auth::user()->hasFeature('Batch uploads'))
+                                    <span class="text-[10px] font-semibold bg-primary-500/20 text-primary-400 px-1.5 py-0.5 rounded">PRO</span>
+                                @endif
+                            </a>
+                            <a href="{{ route('templates.index') }}" class="flex items-center justify-between px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">
+                                Templates
+                                @if(Auth::check() && !Auth::user()->hasFeature('Custom watermark templates'))
+                                    <span class="text-[10px] font-semibold bg-primary-500/20 text-primary-400 px-1.5 py-0.5 rounded">PRO</span>
+                                @endif
+                            </a>
                             <div class="border-t border-dark-700"></div>
                             <p class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Submissions</p>
                             <a href="{{ route('lenders.index') }}" class="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-dark-700">Manage Lenders</a>

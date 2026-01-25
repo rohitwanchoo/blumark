@@ -55,9 +55,11 @@ Route::prefix('v1')->group(function () {
             Route::post('/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes']);
         });
 
-        // Watermark Jobs
-        Route::apiResource('watermark-jobs', WatermarkJobController::class);
-        Route::get('/watermark-jobs/{watermark_job}/status', [WatermarkJobController::class, 'status']);
-        Route::get('/watermark-jobs/{watermark_job}/download', [WatermarkJobController::class, 'download']);
+        // Watermark Jobs (requires API access feature)
+        Route::middleware('feature:API access')->group(function () {
+            Route::apiResource('watermark-jobs', WatermarkJobController::class);
+            Route::get('/watermark-jobs/{watermark_job}/status', [WatermarkJobController::class, 'status']);
+            Route::get('/watermark-jobs/{watermark_job}/download', [WatermarkJobController::class, 'download']);
+        });
     });
 });

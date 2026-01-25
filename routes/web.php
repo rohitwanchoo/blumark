@@ -99,8 +99,8 @@ Route::middleware('guest')->group(function () {
 
 // Authenticated routes
 Route::middleware('auth')->group(function () {
-    // Logout
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    // Logout (support both GET and POST for convenience)
+    Route::match(['get', 'post'], 'logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     // Email Verification
     Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
@@ -147,8 +147,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/{job}/shares', [ShareController::class, 'listForJob'])->name('shares');
     });
 
-    // Batch processing (requires verified email)
-    Route::prefix('batch')->name('batch.')->middleware('verified')->group(function () {
+    // Batch processing (requires verified email and Batch uploads feature)
+    Route::prefix('batch')->name('batch.')->middleware(['verified', 'feature:Batch uploads'])->group(function () {
         Route::get('/', [BatchController::class, 'index'])->name('index');
         Route::get('/create', [BatchController::class, 'create'])->name('create');
         Route::post('/', [BatchController::class, 'store'])->name('store');
@@ -158,8 +158,8 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{batch}', [BatchController::class, 'destroy'])->name('destroy');
     });
 
-    // Templates (requires verified email)
-    Route::prefix('templates')->name('templates.')->middleware('verified')->group(function () {
+    // Templates (requires verified email and Custom watermark templates feature)
+    Route::prefix('templates')->name('templates.')->middleware(['verified', 'feature:Custom watermark templates'])->group(function () {
         Route::get('/', [TemplateController::class, 'index'])->name('index');
         Route::get('/list', [TemplateController::class, 'list'])->name('list');
         Route::post('/', [TemplateController::class, 'store'])->name('store');
