@@ -3,7 +3,7 @@
     "info": {
         "title": "BluMark API Documentation",
         "version": "1.0.0",
-        "description": "## BluMark PDF Watermarking API\n\nWelcome to the BluMark API. This API allows you to programmatically watermark PDF documents with custom ISO and lender information.\n\n### Authentication\n\nAll protected endpoints require a Bearer token obtained through the `/v1/login` or `/v1/register` endpoints.\n\nInclude the token in the `Authorization` header:\n```\nAuthorization: Bearer your-api-token\n```\n\n### Two-Factor Authentication\n\nIf 2FA is enabled on an account, the login endpoint will return `two_factor_required: true`. You must then call `/v1/two-factor-challenge` with a valid TOTP code to complete authentication.\n\n### Rate Limits\n\nAPI requests are subject to rate limiting based on your subscription plan. Check your user profile for remaining credits and job limits.\n\n### Watermark Job Workflow\n\n1. **Create a job** - Upload a PDF with watermark settings via `POST /v1/watermark-jobs`\n2. **Check status** - Poll `GET /v1/watermark-jobs/{id}/status` until processing completes\n3. **Download** - Retrieve the watermarked PDF via `GET /v1/watermark-jobs/{id}/download`"
+        "description": "## BluMark PDF Watermarking API\n\nWelcome to the BluMark API. This API allows you to programmatically watermark PDF documents with custom ISO and lender information.\n\n### Authentication\n\nAll protected endpoints require a Bearer token obtained through the `/v1/login` or `/v1/register` endpoints.\n\nInclude the token in the `Authorization` header:\n```\nAuthorization: Bearer your-api-token\n```\n\n### Rate Limits\n\nAPI requests are subject to rate limiting based on your subscription plan. Check your user profile for remaining credits and job limits.\n\n### Watermark Job Workflow\n\n1. **Create a job** - Upload a PDF with watermark settings via `POST /v1/watermark-jobs`\n2. **Check status** - Poll `GET /v1/watermark-jobs/{id}/status` until processing completes\n3. **Download** - Retrieve the watermarked PDF via `GET /v1/watermark-jobs/{id}/download`"
     },
     "servers": [
         {
@@ -53,12 +53,15 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "User registered successfully",
+                    "200": {
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/AuthResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        201
+                                    ]
                                 }
                             }
                         }
@@ -73,7 +76,7 @@
         "/v1/login": {
             "post": {
                 "operationId": "auth.login",
-                "description": "Authenticate with email and password to receive an API token.\nIf the user has 2FA enabled, the response will include `two_factor_required: true`\nand you must call the `/v1/two-factor-challenge` endpoint to complete login.",
+                "description": "Authenticate with email and password to receive an API token.\nIf the user has 2FA enabled, the response will include `two_factor_required: true`\nand you must call the `/two-factor-challenge` endpoint to complete login.",
                 "summary": "Login",
                 "tags": [
                     "Authentication"
@@ -90,17 +93,185 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Login successful or 2FA required",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "oneOf": [
-                                        {
-                                            "$ref": "#/components/schemas/AuthResponse"
-                                        },
-                                        {
-                                            "$ref": "#/components/schemas/TwoFactorRequiredResponse"
-                                        }
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/v1/forgot-password": {
+            "post": {
+                "operationId": "passwordReset.sendResetLink",
+                "description": "Send a password reset link to the user's email address.\nThe link will be valid for a limited time period.",
+                "summary": "Send password reset link",
+                "tags": [
+                    "Authentication"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    }
+                                },
+                                "required": [
+                                    "email"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/v1/reset-password": {
+            "post": {
+                "operationId": "passwordReset.reset",
+                "description": "Reset the user's password using the token received via email.",
+                "summary": "Reset password",
+                "tags": [
+                    "Authentication"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "token",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                },
+                "security": []
+            }
+        },
+        "/v1/two-factor-challenge": {
+            "post": {
+                "operationId": "auth.verifyTwoFactor",
+                "description": "Complete login by providing a valid 2FA code after receiving `two_factor_required: true`\nfrom the login endpoint.",
+                "summary": "Verify two-factor authentication",
+                "tags": [
+                    "Authentication"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "code": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    },
+                                    "recovery_code": {
+                                        "type": [
+                                            "string",
+                                            "null"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "email",
+                                    "password"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "integer",
+                                    "enum": [
+                                        200
                                     ]
                                 }
                             }
@@ -123,11 +294,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Logged out successfully",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/MessageResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
@@ -148,16 +322,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "User profile retrieved",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "user": {
-                                            "$ref": "#/components/schemas/User"
-                                        }
-                                    }
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
@@ -168,124 +340,9 @@
                 }
             }
         },
-        "/v1/forgot-password": {
-            "post": {
-                "operationId": "auth.forgotPassword",
-                "description": "Send a password reset link to the user's email address.\nThe link will be valid for a limited time period.",
-                "summary": "Send password reset link",
-                "tags": [
-                    "Authentication"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email"
-                                    }
-                                },
-                                "required": ["email"]
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Reset link sent",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/MessageResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                },
-                "security": []
-            }
-        },
-        "/v1/reset-password": {
-            "post": {
-                "operationId": "auth.resetPassword",
-                "description": "Reset the user's password using the token received via email.",
-                "summary": "Reset password",
-                "tags": [
-                    "Authentication"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ResetPasswordRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Password reset successful",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/MessageResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                },
-                "security": []
-            }
-        },
-        "/v1/two-factor-challenge": {
-            "post": {
-                "operationId": "auth.twoFactorChallenge",
-                "description": "Complete login by providing a valid 2FA code after receiving `two_factor_required: true`\nfrom the login endpoint. You can provide either a TOTP code from your authenticator app\nor a recovery code.",
-                "summary": "Verify two-factor authentication",
-                "tags": [
-                    "Authentication"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/TwoFactorChallengeRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Login successful",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AuthResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    }
-                },
-                "security": []
-            }
-        },
         "/v1/email/verification-status": {
             "get": {
-                "operationId": "email.verificationStatus",
+                "operationId": "emailVerification.status",
                 "description": "Check if the authenticated user's email has been verified.",
                 "summary": "Get email verification status",
                 "tags": [
@@ -293,11 +350,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Verification status retrieved",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmailVerificationStatusResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
@@ -310,7 +370,7 @@
         },
         "/v1/email/verification-notification": {
             "post": {
-                "operationId": "email.resendVerification",
+                "operationId": "emailVerification.resend",
                 "description": "Send a new email verification notification to the authenticated user.\nOnly works if the user's email is not already verified.",
                 "summary": "Resend verification email",
                 "tags": [
@@ -318,11 +378,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Verification email sent or already verified",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/MessageResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
@@ -335,7 +398,7 @@
         },
         "/v1/email/verify/{id}/{hash}": {
             "get": {
-                "operationId": "email.verify",
+                "operationId": "emailVerification.verify",
                 "description": "Verify the user's email address using the verification token from the email link.\nThe hash should be the SHA-256 hash of the user's email address.",
                 "summary": "Verify email with token",
                 "tags": [
@@ -346,16 +409,14 @@
                         "name": "id",
                         "in": "path",
                         "required": true,
-                        "description": "The user ID",
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     },
                     {
                         "name": "hash",
                         "in": "path",
                         "required": true,
-                        "description": "SHA-256 hash of the user's email",
                         "schema": {
                             "type": "string"
                         }
@@ -363,27 +424,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Email verified successfully",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EmailVerifyResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "403": {
-                        "description": "Invalid verification link",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/MessageResponse"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -398,17 +452,14 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "2FA status retrieved",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "enabled": {
-                                            "type": "boolean",
-                                            "description": "Whether 2FA is enabled"
-                                        }
-                                    }
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
@@ -422,18 +473,21 @@
         "/v1/two-factor/enable": {
             "post": {
                 "operationId": "twoFactor.enable",
-                "description": "Generate a new 2FA secret and QR code URL. The user must then confirm\nthe setup by providing a valid TOTP code via the confirm endpoint.",
+                "description": "Generate a new 2FA secret and QR code URL. The user must then confirm\nthe setup by providing a valid TOTP code.",
                 "summary": "Enable 2FA",
                 "tags": [
                     "Two-Factor Authentication"
                 ],
                 "responses": {
                     "200": {
-                        "description": "2FA secret generated",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TwoFactorEnableResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
@@ -462,31 +516,35 @@
                                     "code": {
                                         "type": "string",
                                         "minLength": 6,
-                                        "maxLength": 6,
-                                        "description": "6-digit TOTP code from authenticator app"
+                                        "maxLength": 6
                                     }
                                 },
-                                "required": ["code"]
+                                "required": [
+                                    "code"
+                                ]
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "2FA enabled successfully",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TwoFactorConfirmResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
                     },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -499,46 +557,42 @@
                 "tags": [
                     "Two-Factor Authentication"
                 ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "password": {
-                                        "type": "string",
-                                        "description": "Current account password"
-                                    }
-                                },
-                                "required": ["password"]
-                            }
+                "parameters": [
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
                         }
                     }
-                },
+                ],
                 "responses": {
                     "200": {
-                        "description": "2FA disabled successfully",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/MessageResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
                     },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
         },
         "/v1/two-factor/recovery-codes": {
             "get": {
-                "operationId": "twoFactor.getRecoveryCodes",
+                "operationId": "twoFactor.recoveryCodes",
                 "description": "Retrieve the current recovery codes.",
                 "summary": "Get recovery codes",
                 "tags": [
@@ -546,20 +600,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Recovery codes retrieved",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RecoveryCodesResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             },
@@ -572,20 +626,20 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Recovery codes regenerated",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TwoFactorConfirmResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
                     }
                 }
             }
@@ -602,20 +656,22 @@
                     {
                         "name": "per_page",
                         "in": "query",
-                        "description": "Number of jobs per page",
                         "schema": {
-                            "type": "integer",
+                            "type": "string",
                             "default": 15
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of watermark jobs",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/WatermarkJobListResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
@@ -643,28 +699,21 @@
                     }
                 },
                 "responses": {
-                    "201": {
-                        "description": "Watermark job created",
+                    "200": {
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/WatermarkJobCreateResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        201
+                                    ]
                                 }
                             }
                         }
                     },
                     "401": {
                         "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "403": {
-                        "description": "Job limit exceeded",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/JobLimitExceededResponse"
-                                }
-                            }
-                        }
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
@@ -693,28 +742,23 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Watermark job details",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/WatermarkJob"
-                                        }
-                                    }
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
                     },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/ForbiddenException"
-                    },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             },
@@ -738,23 +782,23 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Watermark job deleted",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/MessageResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
                     },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/ForbiddenException"
-                    },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -780,23 +824,23 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Job status retrieved",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/WatermarkJobStatusResponse"
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
                     },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/ForbiddenException"
-                    },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -822,41 +866,23 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "The watermarked PDF file",
-                        "content": {
-                            "application/pdf": {
-                                "schema": {
-                                    "type": "string",
-                                    "format": "binary"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "$ref": "#/components/responses/AuthenticationException"
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/ForbiddenException"
-                    },
-                    "404": {
-                        "description": "File not available for download",
+                        "description": "",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "File not available for download"
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "file_not_ready"
-                                        }
-                                    }
+                                    "type": "integer",
+                                    "enum": [
+                                        200
+                                    ]
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/AuthenticationException"
                     }
                 }
             }
@@ -871,41 +897,6 @@
             }
         },
         "schemas": {
-            "User": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email"
-                    },
-                    "email_verified_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    },
-                    "credits": {
-                        "type": "integer"
-                    },
-                    "plan": {
-                        "type": "string",
-                        "enum": ["free", "pro", "enterprise"]
-                    },
-                    "remaining_jobs": {
-                        "type": "integer"
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                },
-                "title": "User"
-            },
             "LoginRequest": {
                 "type": "object",
                 "properties": {
@@ -950,218 +941,36 @@
                 ],
                 "title": "RegisterRequest"
             },
-            "ResetPasswordRequest": {
-                "type": "object",
-                "properties": {
-                    "token": {
-                        "type": "string",
-                        "description": "Password reset token from email"
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email"
-                    },
-                    "password": {
-                        "type": "string"
-                    },
-                    "password_confirmation": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "token",
-                    "email",
-                    "password",
-                    "password_confirmation"
-                ],
-                "title": "ResetPasswordRequest"
-            },
-            "TwoFactorChallengeRequest": {
-                "type": "object",
-                "properties": {
-                    "email": {
-                        "type": "string",
-                        "format": "email"
-                    },
-                    "password": {
-                        "type": "string"
-                    },
-                    "code": {
-                        "type": "string",
-                        "description": "6-digit TOTP code from authenticator app",
-                        "nullable": true
-                    },
-                    "recovery_code": {
-                        "type": "string",
-                        "description": "Recovery code (alternative to TOTP code)",
-                        "nullable": true
-                    }
-                },
-                "required": [
-                    "email",
-                    "password"
-                ],
-                "title": "TwoFactorChallengeRequest"
-            },
-            "AuthResponse": {
-                "type": "object",
-                "properties": {
-                    "message": {
-                        "type": "string",
-                        "example": "Login successful"
-                    },
-                    "user": {
-                        "$ref": "#/components/schemas/User"
-                    },
-                    "token": {
-                        "type": "string",
-                        "example": "1|abc123xyz..."
-                    },
-                    "token_type": {
-                        "type": "string",
-                        "example": "Bearer"
-                    }
-                },
-                "title": "AuthResponse"
-            },
-            "TwoFactorRequiredResponse": {
-                "type": "object",
-                "properties": {
-                    "two_factor_required": {
-                        "type": "boolean",
-                        "example": true
-                    },
-                    "message": {
-                        "type": "string",
-                        "example": "Two-factor authentication required."
-                    }
-                },
-                "title": "TwoFactorRequiredResponse"
-            },
-            "TwoFactorEnableResponse": {
-                "type": "object",
-                "properties": {
-                    "secret": {
-                        "type": "string",
-                        "description": "The 2FA secret key",
-                        "example": "JBSWY3DPEHPK3PXP"
-                    },
-                    "qr_code_url": {
-                        "type": "string",
-                        "description": "URL for generating QR code",
-                        "example": "otpauth://totp/BluMark:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=BluMark"
-                    }
-                },
-                "title": "TwoFactorEnableResponse"
-            },
-            "TwoFactorConfirmResponse": {
-                "type": "object",
-                "properties": {
-                    "message": {
-                        "type": "string",
-                        "example": "Two-factor authentication enabled."
-                    },
-                    "recovery_codes": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "example": ["abcdef1234-ghijkl5678", "mnopqr9012-stuvwx3456"]
-                    }
-                },
-                "title": "TwoFactorConfirmResponse"
-            },
-            "RecoveryCodesResponse": {
-                "type": "object",
-                "properties": {
-                    "recovery_codes": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "example": ["abcdef1234-ghijkl5678", "mnopqr9012-stuvwx3456"]
-                    }
-                },
-                "title": "RecoveryCodesResponse"
-            },
-            "EmailVerificationStatusResponse": {
-                "type": "object",
-                "properties": {
-                    "verified": {
-                        "type": "boolean"
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email"
-                    },
-                    "email_verified_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    }
-                },
-                "title": "EmailVerificationStatusResponse"
-            },
-            "EmailVerifyResponse": {
-                "type": "object",
-                "properties": {
-                    "message": {
-                        "type": "string",
-                        "example": "Email verified successfully."
-                    },
-                    "verified": {
-                        "type": "boolean",
-                        "example": true
-                    }
-                },
-                "title": "EmailVerifyResponse"
-            },
-            "MessageResponse": {
-                "type": "object",
-                "properties": {
-                    "message": {
-                        "type": "string"
-                    }
-                },
-                "title": "MessageResponse"
-            },
             "StoreWatermarkJobRequest": {
                 "type": "object",
                 "properties": {
                     "pdf_file": {
                         "type": "string",
                         "format": "binary",
-                        "description": "The PDF file to watermark (max 50MB)"
+                        "contentMediaType": "application/octet-stream",
+                        "maxLength": 51200
                     },
                     "iso": {
                         "type": "string",
-                        "maxLength": 50,
-                        "description": "The ISO number to display in the watermark"
+                        "maxLength": 50
                     },
                     "lender": {
                         "type": "string",
-                        "maxLength": 50,
-                        "description": "The lender name to display in the watermark"
+                        "maxLength": 50
                     },
                     "font_size": {
                         "type": "integer",
                         "minimum": 8,
-                        "maximum": 48,
-                        "default": 15,
-                        "description": "Font size in points"
+                        "maximum": 48
                     },
                     "color": {
                         "type": "string",
-                        "pattern": "^#[0-9A-Fa-f]{6}$",
-                        "default": "#878787",
-                        "description": "Hex color code for the watermark text"
+                        "pattern": "^#[0-9A-Fa-f]{6}$"
                     },
                     "opacity": {
                         "type": "integer",
                         "minimum": 1,
-                        "maximum": 100,
-                        "default": 20,
-                        "description": "Opacity percentage"
+                        "maximum": 100
                     }
                 },
                 "required": [
@@ -1170,153 +979,6 @@
                     "lender"
                 ],
                 "title": "StoreWatermarkJobRequest"
-            },
-            "WatermarkJob": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer"
-                    },
-                    "original_filename": {
-                        "type": "string"
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": ["pending", "processing", "done", "failed"]
-                    },
-                    "error_message": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "settings": {
-                        "type": "object",
-                        "properties": {
-                            "iso": {
-                                "type": "string"
-                            },
-                            "lender": {
-                                "type": "string"
-                            },
-                            "font_size": {
-                                "type": "integer"
-                            },
-                            "color": {
-                                "type": "string"
-                            },
-                            "opacity": {
-                                "type": "integer"
-                            }
-                        }
-                    },
-                    "page_count": {
-                        "type": "integer",
-                        "nullable": true
-                    },
-                    "file_size": {
-                        "type": "integer"
-                    },
-                    "file_size_formatted": {
-                        "type": "string"
-                    },
-                    "can_download": {
-                        "type": "boolean"
-                    },
-                    "processed_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    },
-                    "created_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    },
-                    "updated_at": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                },
-                "title": "WatermarkJob"
-            },
-            "WatermarkJobListResponse": {
-                "type": "object",
-                "properties": {
-                    "data": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/WatermarkJob"
-                        }
-                    },
-                    "meta": {
-                        "type": "object",
-                        "properties": {
-                            "current_page": {
-                                "type": "integer"
-                            },
-                            "last_page": {
-                                "type": "integer"
-                            },
-                            "per_page": {
-                                "type": "integer"
-                            },
-                            "total": {
-                                "type": "integer"
-                            }
-                        }
-                    }
-                },
-                "title": "WatermarkJobListResponse"
-            },
-            "WatermarkJobCreateResponse": {
-                "type": "object",
-                "properties": {
-                    "message": {
-                        "type": "string",
-                        "example": "Watermark job created successfully"
-                    },
-                    "data": {
-                        "$ref": "#/components/schemas/WatermarkJob"
-                    }
-                },
-                "title": "WatermarkJobCreateResponse"
-            },
-            "WatermarkJobStatusResponse": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "integer"
-                    },
-                    "status": {
-                        "type": "string",
-                        "enum": ["pending", "processing", "done", "failed"]
-                    },
-                    "error_message": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "can_download": {
-                        "type": "boolean"
-                    },
-                    "processed_at": {
-                        "type": "string",
-                        "format": "date-time",
-                        "nullable": true
-                    }
-                },
-                "title": "WatermarkJobStatusResponse"
-            },
-            "JobLimitExceededResponse": {
-                "type": "object",
-                "properties": {
-                    "message": {
-                        "type": "string",
-                        "example": "You have reached your daily job limit. Please upgrade your plan or wait until tomorrow."
-                    },
-                    "error": {
-                        "type": "string",
-                        "example": "job_limit_exceeded"
-                    }
-                },
-                "title": "JobLimitExceededResponse"
             }
         },
         "responses": {
@@ -1359,26 +1021,7 @@
                             "properties": {
                                 "message": {
                                     "type": "string",
-                                    "example": "Unauthenticated."
-                                }
-                            },
-                            "required": [
-                                "message"
-                            ]
-                        }
-                    }
-                }
-            },
-            "ForbiddenException": {
-                "description": "Forbidden",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "message": {
-                                    "type": "string",
-                                    "example": "You are not authorized to access this job."
+                                    "description": "Error overview."
                                 }
                             },
                             "required": [
@@ -1397,7 +1040,7 @@
                             "properties": {
                                 "message": {
                                     "type": "string",
-                                    "example": "No query results for model [WatermarkJob]."
+                                    "description": "Error overview."
                                 }
                             },
                             "required": [
